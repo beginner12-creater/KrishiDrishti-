@@ -11,7 +11,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
   const { overallRiskScore, subIndices } = riskMetrics;
 
-  // Clean Weather Status Card (Light Theme)
+  // Clean Weather Status Card
   const getSimpleStatus = (score) => {
     if (score >= 70) return { title: '🔴 HIGH RISK (धोका)', desc: 'Weather alert! Take crop protection steps below.', cardBg: 'bg-red-50 border-red-200 text-red-900', badgeBg: 'bg-red-100 text-red-800 border-red-300' };
     if (score >= 45) return { title: '🟡 MODERATE RISK (काळजी घ्या)', desc: 'Weather requires care. Follow simple crop advice.', cardBg: 'bg-amber-50 border-amber-200 text-amber-900', badgeBg: 'bg-amber-100 text-amber-800 border-amber-300' };
@@ -84,20 +84,20 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
   const currentActions = getCropSpecificActions(selectedCrop);
 
-  // Get simple language script for Voice Panel
+  // ENJOYABLE, CHEERFUL & PLEASANT AUDIO VOICE SCRIPT (MARATHI, HINDI, ENGLISH)
   const getVoiceScript = () => {
     if (voiceLang === 'mr') {
-      return `नमस्कार शेतकरी बंधूंनो! ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'धोकादायक' : 'सुरक्षित'} आहे. ${selectedCrop} पिकाला: ${currentActions.water} धन्यवाद!`;
+      return `नमस्कार शेतकरी दादा! 🙏 ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'थोडे काळजीचे' : 'उत्तम आणि छान'} आहे! आपल्या ${selectedCrop} पिकाला संध्याकाळी थंड हवेत हलके पाणी द्या. जैविक कडुनिंब फवारणी करा आणि निश्चिंत राहा! तुमची शेती सुफलाम होवो! धन्यवाद! 🌾`;
     } else if (voiceLang === 'hi') {
-      return `नमस्कार किसान भाइयों! ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'जोखिम भरा' : 'सुरक्षित'} है। ${selectedCrop} फसल के लिए: ${currentActions.water} धन्यवाद!`;
+      return `नमस्कार किसान भाई! 🙏 ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'सावधानी का' : 'बहुत ही बढ़िया'} है! अपनी ${selectedCrop} फसल को शाम के समय पानी दें। हल्की जैविक नीम फवारणी करें और खुश रहें! आपकी फसल लहराएगी! धन्यवाद! 🌾`;
     } else {
-      return `Hello Farmer brother! In ${village.villageName} village today, climate conditions are ${overallRiskScore > 65 ? 'risky' : 'good'}. For your ${selectedCrop} crop: ${currentActions.water} Thank you!`;
+      return `Hello Farmer Brother! 🙏 Weather in ${village.villageName} village today is ${overallRiskScore > 65 ? 'requiring care' : 'favorable and good'}! Irrigate your ${selectedCrop} crop in the gentle evening breeze. Apply organic neem spray and enjoy a joyful harvest! Thank you! 🌾`;
     }
   };
 
   const scriptText = getVoiceScript();
 
-  // Voice Speech Function
+  // Voice Speech Function with Pitch & Rate Tuning
   const handleToggleSpeech = () => {
     if (!('speechSynthesis' in window)) return;
 
@@ -109,6 +109,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
     const utterance = new SpeechSynthesisUtterance(scriptText);
     utterance.rate = speechSpeed;
+    utterance.pitch = 1.05; // Cheerful natural pitch
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
@@ -124,7 +125,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
   return (
     <div className="space-y-6">
       
-      {/* 1. FRONT AI VOICE PANEL HERO BANNER (LIGHT THEME) */}
+      {/* 1. FRONT AI VOICE PANEL HERO BANNER */}
       <div className={`p-5 sm:p-7 rounded-3xl border shadow-sm space-y-5 transition-all ${status.cardBg}`}>
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
@@ -153,8 +154,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
                 onChange={(e) => setVoiceLang(e.target.value)}
                 className="bg-transparent text-slate-900 font-bold focus:outline-none cursor-pointer text-xs"
               >
-                <option value="mr">मराठी</option>
-                <option value="hi">हिन्दी</option>
+                <option value="mr">मराठी (Marathi)</option>
+                <option value="hi">हिन्दी (Hindi)</option>
                 <option value="en">English</option>
               </select>
             </div>
@@ -164,9 +165,9 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
               className="bg-transparent text-slate-900 font-bold focus:outline-none cursor-pointer text-xs"
             >
-              <option value="0.7">Slow</option>
-              <option value="0.85">Normal</option>
-              <option value="1.0">Fast</option>
+              <option value="0.7">Slow (हळू)</option>
+              <option value="0.85">Normal (छान)</option>
+              <option value="1.0">Fast (जलद)</option>
             </select>
           </div>
         </div>
@@ -186,21 +187,21 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               ))}
             </div>
 
-            <p className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <p className="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200 shadow-xs">
               "{scriptText}"
             </p>
           </div>
 
           <button
             onClick={handleToggleSpeech}
-            className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center space-x-2 shrink-0 shadow-md ${
+            className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center space-x-2 shrink-0 shadow-md cursor-pointer ${
               isSpeaking
                 ? 'bg-red-600 hover:bg-red-500 text-white animate-pulse'
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white'
             }`}
           >
             {isSpeaking ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            <span>{isSpeaking ? 'Stop Voice' : '▶ 🔊 सल्ला ऐका (Listen Audio)'}</span>
+            <span>{isSpeaking ? 'Stop Voice (थांबवा)' : '▶ 🔊 सल्ला ऐका (Listen Audio)'}</span>
           </button>
         </div>
 

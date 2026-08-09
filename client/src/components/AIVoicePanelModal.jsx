@@ -11,14 +11,14 @@ export default function AIVoicePanelModal({ village, riskMetrics, onClose }) {
   const { overallRiskScore, cropVulnerability } = riskMetrics;
   const currentCrop = village.primaryCrops[0] || 'Cotton';
 
-  // Get simple language captions
+  // Enjoyable & Pleasant Speech Script
   const getSpeechScript = () => {
     if (selectedLanguage === 'mr') {
-      return `नमस्कार शेतकरी बंधूंनो! ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'धोकादायक' : 'सुरक्षित'} आहे. ${currentCrop} पिकाला संध्याकाळी पाणी द्या. 5 टक्के कडुनिंब अर्क फवारा. धन्यवाद!`;
+      return `नमस्कार शेतकरी दादा! 🙏 ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'थोडे काळजीचे' : 'उत्तम आणि छान'} आहे! आपल्या ${currentCrop} पिकाला संध्याकाळी थंड हवेत हलके पाणी द्या. जैविक कडुनिंब फवारणी करा आणि निश्चिंत राहा! तुमची शेती सुफलाम होवो! धन्यवाद! 🌾`;
     } else if (selectedLanguage === 'hi') {
-      return `नमस्कार किसान भाइयों! ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'जोखिम भरा' : 'सुरक्षित'} है। ${currentCrop} फसल को शाम को पानी दें और नीम अर्क छिड़कें। धन्यवाद!`;
+      return `नमस्कार किसान भाई! 🙏 ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'सावधानी का' : 'बहुत ही बढ़िया'} है! अपनी ${currentCrop} फसल को शाम के समय पानी दें। हल्की जैविक नीम फवारणी करें और खुश रहें! आपकी फसल लहराएगी! धन्यवाद! 🌾`;
     } else {
-      return `Hello Farmer brother! In ${village.villageName} village today, climate conditions are ${overallRiskScore > 65 ? 'risky' : 'favorable'}. Irrigate ${currentCrop} in evening and spray organic Neem extract. Thank you!`;
+      return `Hello Farmer Brother! 🙏 Weather in ${village.villageName} village today is ${overallRiskScore > 65 ? 'requiring care' : 'favorable and good'}! Irrigate your ${currentCrop} crop in the gentle evening breeze. Apply organic neem spray and enjoy a joyful harvest! Thank you! 🌾`;
     }
   };
 
@@ -35,6 +35,7 @@ export default function AIVoicePanelModal({ village, riskMetrics, onClose }) {
 
     const utterance = new SpeechSynthesisUtterance(scriptText);
     utterance.rate = speechSpeed;
+    utterance.pitch = 1.05; // Cheerful natural pitch
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
@@ -86,7 +87,7 @@ export default function AIVoicePanelModal({ village, riskMetrics, onClose }) {
             ))}
           </div>
 
-          <p className="text-sm font-semibold text-slate-800 leading-relaxed px-2 bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
+          <p className="text-sm font-bold text-slate-900 leading-relaxed px-2 bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
             "{scriptText}"
           </p>
         </div>
@@ -116,7 +117,7 @@ export default function AIVoicePanelModal({ village, riskMetrics, onClose }) {
               className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-bold focus:outline-none"
             >
               <option value="0.7">Slow (हळू)</option>
-              <option value="0.85">Normal (सामान्य)</option>
+              <option value="0.85">Normal (छान)</option>
               <option value="1.0">Fast (जलद)</option>
             </select>
           </div>

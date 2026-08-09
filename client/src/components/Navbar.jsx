@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, Settings } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -8,7 +8,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
     { code: 'mr', label: 'मराठी' },
     { code: 'hi', label: 'हिन्दी' },
     { code: 'en', label: 'EN' },
-    { code: 'pa', label: '<ctrl42>ਪੰਜਾਬੀ' },
+    { code: 'pa', label: 'ਪੰਜਾਬੀ' },
     { code: 'ta', label: 'தமிழ்' },
     { code: 'te', label: 'తెలుగు' },
     { code: 'gu', label: 'ગુજરાતી' }
@@ -19,8 +19,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
     { id: 'profit', label: '💰 Profit Crops', icon: IndianRupee },
     { id: 'advisory', label: 'AI Advisory', icon: ShieldAlert },
     { id: 'map', label: 'Geo Map', icon: MapPin },
-    { id: 'chat', label: 'Krishi Mitr AI', icon: Bot },
-    { id: 'admin', label: '⚙️ Admin Hub', icon: Settings }
+    { id: 'chat', label: 'Krishi Mitr AI', icon: Bot }
   ];
 
   const handleTabClick = (tabId) => {

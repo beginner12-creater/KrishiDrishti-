@@ -12,7 +12,6 @@ import PrintReportModal from './components/PrintReportModal';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
 import BottomNavBar from './components/BottomNavBar';
-import AdminHub from './components/AdminHub';
 import PlatformImpactFeatures from './components/PlatformImpactFeatures';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
@@ -24,7 +23,7 @@ export default function App() {
   const [hierarchy, setHierarchy] = useState({});
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'advisory' | 'map' | 'chat' | 'admin'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'advisory' | 'map' | 'chat'
   const [viewMode, setViewMode] = useState('farmer'); // 'farmer' | 'detailed'
   const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
@@ -210,13 +209,6 @@ export default function App() {
                     village={selectedVillage}
                     riskMetrics={riskMetrics}
                     currentLang={currentLang}
-                  />
-                )}
-
-                {/* TAB 6: ADMIN HUB */}
-                {activeTab === 'admin' && (
-                  <AdminHub
-                    villages={allVillages}
                   />
                 )}
               </div>

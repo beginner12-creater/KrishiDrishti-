@@ -13,7 +13,7 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   // Pillar 1: Crop Variety & Sowing Window Strategy
   let sowingRecommendation = "";
   if (isDroughtProne) {
-    sowingRecommendation = `For ${primaryCrop} in ${village.villageName}, adopt short-duration, drought-tolerant varieties (e.g., DBW-303, JS 20-34, or Phule Samrudhi). Delay sowing by 10-14 days if monsoon onset is delayed by >2 weeks. Consider intercropping with Pigeonpea or Pearl Millet (2:1 ratio) to cushion climate risk.`;
+    sowingRecommendation = `For ${primaryCrop} in ${village.villageName}, adopt short-duration, drought-tolerant certified seed varieties (e.g., DBW-303, JS 20-34, or Phule Samrudhi). Delay sowing by 10-14 days if monsoon onset is delayed by >2 weeks. Consider intercropping with Pigeonpea or Pearl Millet (2:1 ratio) to cushion climate risk.`;
   } else if (isFloodProne) {
     sowingRecommendation = `Select submergence-tolerant crop cultivars (e.g., Swarna-Sub1 for Paddy or waterlogging-resistant Maize hybrids). Prepare raised seedbeds (Broad Bed Furrow system) with deep drainage channels.`;
   } else {
@@ -120,7 +120,7 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
-// KRISHI MITR CONVERSATIONAL ENGINE WITH HOW-TO-GROW PLANT TUTORIAL GENERATOR
+// KRISHI MITR CONVERSATIONAL ENGINE WITH CERTIFIED SEED VARIETY & SAPLING ADVISORY
 export function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase().trim();
   const vName = village ? village.villageName : "your village";
@@ -161,11 +161,41 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
     return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — your personal digital agronomist and farming friend created to help farmers in ${vName} and all across India with simple, practical crop advice!`;
   }
 
-  // 2. HOW TO GROW ANY PLANT / CROP / TREE TUTORIAL ENGINE
-  if (qLower.includes("grow") || qLower.includes("plant") || qLower.includes("cultivate") || qLower.includes("उगवावे") || qLower.includes("लागवड") || qLower.includes("खेती")) {
-    // Extract plant name from query (e.g. "how to grow tomato" -> "Tomato")
-    let rawPlant = qLower.replace("how to grow", "").replace("how to plant", "").replace("how to cultivate", "").replace("grow", "").replace("plant", "").replace("कसे उगवावे", "").replace("की खेती कैसे करें", "").trim();
+  // 2. SPECIFIC SEED VARIETY & SAPLING NURSERY ADVISORY ENGINE
+  if (qLower.includes("seed") || qLower.includes("variety") || qLower.includes("sapling") || qLower.includes("nursery") || qLower.includes("बियाणे") || qLower.includes("वाण") || qLower.includes("रोप") || qLower.includes("बीज")) {
     
+    // Extract plant name from query
+    let rawPlant = qLower.replace("seed", "").replace("variety", "").replace("sapling", "").replace("nursery", "").replace("best", "").replace("which", "").replace("type", "").replace("of", "").replace("for", "").replace("बियाणे", "").replace("वाण", "").replace("रोप", "").trim();
+    const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your crop";
+
+    let seedRecommendation = "";
+    if (plantName.toLowerCase().includes("cotton") || plantName.toLowerCase().includes("कापूस")) {
+      seedRecommendation = "• Top Certified Seeds: PKV-028, Rashi 659 BG-II, or Ajit 155.\n• Germination Rate: Buy certified blue-tag seeds with 90%+ germination.";
+    } else if (plantName.toLowerCase().includes("soybean") || plantName.toLowerCase().includes("सोयाबीन")) {
+      seedRecommendation = "• Top Certified Seeds: Phule Samrudhi (KDS 753), JS 20-34, or MACS 1407.\n• Seed Treatment: Treat seeds with Rhizobium culture + Trichoderma (10g/kg).";
+    } else if (plantName.toLowerCase().includes("tomato") || plantName.toLowerCase().includes("टोमॅटो")) {
+      seedRecommendation = "• Top Hybrid Seeds & Saplings: Syngenta Abhinav, Arka Rakshak, or US 1080.\n• Sapling Tip: Buy 25-30 day old healthy nursery seedling saplings with 4-5 true leaves.";
+    } else if (plantName.toLowerCase().includes("pomegranate") || plantName.toLowerCase().includes("डाळिंब")) {
+      seedRecommendation = "• Top Graft Sapling Variety: Bhagwa (Super Bhagwa) tissue-culture graft saplings.\n• Nursery Tip: Purchase 9-12 month old certified disease-free air-layered saplings.";
+    } else if (plantName.toLowerCase().includes("mango") || plantName.toLowerCase().includes("आंबा")) {
+      seedRecommendation = "• Top Graft Saplings: Kesar Mango, Alphonso (Hapus), or Dasheri grafted saplings.\n• Sapling Tip: Plant 1-year old stone-grafted sapling during monsoon with 10m x 10m spacing.";
+    } else {
+      seedRecommendation = `• Top Certified Seeds & Hybrid Varieties: ICAR/MPKV Certified High-Yielding Hybrid Varieties for ${plantName}.\n• Seed Treatment: Treat seeds with Azotobacter & Trichoderma Viride (10g/kg) 24h before sowing.\n• Sapling Nursery Tip: Select 30-day-old vigorous saplings with strong root ball from government certified nursery.`;
+    }
+
+    return `Namaste Kisan Bhai! 🙏 Recommended **Seed Varieties & Sapling Guide** for **${plantName}** in ${vName}:
+
+🌾 **Certified Seed Variety Recommendations (उत्तम बियाणे वाण)**:
+${seedRecommendation}
+
+💡 **Smart Nursery & Sowing Tips (महत्त्वाचा सल्ला)**:
+1. Always purchase seeds/saplings from Government Krishi Vigyan Kendra (KVK) or licensed Krishi Seva Kendra to avoid spurious duplicate seeds.
+2. Conduct a quick seed germination test in moist cloth before sowing in your field! 🌾✨`;
+  }
+
+  // 3. HOW TO GROW ANY PLANT TUTORIAL ENGINE
+  if (qLower.includes("grow") || qLower.includes("plant") || qLower.includes("cultivate") || qLower.includes("उगवावे") || qLower.includes("लागवड") || qLower.includes("खेती")) {
+    let rawPlant = qLower.replace("how to grow", "").replace("how to plant", "").replace("how to cultivate", "").replace("grow", "").replace("plant", "").replace("कसे उगवावे", "").replace("की खेती कैसे करें", "").trim();
     const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your chosen plant";
 
     return `Namaste Kisan Bhai! 🙏 Here is a simple 4-step guide on **How to Grow ${plantName}** in ${vName}:
@@ -173,8 +203,8 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 1. 🌍 Soil & Sun (माती व हवामान):
    - ${plantName} grows best in well-drained loamy or black soil with organic compost. Needs 6-8 hours of daily sunlight.
 
-2. 🌱 Sowing & Spacing (पेरणी व अंतर):
-   - Treat seeds with Trichoderma (10g/kg). Keep 45cm distance between rows and 15cm between plants.
+2. 🌱 Sowing & Seed Variety (बियाणे वाण व अंतर):
+   - Use MPKV/ICAR certified hybrid seed varieties or healthy 30-day-old nursery saplings. Treat seeds with Trichoderma (10g/kg). Keep proper distance between rows.
 
 3. 💧 Watering & Fertilizer (पाणी व खत):
    - Irrigate every 4-6 days using drip irrigation. Apply Organic FYM manure + 1% Potassium Nitrate during flowering.
@@ -185,7 +215,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 Your ${plantName} harvest will be healthy and profitable! 🌾✨`;
   }
 
-  // 3. CHECK IF QUERY IS RELATED TO AGRICULTURE & FARMING
+  // 4. CHECK IF QUERY IS RELATED TO AGRICULTURE & FARMING
   const agriKeywords = [
     "crop", "farm", "weather", "rain", "water", "drought", "flood", "soil", "fertilizer", "urea", "dap",
     "pest", "bug", "disease", "spray", "insect", "mulch", "harvest", "sow", "seed", "mandi", "price",
@@ -204,17 +234,18 @@ Your ${plantName} harvest will be healthy and profitable! 🌾✨`;
     return `Namaste Kisan Bhai! 🙏 I am Krishi Mitr (कृषि मित्र), a specialized Digital Farming & Agricultural AI Assistant. 
 
 🌾 I can answer any question on:
-1. How to grow any plant / crop / fruit / vegetable (e.g., "How to grow Tomato", "How to grow Mango")
-2. Rain, Weather & Drought Forecasts
-3. Organic Jeevamrut & Fertilizers
-4. Insect & Pest Control Sprays
-5. Crop Profit & APMC Mandi Rates
-6. Government Subsidies & PMFBY Insurance
+1. Certified Seed Varieties & Nursery Saplings (e.g., "Best seed for Tomato", "Sapling variety for Mango")
+2. How to grow any plant / crop / fruit / vegetable (e.g., "How to grow Tomato")
+3. Rain, Weather & Drought Forecasts
+4. Organic Jeevamrut & Fertilizers
+5. Insect & Pest Control Sprays
+6. Crop Profit & APMC Mandi Rates
+7. Government Subsidies & PMFBY Insurance
 
-Please ask me how to grow any plant or any crop question! 🚜✨`;
+Please ask me about seeds, saplings, or any crop question! 🚜✨`;
   }
 
-  // 4. COMPREHENSIVE AGRICULTURAL KNOWLEDGE BASE ANSWERS
+  // 5. COMPREHENSIVE AGRICULTURAL KNOWLEDGE BASE ANSWERS
 
   // A. PROFIT & HIGH RETURN CROPS
   if (qLower.includes("profit") || qLower.includes("money") || qLower.includes("earn") || qLower.includes("income") || qLower.includes("नफा") || qLower.includes("कमाई")) {
@@ -265,5 +296,5 @@ Please ask me how to grow any plant or any crop question! 🚜✨`;
   // DEFAULT GEMINI AGRICULTURAL RESPONSE
   return `Namaste Farmer Brother! 🙏 For ${vName} (${dName}), overall agricultural conditions are good. 
 
-Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice! Ask me how to grow any plant! 🌾`;
+Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice! Ask me about certified seeds or saplings! 🌾`;
 }

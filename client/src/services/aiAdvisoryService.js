@@ -1,4 +1,4 @@
-// AI Agricultural Advisory Generator Engine & Krishi Mitr Conversational Assistant with Official Google Gemini API Integration
+// AI Agricultural Advisory Generator Engine & Krishi Mitr Conversational Assistant with Official AI Integration
 
 export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, lang = "en") {
   const primaryCrop = selectedCrop || village.primaryCrops[0];
@@ -120,19 +120,19 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
-// OFFICIAL GOOGLE GEMINI API LIVE INTEGRATION WITH HYBRID FALLBACK ENGINE
+// OFFICIAL KRISHI MITR CONVERSATIONAL ENGINE
 export async function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase().trim();
   const vName = village ? village.villageName : "your village";
   const dName = village ? village.districtName : "your district";
   const cropsStr = village ? village.primaryCrops.join(", ") : "Cotton, Soybean, Sugarcane, Pomegranate, Onion";
 
-  // Check for environment Gemini Key
-  const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || window.GEMINI_API_KEY;
+  // Check for environment API Key
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || window.GEMINI_API_KEY;
 
-  if (geminiApiKey) {
+  if (apiKey) {
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -142,8 +142,9 @@ export async function answerKrishiMitrQuery(query, village, riskMetrics) {
               Crops in village: ${cropsStr}.
 
               STRICT RULES:
-              1. If the user's question is about agriculture, crops, how to grow any plant, seeds, saplings, weather, soil, fertilizers, pests, market rates, or government schemes, give a simple 4-step answer in warm Indian language.
-              2. If the user asks a non-agricultural question (sports, movies, politics, coding, general trivia), politely decline in Indian language saying you only answer farming & agricultural questions.
+              1. Never mention or refer to Gemini, Google, or any underlying model name in your response. Identify purely as Krishi Mitr (कृषि मित्र).
+              2. If the user's question is about agriculture, crops, how to grow any plant, seeds, saplings, weather, soil, fertilizers, pests, market rates, or government schemes, give a simple 4-step answer in warm Indian language.
+              3. If the user asks a non-agricultural question (sports, movies, politics, coding, general trivia), politely decline in Indian language saying you only answer farming & agricultural questions.
               
               User Question: "${query}"`
             }]
@@ -153,25 +154,28 @@ export async function answerKrishiMitrQuery(query, village, riskMetrics) {
 
       if (response.ok) {
         const data = await response.json();
-        const geminiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (geminiText) return geminiText;
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          // Strip any unexpected Gemini references
+          return rawText.replace(/gemini/gi, 'Krishi Mitr AI').replace(/google/gi, 'Krishi Mitr');
+        }
       }
     } catch (err) {
-      console.warn("Gemini API call failed, switching to local Krishi Mitr Agro engine:", err);
+      console.warn("API call failed, switching to local Krishi Mitr Agro engine:", err);
     }
   }
 
-  // LOCAL AGRO ENGINE (RUNS IF NO GEMINI KEY IS SET OR AS INSTANT FALLBACK)
+  // LOCAL AGRO ENGINE (RUNS IF NO KEY IS SET OR AS INSTANT FALLBACK)
 
   // 1. FRIENDLY GREETINGS & DAILY GESTURES
   if (qLower.includes("how are you") || qLower.includes("kaise ho") || qLower.includes("kase aahat") || qLower.includes("कसे आहात") || qLower.includes("कैसे हो") || qLower.includes("how r u")) {
-    return `Namaste Kisan Bhai! 🙏 Powered by Google Gemini AI, I am doing great and feeling happy to talk to you! 😊 
+    return `Namaste Kisan Bhai! 🙏 I am doing great and feeling happy to talk to you! 😊 
 
 How is your day going on your farm in ${vName}? How are your crops doing today? 🌾 Tell me, how can I help you today?`;
   }
 
   if (qLower.includes("hello") || qLower.includes("hi") || qLower.includes("hey") || qLower.includes("namaste") || qLower.includes("नमस्कार") || qLower.includes("नमस्ते") || qLower.includes("ram ram") || qLower.includes("राम राम")) {
-    return `Namaste! Ram Ram Kisan Bhai! 🙏 Welcome! Powered by Google Gemini AI! 😊 
+    return `Namaste! Ram Ram Kisan Bhai! 🙏 Welcome! 😊 
 
 I hope you and your family are healthy and happy today! Weather in ${vName} is looking good for farm work. What crop advice or help do you need today?`;
   }
@@ -189,7 +193,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
   }
 
   if (qLower.includes("who are you") || qLower.includes("your name") || qLower.includes("tumhi kon") || qLower.includes("तुम कौन हो") || qLower.includes("तू कोण आहेस")) {
-    return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — powered by Google Gemini AI model! Created to help farmers in ${vName} and across India with simple, practical crop advice!`;
+    return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — your personal digital agronomist created to help farmers in ${vName} and across India with simple, practical crop advice!`;
   }
 
   // 2. SPECIFIC SEED VARIETY & SAPLING NURSERY ADVISORY ENGINE
@@ -212,7 +216,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
       seedRecommendation = `• Top Certified Seeds & Hybrid Varieties: ICAR/MPKV Certified High-Yielding Hybrid Varieties for ${plantName}.\n• Seed Treatment: Treat seeds with Azotobacter & Trichoderma Viride (10g/kg) 24h before sowing.\n• Sapling Nursery Tip: Select 30-day-old vigorous saplings with strong root ball from government certified nursery.`;
     }
 
-    return `Namaste Kisan Bhai! 🙏 Powered by Gemini AI: Recommended **Seed Varieties & Sapling Guide** for **${plantName}** in ${vName}:
+    return `Namaste Kisan Bhai! 🙏 Recommended **Seed Varieties & Sapling Guide** for **${plantName}** in ${vName}:
 
 🌾 **Certified Seed Variety Recommendations (उत्तम बियाणे वाण)**:
 ${seedRecommendation}
@@ -227,7 +231,7 @@ ${seedRecommendation}
     let rawPlant = qLower.replace("how to grow", "").replace("how to plant", "").replace("how to cultivate", "").replace("grow", "").replace("plant", "").replace("कसे उगवावे", "").replace("की खेती कैसे करें", "").trim();
     const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your chosen plant";
 
-    return `Namaste Kisan Bhai! 🙏 Powered by Gemini AI: Here is a simple 4-step guide on **How to Grow ${plantName}** in ${vName}:
+    return `Namaste Kisan Bhai! 🙏 Here is a simple 4-step guide on **How to Grow ${plantName}** in ${vName}:
 
 1. 🌍 Soil & Sun (माती व हवामान):
    - ${plantName} grows best in well-drained loamy or black soil with organic compost. Needs 6-8 hours of daily sunlight.
@@ -260,7 +264,7 @@ Your ${plantName} harvest will be healthy and profitable! 🌾✨`;
 
   // IF QUESTION IS NON-AGRICULTURAL -> POLITELY DECLINE AND ASK FOR AGRI QUESTIONS
   if (!isAgriRelated) {
-    return `Namaste Kisan Bhai! 🙏 I am Krishi Mitr (कृषि मित्र), powered by Google Gemini AI. 
+    return `Namaste Kisan Bhai! 🙏 I am Krishi Mitr (कृषि मित्र), a specialized Digital Farming & Agricultural AI Assistant. 
 
 🌾 I can answer any question on:
 1. Certified Seed Varieties & Nursery Saplings (e.g., "Best seed for Tomato", "Sapling variety for Mango")
@@ -295,8 +299,8 @@ Please ask me about seeds, saplings, or any crop question! 🚜✨`;
 3. 💧 Give with Water: Give this Jeevamrut with your drip or watering channel twice a month. Your soil will become soft, fertile, and full of natural earthworms!`;
   }
 
-  // DEFAULT GEMINI AGRICULTURAL RESPONSE
-  return `Namaste Farmer Brother! 🙏 Powered by Gemini AI: For ${vName} (${dName}), overall agricultural conditions are good. 
+  // DEFAULT AGRICULTURAL RESPONSE
+  return `Namaste Farmer Brother! 🙏 For ${vName} (${dName}), overall agricultural conditions are good. 
 
 Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice! Ask me about certified seeds, saplings, or how to grow any plant! 🌾`;
 }

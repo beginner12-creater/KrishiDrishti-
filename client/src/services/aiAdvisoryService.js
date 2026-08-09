@@ -1,4 +1,4 @@
-// AI Agricultural Advisory Generator Engine (Client-side)
+// AI Agricultural Advisory Generator Engine & Krishi Mitr Conversational Assistant
 
 export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, lang = "en") {
   const primaryCrop = selectedCrop || village.primaryCrops[0];
@@ -120,14 +120,14 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
-// GEMINI-STYLE FRIENDLY, WARM, EMPATHETIC, NON-TECHNICAL & DAILY GESTURES CONVERSATIONAL ENGINE
+// KRISHI MITR CONVERSATIONAL ENGINE WITH STRICT AGRICULTURE DOMAIN VERIFICATION
 export function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase().trim();
   const vName = village ? village.villageName : "your village";
   const dName = village ? village.districtName : "your district";
   const cropsStr = village ? village.primaryCrops.join(", ") : "Cotton, Soybean, Sugarcane, Pomegranate, Onion";
 
-  // 1. DAILY GESTURES & GREETINGS ("How are you?", "Hello", "Kasale aahat", "Kaise ho")
+  // 1. FRIENDLY GREETINGS & DAILY GESTURES
   if (qLower.includes("how are you") || qLower.includes("kaise ho") || qLower.includes("kase aahat") || qLower.includes("कसे आहात") || qLower.includes("कैसे हो") || qLower.includes("how r u")) {
     return `Namaste Kisan Bhai! 🙏 I am doing great and feeling happy to talk to you! 😊 
 
@@ -162,7 +162,38 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
     return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — your personal digital agronomist and farming friend created to help farmers in ${vName} and all across India with simple, practical crop advice!`;
   }
 
-  // 2. PROFIT & HIGH RETURN CROPS (GEMINI STYLE)
+  // 2. CHECK IF QUERY IS RELATED TO AGRICULTURE & FARMING
+  const agriKeywords = [
+    "crop", "farm", "weather", "rain", "water", "drought", "flood", "soil", "fertilizer", "urea", "dap",
+    "pest", "bug", "disease", "spray", "insect", "mulch", "harvest", "sow", "seed", "mandi", "price",
+    "profit", "yield", "acre", "hektare", "land", "jeevamrut", "organic", "cotton", "sugarcane", "soybean",
+    "onion", "grapes", "pomegranate", "bajra", "rice", "paddy", "wheat", "turmeric", "mango", "cashew",
+    "insurance", "pmfby", "subsidy", "kisan", "scheme", "helpline", "icar", "imd", "irrigation", "drip",
+    "sprinkler", "monsoon", "kharif", "rabi", "summer", "temperature", "heatwave", "yellow", "leaf",
+    "पेरणी", "पाणी", "खत", "फवारणी", "कीड", "रोग", "पिक", "शेती", "दुष्काळ", "पाऊस", "बाजारभाव", "उत्पन्न",
+    "कापूस", "ऊस", "सोयाबीन", "कांदा", "द्राक्ष", "डाळिंब", "हळद", "बाजरी", "गहू", "विमा", "योजना", "अनुदान"
+  ];
+
+  const isAgriRelated = agriKeywords.some(kw => qLower.includes(kw));
+
+  // IF QUESTION IS NON-AGRICULTURAL (OUT OF AGRI DOMAIN) -> POLITELY DECLINE AND ASK FOR AGRI QUESTIONS
+  if (!isAgriRelated) {
+    return `Namaste Kisan Bhai! 🙏 I am Krishi Mitr (कृषि मित्र), a specialized Digital Farming & Agricultural AI Assistant. 
+
+🌾 I can only answer questions related to:
+1. Crops, Sowing & Variety Selection
+2. Rain, Weather & Drought Forecasts
+3. Organic Jeevamrut & Fertilizers
+4. Insect & Pest Control Sprays
+5. Crop Profit & APMC Mandi Rates
+6. Government Subsidies & PMFBY Insurance
+
+Please ask me any question about your crops, farm, or weather! I am happy to help you! 🚜✨`;
+  }
+
+  // 3. COMPREHENSIVE AGRICULTURAL KNOWLEDGE BASE ANSWERS
+
+  // A. PROFIT & HIGH RETURN CROPS
   if (qLower.includes("profit") || qLower.includes("money") || qLower.includes("earn") || qLower.includes("income") || qLower.includes("नफा") || qLower.includes("कमाई")) {
     return `Namaste Farmer Brother! 🙏 In ${vName}, here is how you can earn maximum profit from your land without stress:
 
@@ -172,7 +203,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 4. 📱 APMC Mandi Tip: Always check market prices on your phone before selling so buyers give you top rates!`;
   }
 
-  // 3. ORGANIC / ZERO COST NATURAL FARMING (GEMINI STYLE)
+  // B. ORGANIC & ZERO COST JEEVAMRUT
   if (qLower.includes("organic") || qLower.includes("jeevamrut") || qLower.includes("natural") || qLower.includes("जैविक") || qLower.includes("सेंद्रिय") || qLower.includes("zero cost")) {
     return `Namaste! 🙏 You can easily save ₹4,000 per acre on chemical fertilizers using simple home-made Jeevamrut:
 
@@ -181,7 +212,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 3. 💧 Give with Water: Give this Jeevamrut with your drip or watering channel twice a month. Your soil will become soft, fertile, and full of natural earthworms!`;
   }
 
-  // 4. WATER CONSERVATION & DRIP IRRIGATION HACKS (GEMINI STYLE)
+  // C. WATER & DRIP IRRIGATION
   if (qLower.includes("water") || qLower.includes("irrigation") || qLower.includes("drought") || qLower.includes("पाणी") || qLower.includes("सिंचन") || qLower.includes("दुष्काळ")) {
     return `Namaste! 🙏 Water is precious in ${vName}. Here are 3 simple ways to keep your crops green during hot dry weather:
 
@@ -190,7 +221,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 3. 🏛️ Government Drip Subsidy: Get 55% to 80% money back from government for installing Drip Irrigation. It saves half your water!`;
   }
 
-  // 5. PEST CONTROL & INSECT HACKS (GEMINI STYLE)
+  // D. PEST CONTROL & SPRAY
   if (qLower.includes("pest") || qLower.includes("disease") || qLower.includes("worm") || qLower.includes("bug") || qLower.includes("कीड") || qLower.includes("रोग") || qLower.includes("फवारणी")) {
     return `Namaste! 🙏 Stop dangerous insects before they hurt your crops in ${vName}:
 
@@ -199,7 +230,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 3. 🪱 Pheromone Traps: Put 8 Pink Bollworm traps per acre in cotton fields to catch adult moths early!`;
   }
 
-  // 6. GOVERNMENT SCHEMES & SUBSIDIES (GEMINI STYLE)
+  // E. GOVERNMENT SCHEMES & INSURANCE
   if (qLower.includes("scheme") || qLower.includes("subsidy") || qLower.includes("pmfby") || qLower.includes("insurance") || qLower.includes("kisan") || qLower.includes("योजना") || qLower.includes("अनुदान") || qLower.includes("विमा")) {
     return `Namaste! 🙏 Here are the top government benefits every farmer in ${vName} should use:
 
@@ -208,7 +239,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 3. 💳 Kisan Credit Card (KCC): Get low-interest crop loan at just 4% interest rate per year.`;
   }
 
-  // 7. SOIL HEALTH & FERTILIZER MATH (GEMINI STYLE)
+  // F. SOIL HEALTH & FERTILIZER
   if (qLower.includes("soil") || qLower.includes("fertilizer") || qLower.includes("urea") || qLower.includes("dap") || qLower.includes("माती") || qLower.includes("खत")) {
     return `Namaste! 🙏 Keep your farm soil healthy and productive in ${vName}:
 
@@ -217,17 +248,17 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
 3. ☘️ Green Manure: Sow Dhaincha or Sunnhemp before your main crop to naturally double soil fertility.`;
   }
 
-  // 8. CROP SELECTION & SOWING WINDOW (GEMINI STYLE)
-  if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant") || qLower.includes("पीक") || qLower.includes("पेरणी")) {
+  // G. CROP SELECTION & WEATHER FORECAST
+  if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant") || qLower.includes("weather") || qLower.includes("rain") || qLower.includes("पीक") || qLower.includes("पेरणी") || qLower.includes("हवामान")) {
     return `Namaste! 🙏 Best crops for ${vName} (${dName}):
 
 Main Crops: ${cropsStr}.
-1. ☀️ Delayed Rain Strategy: If monsoon is late, sow short-duration crops like Bajra, Soybean, or Turmeric which need less rain.
-2. 🌾 Double Protection: Always plant 2 crops together (like Cotton + Turmeric). If weather damages one, the second crop saves your harvest!`;
+1. ☀️ Weather Strategy: Rain conditions in ${vName} are stable. If monsoon delays, sow short-duration crops like Bajra, Soybean, or Turmeric which need less rain.
+2. 🌾 Intercropping Tip: Always plant 2 crops together (like Cotton + Turmeric). If weather damages one, the second crop saves your harvest!`;
   }
 
-  // DEFAULT FRIENDLY GEMINI RESPONSE
-  return `Namaste Farmer Brother! 🙏 In ${vName} (${dName}), overall climate weather is stable today. 
+  // DEFAULT GEMINI AGRICULTURAL RESPONSE
+  return `Namaste Farmer Brother! 🙏 For ${vName} (${dName}), overall agricultural conditions are good. 
 
-Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice!`;
+Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice! Ask me any crop question! 🌾`;
 }

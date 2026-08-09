@@ -96,22 +96,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
         insurance: "Trigger crop insurance claim within 72h if summer windstorms blow down trees."
       };
     }
-    if (name.includes('guava') || name.includes('पेरू')) {
-      return {
-        water: "Irrigate every 7-10 days during fruit set. Reduce watering during flower induction (Bahar).",
-        fertilizer: "Spray Zinc Sulphate + Borax (0.2%) for larger, sweeter guava fruit development.",
-        pest: "Wrap individual fruits in foam bags to prevent Fruit Fly (Bactrocera) infestation.",
-        insurance: "Claim crop insurance if severe drought causes early fruit drop."
-      };
-    }
-    if (name.includes('turmeric') || name.includes('हळद')) {
-      return {
-        water: "Provide broad bed furrow irrigation every 7 days. Ensure good drainage during monsoon.",
-        fertilizer: "Apply Ferrous Sulphate (10kg/acre) + Micronutrient mixture for deep orange curcumin color.",
-        pest: "Spray Mancozeb (2.5g/L) for Leaf Spot & Rhizome Rot prevention.",
-        insurance: "Inform bank within 72 hours if waterlogging rots turmeric rhizomes in heavy rain."
-      };
-    }
 
     // Default fallback advice
     return {
@@ -154,6 +138,11 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
     setIsSpeaking(true);
     window.speechSynthesis.speak(utterance);
+  };
+
+  const handleCropButtonClick = (crop) => {
+    setSelectedCrop(crop);
+    if (onSelectCrop) onSelectCrop(crop);
   };
 
   return (
@@ -274,7 +263,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
       </div>
 
-      {/* 2. CHOOSE CROP */}
+      {/* 2. CHOOSE CROP (STAYS ON SAME PAGE, NO REDIRECT!) */}
       <div className="bg-slate-900/90 border border-slate-800 p-5 sm:p-6 rounded-3xl shadow-xl">
         <h3 className="text-base sm:text-lg font-black text-slate-100 mb-3 flex items-center gap-2">
           <Sprout className="w-6 h-6 text-emerald-400" />
@@ -287,11 +276,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
             return (
               <button
                 key={crop}
-                onClick={() => {
-                  setSelectedCrop(crop);
-                  onSelectCrop(crop);
-                }}
-                className={`p-4 rounded-2xl text-left border-2 transition-all min-h-[85px] flex flex-col justify-between ${
+                onClick={() => handleCropButtonClick(crop)}
+                className={`p-4 rounded-2xl text-left border-2 transition-all min-h-[85px] flex flex-col justify-between cursor-pointer ${
                   isSelected
                     ? 'bg-emerald-500 text-slate-950 font-black border-emerald-400 shadow-lg scale-[1.02]'
                     : 'bg-slate-950 hover:bg-slate-800 text-slate-200 border-slate-800'
@@ -305,7 +291,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
         </div>
       </div>
 
-      {/* 3. DYNAMIC 4-STEP ACTION PLAN FOR SELECTED CROP */}
+      {/* 3. DYNAMIC 4-STEP ACTION PLAN FOR SELECTED CROP (UPDATES ON SAME PAGE!) */}
       <div className="bg-slate-900/90 border border-slate-800 p-5 sm:p-6 rounded-3xl shadow-xl space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2">
@@ -313,7 +299,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
             Key Actions for <span className="text-emerald-400 underline decoration-emerald-500/50">{selectedCrop}</span> (उपाय):
           </h3>
           <span className="text-xs bg-emerald-950 text-emerald-400 px-3 py-1 rounded-full border border-emerald-800 font-bold hidden sm:inline">
-            Custom Advice for {selectedCrop}
+            Advice for {selectedCrop}
           </span>
         </div>
 

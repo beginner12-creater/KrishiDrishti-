@@ -71,7 +71,7 @@ export default function App() {
     loadVillageDetails(villageObj.id);
   };
 
-  // Handle clicking "Get Advisory Guide" from Profit Cards or Crop Matrix
+  // Handle clicking "Get Full Advisory Guide" from Profit Cards or Crop Matrix
   const handleSelectCropForAdvisory = (cropName) => {
     setSelectedCropForAdvisory(cropName);
     setViewMode('detailed');
@@ -114,13 +114,13 @@ export default function App() {
         ) : selectedVillage && riskMetrics ? (
           <div>
             
-            {/* FARMER SIMPLE MODE (DEFAULT EASY VIEW FOR FARMERS) */}
+            {/* FARMER SIMPLE MODE (STAYS ON SAME PAGE, NO REDIRECT!) */}
             {viewMode === 'farmer' ? (
               <div className="space-y-6">
                 <FarmerSimpleView
                   village={selectedVillage}
                   riskMetrics={riskMetrics}
-                  onSelectCrop={(crop) => handleSelectCropForAdvisory(crop)}
+                  onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
                 />
                 
                 {/* Profit Maximizing Crop Suggestions */}

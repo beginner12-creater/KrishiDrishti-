@@ -2,11 +2,19 @@ import React, { useState } from 'react';
 import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 export default function PlatformImpactFeatures({ village, riskMetrics, onNavigateTab }) {
-  const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical' | 'outcome'
+  const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
 
   const vName = village ? village.villageName : 'Selected Village';
   const dName = village ? village.districtName : 'Selected District';
+  const bName = village ? village.blockName : 'Selected Taluka';
   const cropName = village?.primaryCrops ? village.primaryCrops[0] : 'Crop';
+  const primaryCropsStr = village?.primaryCrops ? village.primaryCrops.join(', ') : 'Cotton, Soybean';
+
+  // Dynamic Metrics from Selected Village & Risk Engine
+  const overallRisk = riskMetrics?.overallRiskScore || 62;
+  const subIdx = riskMetrics?.subIndices || { droughtIndex: 58, heatwaveIndex: 65, floodIndex: 30, pestIndex: 50, soilIndex: 45 };
+  const forecastDays = riskMetrics?.forecastDays || [];
+  const todayForecast = forecastDays[0] || { maxTempC: 34, minTempC: 24, humidityPercent: 65, windSpeedKmh: 12, precipitationProbPercent: 20 };
 
   const outcomes = [
     { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", icon: Bell, color: "text-amber-600 bg-amber-50 hover:border-amber-400" },
@@ -39,7 +47,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
               <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
                 Expected Outcomes <span className="text-xs font-bold text-slate-500">(अपेक्षित फायदे)</span>
               </h2>
-              <p className="text-xs text-slate-500 font-medium">Click any outcome to see actionable farmer impact for {vName}</p>
+              <p className="text-xs text-slate-500 font-medium">Dynamic climate impact for <strong>{vName} ({bName}, {dName})</strong></p>
             </div>
           </div>
           <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2.5 py-1 rounded-full border border-emerald-300">
@@ -81,7 +89,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
               <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
                 Core Platform Features <span className="text-xs font-bold text-slate-500">(मुख्य वैशिष्ट्ये)</span>
               </h2>
-              <p className="text-xs text-slate-500 font-medium">Click any feature below to launch the interactive live tool</p>
+              <p className="text-xs text-slate-500 font-medium">Click any feature below to launch dynamic region analysis for <strong>{vName}</strong></p>
             </div>
           </div>
           <span className="text-[10px] bg-teal-100 text-teal-800 font-black px-2.5 py-1 rounded-full border border-teal-300">
@@ -120,10 +128,10 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
       </div>
 
       {/* ========================================================================= */}
-      {/* INTERACTIVE FEATURE & OUTCOME MODALS */}
+      {/* DYNAMIC FEATURE & OUTCOME MODALS FOR SELECTED VILLAGE & REGION */}
       {/* ========================================================================= */}
 
-      {/* FEATURE 1: HYPERLOCAL WEATHER FORECAST MODAL */}
+      {/* FEATURE 1: DYNAMIC HYPERLOCAL WEATHER FORECAST MODAL */}
       {activeModal === 'weather' && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl animate-scaleUp border border-slate-200">
@@ -134,9 +142,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Hyperlocal 7-Day Weather Forecast <span className="text-xs font-bold text-slate-500">(अचूक हवामान)</span>
+                    Hyperlocal Weather Forecast for {vName} <span className="text-xs font-bold text-slate-500">({bName}, {dName})</span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">IMD Micro-Climate Station for {vName}, {dName}</p>
+                  <p className="text-xs text-slate-500 font-medium">IMD Micro-Climate Station Baseline • Primary Crops: {primaryCropsStr}</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
@@ -145,44 +153,35 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
             </div>
 
             <div className="py-4 space-y-4">
-              {/* Today Baseline Cards */}
+              {/* Today Dynamic Baseline Cards */}
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl">
                   <Thermometer className="w-5 h-5 text-amber-600 mx-auto mb-1" />
                   <span className="text-[10px] text-slate-500 font-bold uppercase block">Max Temp</span>
-                  <span className="text-base font-black text-slate-900">34.2°C</span>
+                  <span className="text-base font-black text-slate-900">{todayForecast.maxTempC}°C</span>
                 </div>
                 <div className="bg-blue-50 border border-blue-200 p-3 rounded-2xl">
                   <Droplets className="w-5 h-5 text-blue-600 mx-auto mb-1" />
                   <span className="text-[10px] text-slate-500 font-bold uppercase block">Humidity</span>
-                  <span className="text-base font-black text-slate-900">68%</span>
+                  <span className="text-base font-black text-slate-900">{todayForecast.humidityPercent}%</span>
                 </div>
                 <div className="bg-teal-50 border border-teal-200 p-3 rounded-2xl">
                   <Wind className="w-5 h-5 text-teal-600 mx-auto mb-1" />
                   <span className="text-[10px] text-slate-500 font-bold uppercase block">Wind Speed</span>
-                  <span className="text-base font-black text-slate-900">14 km/h</span>
+                  <span className="text-base font-black text-slate-900">{todayForecast.windSpeedKmh} km/h</span>
                 </div>
               </div>
 
-              {/* 7-Day Forecast Table */}
+              {/* Dynamic 7-Day Forecast Table */}
               <div>
-                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wide mb-2">7-Day Agro-Met Forecast Table</h4>
-                <div className="space-y-1.5">
-                  {[
-                    { day: "Today (आज)", temp: "34°C / 24°C", rain: "10% Rain", condition: "☀️ Sunny & Clear", advisory: "Ideal for spraying" },
-                    { day: "Tomorrow (उद्या)", temp: "35°C / 25°C", rain: "25% Rain", condition: "⛅ Partly Cloudy", advisory: "Evening irrigation" },
-                    { day: "Day 3 (परवा)", temp: "33°C / 23°C", rain: "65% Heavy Rain", condition: "🌧️ Thunderstorm Warning", advisory: "Postpone sowing & pesticide" },
-                    { day: "Day 4", temp: "31°C / 22°C", rain: "80% Rain", condition: "🌧️ Continuous Rain", advisory: "Clear field drainage channels" },
-                    { day: "Day 5", temp: "32°C / 23°C", rain: "30% Light Rain", condition: "🌥️ Scattered Clouds", advisory: "Inspect crop for stem rot" },
-                    { day: "Day 6", temp: "34°C / 24°C", rain: "15% Rain", condition: "☀️ Sunny", advisory: "Apply 1% Potassium Nitrate" },
-                    { day: "Day 7", temp: "35°C / 25°C", rain: "0% Rain", condition: "☀️ Clear Skies", advisory: "Standard drip watering" }
-                  ].map((d, i) => (
+                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wide mb-2">7-Day Agro-Met Forecast Table for {vName}</h4>
+                <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                  {forecastDays.slice(0, 7).map((d, i) => (
                     <div key={i} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl text-xs font-bold border border-slate-100">
-                      <span className="w-28 text-slate-900 font-extrabold">{d.day}</span>
-                      <span className="w-24 text-slate-600">{d.temp}</span>
-                      <span className="w-28 text-blue-700">{d.rain}</span>
-                      <span className="w-36 text-slate-800">{d.condition}</span>
-                      <span className="text-[11px] text-emerald-800 font-bold truncate">{d.advisory}</span>
+                      <span className="w-28 text-slate-900 font-extrabold">{d.dayName} ({d.date})</span>
+                      <span className="w-24 text-slate-600">{d.maxTempC}°C / {d.minTempC}°C</span>
+                      <span className="w-24 text-blue-700">{d.precipitationProbPercent}% Rain</span>
+                      <span className="text-[11px] text-emerald-800 font-bold truncate">{d.agriImpact}</span>
                     </div>
                   ))}
                 </div>
@@ -198,7 +197,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
         </div>
       )}
 
-      {/* FEATURE 2: AI RISK PREDICTION BREAKDOWN MODAL */}
+      {/* FEATURE 2: DYNAMIC AI RISK PREDICTION MODAL */}
       {activeModal === 'risk' && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-scaleUp border border-slate-200">
@@ -209,9 +208,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    AI Climate Risk Prediction Breakdown <span className="text-xs font-bold text-slate-500">(धोका अंदाज)</span>
+                    AI Risk Prediction for {vName} <span className="text-xs font-bold text-slate-500">({dName})</span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Agro-Climate Vulnerability Scorecard for {vName}</p>
+                  <p className="text-xs text-slate-500 font-medium">Agro-Climate Risk Calculator Baseline</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
@@ -220,52 +219,52 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
             </div>
 
             <div className="py-4 space-y-4">
-              {/* Overall Risk Score */}
+              {/* Dynamic Overall Risk Score */}
               <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl text-center">
-                <span className="text-xs font-black text-amber-900 uppercase block">Overall Climate Risk Index (एकूण हवामान धोका)</span>
-                <span className="text-3xl font-black text-amber-700">{riskMetrics ? riskMetrics.overallRiskScore : '68'}/100</span>
-                <p className="text-xs text-amber-800 font-bold mt-1">Moderate Climate Vulnerability Zone — Drought & Heatwave Surveillance Active</p>
+                <span className="text-xs font-black text-amber-900 uppercase block">Overall Climate Risk Index for {vName}</span>
+                <span className="text-3xl font-black text-amber-700">{overallRisk}/100</span>
+                <p className="text-xs text-amber-800 font-bold mt-1">Groundwater Status: <strong>{village?.groundwaterStatus || 'Critical'}</strong> • Rainfall: <strong>{village?.annualRainfallNormal || 650}mm</strong></p>
               </div>
 
-              {/* Sub Indices Progress Bars */}
+              {/* Dynamic Sub Indices Progress Bars */}
               <div className="space-y-3 text-xs font-bold">
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-slate-800">Drought Index (दुष्काळ धोका)</span>
-                    <span className="text-amber-700 font-black">{riskMetrics?.subIndices?.droughtIndex || '62'}/100</span>
+                    <span className="text-amber-700 font-black">{subIdx.droughtIndex}/100</span>
                   </div>
                   <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${riskMetrics?.subIndices?.droughtIndex || 62}%` }} />
+                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${subIdx.droughtIndex}%` }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-slate-800">Heatwave Index (उष्णता ताण)</span>
-                    <span className="text-orange-700 font-black">{riskMetrics?.subIndices?.heatwaveIndex || '74'}/100</span>
+                    <span className="text-orange-700 font-black">{subIdx.heatwaveIndex}/100</span>
                   </div>
                   <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-500 rounded-full" style={{ width: `${riskMetrics?.subIndices?.heatwaveIndex || 74}%` }} />
+                    <div className="h-full bg-orange-500 rounded-full" style={{ width: `${subIdx.heatwaveIndex}%` }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-slate-800">Pest Threat Index (कीड उपद्रव)</span>
-                    <span className="text-purple-700 font-black">{riskMetrics?.subIndices?.pestIndex || '58'}/100</span>
+                    <span className="text-purple-700 font-black">{subIdx.pestIndex}/100</span>
                   </div>
                   <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-purple-500 rounded-full" style={{ width: `${riskMetrics?.subIndices?.pestIndex || 58}%` }} />
+                    <div className="h-full bg-purple-500 rounded-full" style={{ width: `${subIdx.pestIndex}%` }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-slate-800">Flood Hazard Index (पूर धोका)</span>
-                    <span className="text-blue-700 font-black">{riskMetrics?.subIndices?.floodIndex || '35'}/100</span>
+                    <span className="text-blue-700 font-black">{subIdx.floodIndex}/100</span>
                   </div>
                   <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${riskMetrics?.subIndices?.floodIndex || 35}%` }} />
+                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${subIdx.floodIndex}%` }} />
                   </div>
                 </div>
               </div>
@@ -291,9 +290,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Crop-Specific AI Advisory <span className="text-xs font-bold text-slate-500">(पिकानुसार कृषी सल्ला)</span>
+                    Crop Advisory for {cropName} <span className="text-xs font-bold text-slate-500">({vName})</span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Customized farming strategy for {cropName} in {vName}</p>
+                  <p className="text-xs text-slate-500 font-medium">Crops in village: {primaryCropsStr}</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
@@ -303,18 +302,18 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
 
             <div className="py-4 space-y-3.5 text-xs font-medium leading-relaxed">
               <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                <h4 className="font-black text-emerald-900 text-sm mb-1">🌱 Seed Variety & Sowing Strategy</h4>
-                <p className="text-slate-800">Plant certified short-duration varieties (Phule Samrudhi / JS 20-34). Treat seeds with *Trichoderma Viride* (10g/kg) 24h prior to sowing.</p>
+                <h4 className="font-black text-emerald-900 text-sm mb-1">🌱 Seed Variety & Sowing Strategy for {cropName}</h4>
+                <p className="text-slate-800">For {vName}'s soil ({village?.soilType || 'Black Soil'}), sow certified high-yielding hybrid seeds. Treat seeds with *Trichoderma Viride* (10g/kg) 24h prior to sowing.</p>
               </div>
 
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-2xl">
-                <h4 className="font-black text-blue-900 text-sm mb-1">💧 Micro-Irrigation & Mulching</h4>
-                <p className="text-slate-800">Apply Drip Irrigation strictly between 6 PM to 8 AM. Spread dry sugarcane leaf mulch (5 tonnes/ha) to conserve soil moisture by 35%.</p>
+                <h4 className="font-black text-blue-900 text-sm mb-1">💧 Micro-Irrigation Schedule for {vName}</h4>
+                <p className="text-slate-800">Groundwater status is {village?.groundwaterStatus || 'Critical'}. Apply Drip Irrigation strictly between 6 PM to 8 AM. Spread dry mulch (5 tonnes/ha) to conserve soil moisture by 35%.</p>
               </div>
 
               <div className="p-3 bg-purple-50 border border-purple-200 rounded-2xl">
                 <h4 className="font-black text-purple-900 text-sm mb-1">🐛 Organic Pest Control Spray</h4>
-                <p className="text-slate-800">Install 10 Yellow Sticky Traps per acre. Spray 5% Organic Neem Seed Kernel Extract (NSKE) at 30 days crop stage.</p>
+                <p className="text-slate-800">Install 10 Yellow Sticky Traps per acre. Spray 5% Organic Neem Seed Kernel Extract (NSKE) at early crop stage.</p>
               </div>
             </div>
 
@@ -327,7 +326,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
         </div>
       )}
 
-      {/* FEATURE 4: HARVEST PLANNING & MANDI REALIZATION MODAL */}
+      {/* FEATURE 4: HARVEST PLANNING MODAL */}
       {activeModal === 'harvest' && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-scaleUp border border-slate-200">
@@ -338,9 +337,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Harvest Planning & APMC Mandi Realization <span className="text-xs font-bold text-slate-500">(काढणी व बाजार)</span>
+                    Harvest & APMC Mandi Guide for {vName}
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Post-Harvest Strategy for Maximum Returns in {vName}</p>
+                  <p className="text-xs text-slate-500 font-medium">District APMC Market Hub: {dName} Mandi</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
@@ -350,18 +349,13 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
 
             <div className="py-4 space-y-3 text-xs font-medium leading-relaxed">
               <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-                <h4 className="font-black text-slate-900 text-sm mb-1">🌾 Optimum Moisture Harvesting Window</h4>
-                <p className="text-slate-700">Harvest crops when grain moisture drops to 12-14% (for Soybean/Wheat) or when fruits reach 80% color maturity to minimize post-harvest shattering loss.</p>
-              </div>
-
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-                <h4 className="font-black text-slate-900 text-sm mb-1">📊 Sorting & A-Grade Quality Realization</h4>
-                <p className="text-slate-700">Clean, dry, and grade your produce into A, B, C quality bins before taking it to APMC Mandi to fetch 15-20% higher market price per quintal!</p>
+                <h4 className="font-black text-slate-900 text-sm mb-1">🌾 Optimum Moisture Harvesting Window for {cropName}</h4>
+                <p className="text-slate-700">Harvest crops when grain moisture drops to 12-14% or when fruits reach 80% color maturity to minimize post-harvest loss.</p>
               </div>
 
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl">
-                <h4 className="font-black text-amber-900 text-sm mb-1">📱 APMC Mandi Rates Tracking</h4>
-                <p className="text-amber-800 font-bold">Check live daily market rates on Agmarknet portal before selling to middlemen traders!</p>
+                <h4 className="font-black text-amber-900 text-sm mb-1">📱 APMC {dName} Mandi Realization</h4>
+                <p className="text-amber-800 font-bold">Grade produce into A, B, C quality bins before taking to {dName} APMC Mandi to get 15-20% higher market prices!</p>
               </div>
             </div>
 
@@ -385,9 +379,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Active Emergency Weather Alerts <span className="text-xs font-bold text-slate-500">(इशारा संदेश)</span>
+                    Emergency Alerts for {vName} <span className="text-xs font-bold text-slate-500">({bName})</span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">IMD Warning & Crop Insurance Trigger for {vName}</p>
+                  <p className="text-xs text-slate-500 font-medium">Active Weather Advisory & PMFBY Helpline</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
@@ -399,16 +393,16 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
               <div className="p-3.5 bg-red-50 border border-red-300 rounded-2xl flex items-start space-x-3">
                 <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-black text-red-900 text-sm">⚠️ Heatwave Warning Alert (उष्णतेचा इशारा)</h4>
-                  <p className="text-red-800 mt-1">Temperature expected to cross 38°C over next 48 hours. Irrigate crops in the evening after 6 PM to prevent flower dropping.</p>
+                  <h4 className="font-black text-red-900 text-sm">⚠️ Heatwave Alert for {vName} (उष्णतेचा इशारा)</h4>
+                  <p className="text-red-800 mt-1">Temperature expected to touch {todayForecast.maxTempC}°C over next 48 hours. Irrigate crops in the evening after 6 PM to prevent flower dropping.</p>
                 </div>
               </div>
 
               <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-2xl flex items-start space-x-3">
                 <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-black text-amber-900 text-sm">🛡️ PMFBY Crop Insurance 72-Hour Claim Rule</h4>
-                  <p className="text-amber-800 mt-1">If unseasonal rain or hailstorm damages your field, call toll-free <strong>1800-180-1551</strong> within 72 hours with photos to claim compensation!</p>
+                  <h4 className="font-black text-amber-900 text-sm">🛡️ PMFBY Crop Insurance 72-Hour Claim Helpline</h4>
+                  <p className="text-amber-800 mt-1">If unseasonal rain or hailstorm damages fields in {dName}, call toll-free <strong>1800-180-1551</strong> within 72 hours with mobile photos to claim compensation!</p>
                 </div>
               </div>
             </div>
@@ -433,9 +427,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    10-Year Historical Weather Trends <span className="text-xs font-bold text-slate-500">(मागील हवामान)</span>
+                    10-Year Historical Trends for {vName}
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Decadal Monsoon & Groundwater Analysis for {vName}</p>
+                  <p className="text-xs text-slate-500 font-medium">Decadal Monsoon & Groundwater Analysis for {dName}</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700">
@@ -445,13 +439,13 @@ export default function PlatformImpactFeatures({ village, riskMetrics, onNavigat
 
             <div className="py-4 space-y-3 text-xs font-medium leading-relaxed">
               <div className="p-3 bg-purple-50 border border-purple-200 rounded-2xl">
-                <h4 className="font-black text-purple-900 text-sm mb-1">🌧️ 10-Year Annual Rainfall Pattern</h4>
-                <p className="text-purple-800">Average monsoon rainfall in {dName} has fluctuated between 580mm to 820mm over the last 10 years, with a 12-day delay in monsoon arrival trend.</p>
+                <h4 className="font-black text-purple-900 text-sm mb-1">🌧️ 10-Year Annual Rainfall Normal</h4>
+                <p className="text-purple-800">Normal annual rainfall in {vName} is <strong>{village?.annualRainfallNormal || 650} mm</strong>. Monsoon arrival fluctuates by up to 10-14 days.</p>
               </div>
 
               <div className="p-3 bg-teal-50 border border-teal-200 rounded-2xl">
                 <h4 className="font-black text-teal-900 text-sm mb-1">💧 Groundwater Depth History (CGWB)</h4>
-                <p className="text-teal-800">Groundwater depth in {vName} currently stands at 14.8 meters. Shifting to micro-irrigation is recommended to sustain tube wells.</p>
+                <p className="text-teal-800">Groundwater status in {vName} is currently <strong>{village?.groundwaterStatus || 'Critical'}</strong>. Shifting to drip micro-irrigation is recommended.</p>
               </div>
             </div>
 

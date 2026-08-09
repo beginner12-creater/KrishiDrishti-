@@ -6,15 +6,15 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: `Namaste Kisan Bhai! 🙏 I am Krishi Mitr AI (कृषि मित्र). How are you doing on your farm today? Feel free to ask me anything about your crops, water, or just say hello!`
+      text: `Namaste Kisan Bhai! 🙏 I am Krishi Mitr AI (कृषि मित्र). Ask me how to grow any plant or crop (e.g. "How to grow Tomato", "How to grow Mango", "How to grow Cotton")!`
     }
   ]);
   const [inputQuery, setInputQuery] = useState('');
   const [loading, setLoading] = useState(false);
 
   const samplePrompts = [
-    `😊 How are you today, Krishi Mitr?`,
-    `☀️ Good Morning! How is weather in ${village?.villageName || 'village'}?`,
+    `🌱 How to grow Tomato?`,
+    `🥭 How to grow Mango?`,
     `💰 How to earn ₹3 Lakh/acre net profit?`,
     `🌱 Zero-cost organic Jeevamrut formula & recipe?`,
     `📜 How to claim PMFBY crop insurance within 72 hours?`
@@ -53,7 +53,7 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
               Krishi Mitr AI (कृषि मित्र)
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">Online</span>
             </h3>
-            <p className="text-[11px] text-slate-500 font-medium">Conversational Digital Friend for {village ? village.villageName : 'Selected Village'}</p>
+            <p className="text-[11px] text-slate-500 font-medium">Ask how to grow any plant in {village ? village.villageName : 'Selected Village'}</p>
           </div>
         </div>
         <div className="flex items-center space-x-1 bg-emerald-50 text-emerald-900 border border-emerald-200 px-2.5 py-1 rounded-xl text-xs font-extrabold shrink-0">
@@ -121,7 +121,7 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
       <div className="pt-2.5 border-t border-slate-200 flex items-center gap-2">
         <input
           type="text"
-          placeholder={`Chat with Krishi Mitr (e.g. "How are you?", "Good morning", crop tips)...`}
+          placeholder={`Ask Krishi Mitr (e.g. "How to grow Tomato?", "How to grow Mango?", crop tips)...`}
           value={inputQuery}
           onChange={(e) => setInputQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}

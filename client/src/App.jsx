@@ -13,6 +13,8 @@ import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
 import BottomNavBar from './components/BottomNavBar';
 import AuthModal from './components/AuthModal';
+import ReviewSystem from './components/ReviewSystem';
+import AdminHub from './components/AdminHub';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { t } from './data/translations';
@@ -23,7 +25,7 @@ export default function App() {
   const [hierarchy, setHierarchy] = useState({});
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'advisory' | 'map' | 'compare' | 'chat'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'reviews' | 'advisory' | 'map' | 'chat' | 'admin'
   const [viewMode, setViewMode] = useState('farmer'); // 'farmer' | 'detailed'
   const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
@@ -141,6 +143,13 @@ export default function App() {
                   onSelectCrop={handleSelectCropForAdvisory}
                   currentLang={currentLang}
                 />
+
+                {/* Farmer Review System */}
+                <ReviewSystem
+                  village={selectedVillage}
+                  user={user}
+                  onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                />
               </div>
             ) : (
               /* DETAILED AGRONOMIST MODE */
@@ -180,7 +189,16 @@ export default function App() {
                   />
                 )}
 
-                {/* TAB 3: AI ADVISORY VIEW */}
+                {/* TAB 3: FARMER REVIEWS & RATINGS */}
+                {activeTab === 'reviews' && (
+                  <ReviewSystem
+                    village={selectedVillage}
+                    user={user}
+                    onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                  />
+                )}
+
+                {/* TAB 4: AI ADVISORY VIEW */}
                 {activeTab === 'advisory' && (
                   <AIAdvisorySection
                     village={selectedVillage}
@@ -190,20 +208,12 @@ export default function App() {
                   />
                 )}
 
-                {/* TAB 4: GEO MAP VIEW */}
+                {/* TAB 5: GEO MAP VIEW */}
                 {activeTab === 'map' && (
                   <div>
                     <InteractiveMap village={selectedVillage} riskMetrics={riskMetrics} />
                     <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
                   </div>
-                )}
-
-                {/* TAB 5: COMPARE VILLAGES VIEW */}
-                {activeTab === 'compare' && (
-                  <VillageCompare
-                    allVillages={allVillages}
-                    defaultVillage={selectedVillage}
-                  />
                 )}
 
                 {/* TAB 6: KRISHI MITR AI CHATBOT */}
@@ -212,6 +222,14 @@ export default function App() {
                     village={selectedVillage}
                     riskMetrics={riskMetrics}
                     currentLang={currentLang}
+                  />
+                )}
+
+                {/* TAB 7: ADMIN HUB & USER STORE */}
+                {activeTab === 'admin' && (
+                  <AdminHub
+                    villages={allVillages}
+                    user={user}
                   />
                 )}
               </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, User, LogOut, LogIn } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, User, LogOut, LogIn, Star, Settings } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode, user, onOpenAuthModal, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,10 +17,11 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'profit', label: '💰 Profit Crops', icon: IndianRupee },
+    { id: 'reviews', label: '⭐ Reviews', icon: Star },
     { id: 'advisory', label: 'AI Advisory', icon: ShieldAlert },
     { id: 'map', label: 'Geo Map', icon: MapPin },
-    { id: 'compare', label: 'Compare', icon: GitCompare },
-    { id: 'chat', label: 'Krishi Mitr AI', icon: Bot }
+    { id: 'chat', label: 'Krishi Mitr AI', icon: Bot },
+    { id: 'admin', label: '⚙️ Admin Hub', icon: Settings }
   ];
 
   const handleTabClick = (tabId) => {

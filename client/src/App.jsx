@@ -12,8 +12,6 @@ import PrintReportModal from './components/PrintReportModal';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
 import BottomNavBar from './components/BottomNavBar';
-import AuthModal from './components/AuthModal';
-import ReviewSystem from './components/ReviewSystem';
 import AdminHub from './components/AdminHub';
 import PlatformImpactFeatures from './components/PlatformImpactFeatures';
 
@@ -26,13 +24,11 @@ export default function App() {
   const [hierarchy, setHierarchy] = useState({});
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'reviews' | 'advisory' | 'map' | 'chat' | 'admin'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'advisory' | 'map' | 'chat' | 'admin'
   const [viewMode, setViewMode] = useState('farmer'); // 'farmer' | 'detailed'
   const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // 1. Initial load of village database and hierarchy
@@ -101,9 +97,6 @@ export default function App() {
         activeVillage={selectedVillage}
         viewMode={viewMode}
         setViewMode={setViewMode}
-        user={user}
-        onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onLogout={() => setUser(null)}
       />
 
       {/* Main Container Body */}
@@ -153,12 +146,6 @@ export default function App() {
                   currentLang={currentLang}
                 />
 
-                {/* 4. FARMER REVIEWS */}
-                <ReviewSystem
-                  village={selectedVillage}
-                  user={user}
-                  onOpenAuthModal={() => setIsAuthModalOpen(true)}
-                />
               </div>
             ) : (
               /* DETAILED AGRONOMIST MODE */
@@ -199,16 +186,7 @@ export default function App() {
                   />
                 )}
 
-                {/* TAB 3: FARMER REVIEWS & RATINGS */}
-                {activeTab === 'reviews' && (
-                  <ReviewSystem
-                    village={selectedVillage}
-                    user={user}
-                    onOpenAuthModal={() => setIsAuthModalOpen(true)}
-                  />
-                )}
-
-                {/* TAB 4: AI ADVISORY VIEW */}
+                {/* TAB 3: AI ADVISORY VIEW */}
                 {activeTab === 'advisory' && (
                   <AIAdvisorySection
                     village={selectedVillage}
@@ -218,7 +196,7 @@ export default function App() {
                   />
                 )}
 
-                {/* TAB 5: GEO MAP VIEW */}
+                {/* TAB 4: GEO MAP VIEW */}
                 {activeTab === 'map' && (
                   <div>
                     <InteractiveMap village={selectedVillage} riskMetrics={riskMetrics} />
@@ -226,7 +204,7 @@ export default function App() {
                   </div>
                 )}
 
-                {/* TAB 6: KRISHI MITR AI CHATBOT */}
+                {/* TAB 5: KRISHI MITR AI CHATBOT */}
                 {activeTab === 'chat' && (
                   <KrishiMitrChat
                     village={selectedVillage}
@@ -235,11 +213,10 @@ export default function App() {
                   />
                 )}
 
-                {/* TAB 7: ADMIN HUB & USER STORE */}
+                {/* TAB 6: ADMIN HUB */}
                 {activeTab === 'admin' && (
                   <AdminHub
                     villages={allVillages}
-                    user={user}
                   />
                 )}
               </div>
@@ -285,13 +262,6 @@ export default function App() {
           onClose={() => setIsReportModalOpen(false)}
         />
       )}
-
-      {/* User Login Modal with Google Sign-In & Mobile OTP */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onLoginSuccess={(loggedInUser) => setUser(loggedInUser)}
-      />
 
     </div>
   );

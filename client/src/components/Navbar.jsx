@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, User, LogOut, LogIn, Star, Settings } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, Settings } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode, user, onOpenAuthModal, onLogout }) {
+export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const languages = [
     { code: 'mr', label: 'मराठी' },
     { code: 'hi', label: 'हिन्दी' },
     { code: 'en', label: 'EN' },
-    { code: 'pa', label: 'ਪੰਜਾਬੀ' },
+    { code: 'pa', label: '<ctrl42>ਪੰਜਾਬੀ' },
     { code: 'ta', label: 'தமிழ்' },
     { code: 'te', label: 'తెలుగు' },
     { code: 'gu', label: 'ગુજરાતી' }
@@ -17,7 +17,6 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'profit', label: '💰 Profit Crops', icon: IndianRupee },
-    { id: 'reviews', label: '⭐ Reviews', icon: Star },
     { id: 'advisory', label: 'AI Advisory', icon: ShieldAlert },
     { id: 'map', label: 'Geo Map', icon: MapPin },
     { id: 'chat', label: 'Krishi Mitr AI', icon: Bot },
@@ -33,7 +32,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
     <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-200 px-3 sm:px-6 py-2 transition-all w-full max-w-full overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 w-full min-w-0">
         
-        {/* Row 1: Brand Logo + Language + User Login/Profile + Hamburger */}
+        {/* Row 1: Brand Logo + Language Dropdown + Hamburger */}
         <div className="flex items-center justify-between w-full sm:w-auto min-w-0 gap-2">
           
           {/* Brand Logo */}
@@ -49,7 +48,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
             </div>
           </div>
 
-          {/* Right Mobile Actions: Language + Login + Hamburger */}
+          {/* Right Mobile Actions: Language Dropdown + Mobile Menu Toggle */}
           <div className="flex items-center space-x-1.5 sm:hidden shrink-0">
             {/* Language Dropdown */}
             <div className="relative flex items-center bg-slate-100 border border-slate-200 rounded-lg px-1.5 py-1 text-xs text-slate-800">
@@ -66,32 +65,6 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
                 ))}
               </select>
             </div>
-
-            {/* Login / User Profile */}
-            {user ? (
-              <div className="flex items-center space-x-1 bg-slate-100 border border-slate-200 p-1 rounded-xl">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="w-6 h-6 rounded-lg object-cover shrink-0"
-                />
-                <button
-                  onClick={onLogout}
-                  className="p-1 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-slate-200 cursor-pointer"
-                  title="Logout"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={onOpenAuthModal}
-                className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition-all shadow-xs shrink-0 cursor-pointer min-h-[30px]"
-              >
-                <LogIn className="w-3.5 h-3.5" />
-                <span>Login</span>
-              </button>
-            )}
 
             {/* Mobile Menu Toggle Button */}
             {viewMode === 'detailed' && (
@@ -161,7 +134,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
           </nav>
         )}
 
-        {/* Desktop Only Right Tools: Language & User Auth & Export */}
+        {/* Desktop Only Right Tools: Language Dropdown & Export */}
         <div className="hidden sm:flex items-center space-x-2 shrink-0">
           
           {/* Language Selector Dropdown */}
@@ -179,35 +152,6 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
               ))}
             </select>
           </div>
-
-          {/* User Auth Profile / Login Button */}
-          {user ? (
-            <div className="flex items-center space-x-1.5 bg-slate-100 border border-slate-200 px-2 py-1 rounded-xl">
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-6 h-6 rounded-lg object-cover shrink-0"
-              />
-              <span className="text-xs font-black text-slate-900 max-w-[100px] truncate">
-                {user.name.split(' ')[0]}
-              </span>
-              <button
-                onClick={onLogout}
-                className="p-1 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-slate-200 cursor-pointer"
-                title="Logout"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={onOpenAuthModal}
-              className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition-all shadow-xs shrink-0 cursor-pointer min-h-[32px]"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Login (लॉगिन)</span>
-            </button>
-          )}
 
           {/* Export Report Button */}
           {activeVillage && (

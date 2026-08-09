@@ -21,7 +21,7 @@ export default function BottomNavBar({ activeTab, setActiveTab, viewMode, setVie
   };
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 px-2 py-1.5 shadow-2xl">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 px-2 py-1.5 shadow-lg">
       <div className="flex items-center justify-around">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -33,11 +33,11 @@ export default function BottomNavBar({ activeTab, setActiveTab, viewMode, setVie
               onClick={() => handleTabClick(item)}
               className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all min-w-[60px] min-h-[48px] ${
                 isActive
-                  ? 'text-emerald-400 font-extrabold scale-105'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'text-emerald-700 font-black scale-105'
+                  : 'text-slate-600 hover:text-slate-900 font-semibold'
               }`}
             >
-              <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+              <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'stroke-[2.5] text-emerald-600' : 'stroke-2 text-slate-500'}`} />
               <span className="text-[10px] tracking-tight">{item.label}</span>
             </button>
           );
@@ -46,10 +46,10 @@ export default function BottomNavBar({ activeTab, setActiveTab, viewMode, setVie
         {/* Floating Voice Assistant Trigger Pill */}
         <button
           onClick={onOpenVoicePanel}
-          className="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-amber-400 hover:text-amber-300 transition-all min-w-[55px] min-h-[48px] bg-amber-950/40 border border-amber-800/60"
+          className="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-amber-900 hover:text-amber-950 transition-all min-w-[55px] min-h-[48px] bg-amber-100 border border-amber-300 shadow-xs"
         >
-          <Volume2 className="w-5 h-5 mb-0.5 animate-pulse" />
-          <span className="text-[10px] font-bold">Voice AI</span>
+          <Volume2 className="w-5 h-5 mb-0.5 animate-pulse text-amber-700" />
+          <span className="text-[10px] font-extrabold">Voice AI</span>
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-// AI Agricultural Advisory Generator Engine & Krishi Mitr Conversational Assistant with Official AI Integration
+// AI Agricultural Advisory Generator Engine & Krishi Mitr Conversational Assistant with Detailed Multi-Pillar Knowledge Engine
 
 export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, lang = "en") {
   const primaryCrop = selectedCrop || village.primaryCrops[0];
@@ -120,7 +120,7 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
-// OFFICIAL KRISHI MITR CONVERSATIONAL ENGINE
+// COMPREHENSIVE & DETAILED KRISHI MITR CONVERSATIONAL ENGINE FOR ALL TOPICS
 export async function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase().trim();
   const vName = village ? village.villageName : "your village";
@@ -138,13 +138,13 @@ export async function answerKrishiMitrQuery(query, village, riskMetrics) {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `You are Krishi Mitr AI (कृषि मित्र), a warm, friendly, non-technical Indian digital agronomist for farmers in ${vName}, ${dName}, Maharashtra. 
-              Crops in village: ${cropsStr}.
+              text: `You are Krishi Mitr AI (कृषि मित्र), a highly knowledgeable, warm, empathetic digital agronomy expert and advisor for farmers in ${vName}, ${dName}, Maharashtra. 
 
-              STRICT RULES:
-              1. Never mention or refer to Gemini, Google, or any underlying model name in your response. Identify purely as Krishi Mitr (कृषि मित्र).
-              2. If the user's question is about agriculture, crops, how to grow any plant, seeds, saplings, weather, soil, fertilizers, pests, market rates, or government schemes, give a simple 4-step answer in warm Indian language.
-              3. If the user asks a non-agricultural question (sports, movies, politics, coding, general trivia), politely decline in Indian language saying you only answer farming & agricultural questions.
+              STRICT INSTRUCTIONS:
+              1. Give a VERY DETAILED, COMPREHENSIVE, THOROUGH, AND COMPLETE EXPLANATION on the user's question.
+              2. Include deep step-by-step guidance, exact numerical measurements (e.g. NPK ratios, seed spacing in cm, spray dosage in ml/liter, irrigation frequencies), certified seed varieties, soil testing pH values, and market APMC price tips.
+              3. Organize your detailed answer using clear numbered sections, bold headers, and bullet points.
+              4. Identify purely as Krishi Mitr AI. Do not mention any underlying AI model name.
               
               User Question: "${query}"`
             }]
@@ -156,151 +156,94 @@ export async function answerKrishiMitrQuery(query, village, riskMetrics) {
         const data = await response.json();
         const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (rawText) {
-          // Strip any unexpected Gemini references
           return rawText.replace(/gemini/gi, 'Krishi Mitr AI').replace(/google/gi, 'Krishi Mitr');
         }
       }
     } catch (err) {
-      console.warn("API call failed, switching to local Krishi Mitr Agro engine:", err);
+      console.warn("API call failed, switching to local detailed engine:", err);
     }
   }
 
-  // LOCAL AGRO ENGINE (RUNS IF NO KEY IS SET OR AS INSTANT FALLBACK)
+  // LOCAL DETAILED KNOWLEDGE ENGINE (INSTANT COMPREHENSIVE FALLBACK)
 
-  // 1. FRIENDLY GREETINGS & DAILY GESTURES
-  if (qLower.includes("how are you") || qLower.includes("kaise ho") || qLower.includes("kase aahat") || qLower.includes("कसे आहात") || qLower.includes("कैसे हो") || qLower.includes("how r u")) {
-    return `Namaste Kisan Bhai! 🙏 I am doing great and feeling happy to talk to you! 😊 
+  // 1. DETAILED PLANT GROWING & CULTIVATION TUTORIAL ENGINE
+  if (qLower.includes("grow") || qLower.includes("plant") || qLower.includes("cultivate") || qLower.includes("उगवावे") || qLower.includes("लागवड") || qLower.includes("खेती")) {
+    let rawPlant = qLower.replace("how to grow", "").replace("how to plant", "").replace("how to cultivate", "").replace("grow", "").replace("plant", "").replace("कसे उगवावे", "").replace("की खेती कैसे करें", "").trim();
+    const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your crop";
 
-How is your day going on your farm in ${vName}? How are your crops doing today? 🌾 Tell me, how can I help you today?`;
+    return `Namaste Kisan Bhai! 🙏 Here is a **Complete & Detailed Guide on How to Cultivate ${plantName}** in ${vName} (${dName}):
+
+1. 🌍 **Soil Selection & Field Preparation (माती व रान बांधणी)**:
+   - Soil Type: Medium to deep well-drained black cotton soil or fertile sandy loam with pH range of 6.5 to 7.8.
+   - Field Prep: Perform 2 deep ploughings followed by harrowing. Incorporate 5 tonnes/acre of well-decomposed Farm Yard Manure (FYM) or vermicompost 15 days before planting.
+
+2. 🌱 **Certified Seed Varieties & Germination Treatment (उत्तम बियाणे वाण व बीजप्रक्रिया)**:
+   - Top Varieties: Choose ICAR/MPKV certified high-yielding hybrid varieties suitable for Maharashtra climate.
+   - Seed Treatment: Treat seeds with *Trichoderma Viride* (10g/kg seed) or *Azotobacter* + *PSB* bio-fertilizers 24 hours prior to sowing to safeguard against soil-borne seedling rot and wilt.
+   - Spacing: Maintain 45 cm to 60 cm row-to-row spacing and 15 cm to 20 cm plant-to-plant spacing for optimum sunlight and aeration.
+
+3. 💧 **Precision Irrigation & Drip Schedule (पाणी व्यवस्थापन)**:
+   - Irrigation System: Shift to Drip Irrigation (saves 45% water & boosts yield by 30%).
+   - Watering Frequency: Irrigate every 4 to 6 days during vegetative growth and every 2 to 3 days during flowering and fruit setting stages. Avoid waterlogging at all costs.
+
+4. 🧪 **Balanced Fertilizer & Nutrient Management (खत व्यवस्थापन)**:
+   - Basal Dose: Apply N:P:K in 50:25:25 kg/acre ratio during field preparation.
+   - Foliar Sprays: Spray 1% 19:19:19 water-soluble fertilizer at 30 days and 0:52:34 + Boron (1g/liter) during flower initiation to stop blossom dropping.
+
+5. 🐛 **Integrated Pest & Disease Control (कीड व रोग नियंत्रण)**:
+   - Traps: Install 10 Yellow Sticky Cards per acre for sucking pests (Aphids, Thrips, Whiteflies) and Pheromone traps for moth larvae.
+   - Organic Spray: Spray 5% Neem Seed Kernel Extract (NSKE) at early stage.
+   - Chemical Control: If severe thrips attack occurs, spray *Fipronil 5% SC* (2 ml/liter) or *Imidacloprid* under expert guidance.
+
+6. 📦 **Harvesting, Storage & Market Realization (काढणी व बाजार विक्री)**:
+   - Harvest when fruits/grains reach optimum maturity (80-90% color change or moisture at 12%).
+   - Grade your produce into A, B, C quality grades before sending to APMC Mandi to realize 15-20% higher market price! 🌾✨`;
   }
 
-  if (qLower.includes("hello") || qLower.includes("hi") || qLower.includes("hey") || qLower.includes("namaste") || qLower.includes("नमस्कार") || qLower.includes("नमस्ते") || qLower.includes("ram ram") || qLower.includes("राम राम")) {
-    return `Namaste! Ram Ram Kisan Bhai! 🙏 Welcome! 😊 
-
-I hope you and your family are healthy and happy today! Weather in ${vName} is looking good for farm work. What crop advice or help do you need today?`;
-  }
-
-  if (qLower.includes("good morning") || qLower.includes("subhashok") || qLower.includes("शुभ प्रभात") || qLower.includes("शुभ सकाळ")) {
-    return `Good Morning Kisan Mitra! ☀️ Shubh Prabhat! 
-
-May your hard work today bring a golden harvest to your farm in ${vName}! Have you checked your crop watering today? How can I assist you this morning?`;
-  }
-
-  if (qLower.includes("thank") || qLower.includes("dhanyawad") || qLower.includes("thanks") || qLower.includes("धन्यवाद") || qLower.includes("आभार")) {
-    return `You are most welcome Kisan Bhai! 🙏 
-
-It is my honor to help hard-working farmers like you. Feel free to ask me anytime about crops, water, or fertilizers. May God bless your harvest! 🌾✨`;
-  }
-
-  if (qLower.includes("who are you") || qLower.includes("your name") || qLower.includes("tumhi kon") || qLower.includes("तुम कौन हो") || qLower.includes("तू कोण आहेस")) {
-    return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — your personal digital agronomist created to help farmers in ${vName} and across India with simple, practical crop advice!`;
-  }
-
-  // 2. SPECIFIC SEED VARIETY & SAPLING NURSERY ADVISORY ENGINE
+  // 2. DETAILED SEED VARIETY & NURSERY SAPLING GUIDE
   if (qLower.includes("seed") || qLower.includes("variety") || qLower.includes("sapling") || qLower.includes("nursery") || qLower.includes("बियाणे") || qLower.includes("वाण") || qLower.includes("रोप") || qLower.includes("बीज")) {
     let rawPlant = qLower.replace("seed", "").replace("variety", "").replace("sapling", "").replace("nursery", "").replace("best", "").replace("which", "").replace("type", "").replace("of", "").replace("for", "").replace("बियाणे", "").replace("वाण", "").replace("रोप", "").trim();
     const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your crop";
 
-    let seedRecommendation = "";
-    if (plantName.toLowerCase().includes("cotton") || plantName.toLowerCase().includes("कापूस")) {
-      seedRecommendation = "• Top Certified Seeds: PKV-028, Rashi 659 BG-II, or Ajit 155.\n• Germination Rate: Buy certified blue-tag seeds with 90%+ germination.";
-    } else if (plantName.toLowerCase().includes("soybean") || plantName.toLowerCase().includes("सोयाबीन")) {
-      seedRecommendation = "• Top Certified Seeds: Phule Samrudhi (KDS 753), JS 20-34, or MACS 1407.\n• Seed Treatment: Treat seeds with Rhizobium culture + Trichoderma (10g/kg).";
-    } else if (plantName.toLowerCase().includes("tomato") || plantName.toLowerCase().includes("टोमॅटो")) {
-      seedRecommendation = "• Top Hybrid Seeds & Saplings: Syngenta Abhinav, Arka Rakshak, or US 1080.\n• Sapling Tip: Buy 25-30 day old healthy nursery seedling saplings with 4-5 true leaves.";
-    } else if (plantName.toLowerCase().includes("pomegranate") || plantName.toLowerCase().includes("डाळिंब")) {
-      seedRecommendation = "• Top Graft Sapling Variety: Bhagwa (Super Bhagwa) tissue-culture graft saplings.\n• Nursery Tip: Purchase 9-12 month old certified disease-free air-layered saplings.";
-    } else if (plantName.toLowerCase().includes("mango") || plantName.toLowerCase().includes("आंबा")) {
-      seedRecommendation = "• Top Graft Saplings: Kesar Mango, Alphonso (Hapus), or Dasheri grafted saplings.\n• Sapling Tip: Plant 1-year old stone-grafted sapling during monsoon with 10m x 10m spacing.";
-    } else {
-      seedRecommendation = `• Top Certified Seeds & Hybrid Varieties: ICAR/MPKV Certified High-Yielding Hybrid Varieties for ${plantName}.\n• Seed Treatment: Treat seeds with Azotobacter & Trichoderma Viride (10g/kg) 24h before sowing.\n• Sapling Nursery Tip: Select 30-day-old vigorous saplings with strong root ball from government certified nursery.`;
-    }
+    return `Namaste Kisan Bhai! 🙏 Here is the **Comprehensive Certified Seed & Sapling Guide** for **${plantName}** in ${vName}:
 
-    return `Namaste Kisan Bhai! 🙏 Recommended **Seed Varieties & Sapling Guide** for **${plantName}** in ${vName}:
+🌾 **1. Certified High-Yield Seed Varieties (प्रमाणित बियाणे वाण)**:
+• **Cotton (कापूस)**: PKV-028, Rashi 659 BG-II, Ajit 155, or Ankur 3028 (Yield: 12-15 quintals/acre).
+• **Soybean (सोयाबीन)**: Phule Samrudhi (KDS 753), JS 20-34, MACS 1407 (Drought & disease resistant).
+• **Tomato (टोमॅटो)**: Syngenta Abhinav, Arka Rakshak, US 1080 (High heat tolerance & long shelf life).
+• **Pomegranate (डाळिंब)**: Bhagwa (Super Bhagwa) tissue-culture graft saplings.
+• **Mango (आंबा)**: Kesar Mango, Alphonso (Hapus) stone-graft saplings.
 
-🌾 **Certified Seed Variety Recommendations (उत्तम बियाणे वाण)**:
-${seedRecommendation}
+🌱 **2. Nursery Sapling Selection Criteria (रोपवाटिका रोप निवड)**:
+• Age: Nursery seedling saplings should be 25-30 days old with 4-5 healthy green true leaves.
+• Graft Quality: For fruit saplings, select 9-12 month old air-layered or stone-grafted saplings with a healthy graft union and disease-free root ball.
 
-💡 **Smart Nursery & Sowing Tips (महत्त्वाचा सल्ला)**:
-1. Always purchase seeds/saplings from Government Krishi Vigyan Kendra (KVK) or licensed Krishi Seva Kendra to avoid spurious duplicate seeds.
-2. Conduct a quick seed germination test in moist cloth before sowing in your field! 🌾✨`;
+🧪 **3. Seed Germination Test & Treatment Protocol (बीजप्रक्रिया)**:
+• Test: Wrap 100 seeds in a moist cotton cloth for 48 hours. If >85 seeds germinate, the seed batch is excellent.
+• Fungicide Treatment: Treat seeds with *Carbendazim + Mancozeb* (2g/kg) or *Trichoderma Viride* (10g/kg) to eliminate seed-borne fungal spores. 🌾✨`;
   }
 
-  // 3. HOW TO GROW ANY PLANT TUTORIAL ENGINE
-  if (qLower.includes("grow") || qLower.includes("plant") || qLower.includes("cultivate") || qLower.includes("उगवावे") || qLower.includes("लागवड") || qLower.includes("खेती")) {
-    let rawPlant = qLower.replace("how to grow", "").replace("how to plant", "").replace("how to cultivate", "").replace("grow", "").replace("plant", "").replace("कसे उगवावे", "").replace("की खेती कैसे करें", "").trim();
-    const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your chosen plant";
-
-    return `Namaste Kisan Bhai! 🙏 Here is a simple 4-step guide on **How to Grow ${plantName}** in ${vName}:
-
-1. 🌍 Soil & Sun (माती व हवामान):
-   - ${plantName} grows best in well-drained loamy or black soil with organic compost. Needs 6-8 hours of daily sunlight.
-
-2. 🌱 Sowing & Seed Variety (बियाणे वाण व अंतर):
-   - Use MPKV/ICAR certified hybrid seed varieties or healthy 30-day-old nursery saplings. Treat seeds with Trichoderma (10g/kg). Keep proper distance between rows.
-
-3. 💧 Watering & Fertilizer (पाणी व खत):
-   - Irrigate every 4-6 days using drip irrigation. Apply Organic FYM manure + 1% Potassium Nitrate during flowering.
-
-4. 🐛 Insect Protection (कीड नियंत्रण):
-   - Put yellow sticky traps in the field and spray 5% Organic Neem Water once every 15 days to keep pests away.
-
-Your ${plantName} harvest will be healthy and profitable! 🌾✨`;
-  }
-
-  // 4. CHECK IF QUERY IS RELATED TO AGRICULTURE & FARMING
-  const agriKeywords = [
-    "crop", "farm", "weather", "rain", "water", "drought", "flood", "soil", "fertilizer", "urea", "dap",
-    "pest", "bug", "disease", "spray", "insect", "mulch", "harvest", "sow", "seed", "mandi", "price",
-    "profit", "yield", "acre", "hektare", "land", "jeevamrut", "organic", "cotton", "sugarcane", "soybean",
-    "onion", "grapes", "pomegranate", "bajra", "rice", "paddy", "wheat", "turmeric", "mango", "cashew",
-    "insurance", "pmfby", "subsidy", "kisan", "scheme", "helpline", "icar", "imd", "irrigation", "drip",
-    "sprinkler", "monsoon", "kharif", "rabi", "summer", "temperature", "heatwave", "yellow", "leaf",
-    "पेरणी", "पाणी", "खत", "फवारणी", "कीड", "रोग", "पिक", "शेती", "दुष्काळ", "पाऊस", "बाजारभाव", "उत्पन्न",
-    "कापूस", "ऊस", "सोयाबीन", "कांदा", "द्राक्ष", "डाळिंब", "हळद", "बाजरी", "गहू", "विमा", "योजना", "अनुदान"
-  ];
-
-  const isAgriRelated = agriKeywords.some(kw => qLower.includes(kw));
-
-  // IF QUESTION IS NON-AGRICULTURAL -> POLITELY DECLINE AND ASK FOR AGRI QUESTIONS
-  if (!isAgriRelated) {
-    return `Namaste Kisan Bhai! 🙏 I am Krishi Mitr (कृषि मित्र), a specialized Digital Farming & Agricultural AI Assistant. 
-
-🌾 I can answer any question on:
-1. Certified Seed Varieties & Nursery Saplings (e.g., "Best seed for Tomato", "Sapling variety for Mango")
-2. How to grow any plant / crop / fruit / vegetable (e.g., "How to grow Tomato")
-3. Rain, Weather & Drought Forecasts
-4. Organic Jeevamrut & Fertilizers
-5. Insect & Pest Control Sprays
-6. Crop Profit & APMC Mandi Rates
-7. Government Subsidies & PMFBY Insurance
-
-Please ask me about seeds, saplings, or any crop question! 🚜✨`;
-  }
-
-  // 5. COMPREHENSIVE AGRICULTURAL KNOWLEDGE BASE ANSWERS
-
-  // A. PROFIT & HIGH RETURN CROPS
+  // 3. DETAILED PROFIT & HIGH RETURN CROPS GUIDE
   if (qLower.includes("profit") || qLower.includes("money") || qLower.includes("earn") || qLower.includes("income") || qLower.includes("नफा") || qLower.includes("कमाई")) {
-    return `Namaste Farmer Brother! 🙏 In ${vName}, here is how you can earn maximum profit from your land without stress:
+    return `Namaste Farmer Brother! 🙏 Detailed Income & Profit Plan for ${vName}:
 
-1. 🍇 High-Value Fruit Crops: If you plant Bhagwa Pomegranate or Grapes, you can earn ₹2 Lakh to ₹4 Lakh per acre every year!
-2. 🌵 Dragon Fruit (Kamalam): Requires very little water, gives fruit for 20 years, and sells at high market rates.
-3. 🌿 Smart Intercropping: Plant Turmeric with Maize or Onion with Cotton. If one crop has bad weather, the second crop protects your income!
-4. 📱 APMC Mandi Tip: Always check market prices on your phone before selling so buyers give you top rates!`;
+1. 🍇 **High-Value Horticulture Crops (फळबाग शेती)**:
+   - **Bhagwa Pomegranate / Grapes**: Net Profit ₹2.5 Lakh to ₹4 Lakh per acre per year after Year 3.
+   - **Dragon Fruit (Kamalam)**: Initial investment recovers in 2 years; yields profit for 20 years with minimal water requirement.
+
+2. 🌿 **High-Income Cash & Spice Crops (नगदी व मसाले पिके)**:
+   - **Turmeric (हळद) & Ginger (आले)**: Net Profit ₹1.5 Lakh to ₹2.5 Lakh per acre with 8-9 month crop duration.
+
+3. 🌾 **Multi-Crop Intercropping Strategy (बहुपीक पद्धत)**:
+   - Sowing **Sugarcane + Onion / Garlic** or **Cotton + Turmeric** ensures dual crop revenue and protects against total loss from extreme weather events. 🌾✨`;
   }
 
-  // B. ORGANIC & ZERO COST JEEVAMRUT
-  if (qLower.includes("organic") || qLower.includes("jeevamrut") || qLower.includes("natural") || qLower.includes("जैविक") || qLower.includes("सेंद्रिय") || qLower.includes("zero cost")) {
-    return `Namaste! 🙏 You can easily save ₹4,000 per acre on chemical fertilizers using simple home-made Jeevamrut:
+  // 4. GENERAL DETAILED RESPONSE FOR ANY OTHER TOPIC
+  return `Namaste Kisan Bhai! 🙏 Here is a **Detailed Agricultural & Technical Analysis** for ${vName} (${dName}):
 
-1. 🥣 Home Recipe: Take 10kg fresh cow dung + 10 liters cow urine + 2kg jaggery (गुळ) + 2kg besan (बेसन) + 1 handful farm soil in 200 liters of water.
-2. ⏳ Wait 2 Days: Stir it twice daily with a wooden stick for 2 days.
-3. 💧 Give with Water: Give this Jeevamrut with your drip or watering channel twice a month. Your soil will become soft, fertile, and full of natural earthworms!`;
-  }
+1. 🌍 **Soil & Agronomic Baseline**: Soil organic carbon in ${vName} requires regular FYM amendment. Maintain balanced NPK application based on Soil Health Card data.
+2. 💧 **Smart Water Management**: Adopt Drip Fertigation & Straw Mulching to reduce evapotranspiration losses by 35%.
+3. 🛡️ **Risk Protection & Schemes**: Register on PMFBY crop insurance portal and report any localized crop damage within 72 hours via Toll-Free 1800-180-1551.
 
-  // DEFAULT AGRICULTURAL RESPONSE
-  return `Namaste Farmer Brother! 🙏 For ${vName} (${dName}), overall agricultural conditions are good. 
-
-Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice! Ask me about certified seeds, saplings, or how to grow any plant! 🌾`;
+Feel free to ask me for detailed growing guides, seed recommendations, or pest spray math for any specific crop! 🌾✨`;
 }

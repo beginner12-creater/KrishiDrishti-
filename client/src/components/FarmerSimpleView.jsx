@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sprout, Droplets, Bug, Sun, PhoneCall, Volume2, ArrowRight, Sparkles } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, PhoneCall, Volume2, ArrowRight, Sparkles, VolumeX } from 'lucide-react';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop }) {
   const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
@@ -11,26 +11,43 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
   // Simple Clean Status Badge for Farmers
   const getSimpleStatus = (score) => {
-    if (score >= 70) return { title: '🔴 HIGH RISK (धोका)', bg: 'bg-rose-950/90 border-rose-600 text-rose-200', text: 'Needs Immediate Care! Follow 4-step advice below.' };
-    if (score >= 45) return { title: '🟡 MODERATE RISK (काळजी घ्या)', bg: 'bg-amber-950/90 border-amber-600 text-amber-200', text: 'Take preventive measures for your crops.' };
-    return { title: '🟢 GOOD CONDITIONS (सुरक्षित)', bg: 'bg-emerald-950/90 border-emerald-600 text-emerald-200', text: 'Weather is favorable. Follow normal irrigation schedule.' };
+    if (score >= 70) return { title: '🔴 HIGH RISK (धोका)', color: 'Red', text: 'Weather warning! Follow protection steps below.' };
+    if (score >= 45) return { title: '🟡 MODERATE RISK (काळजी घ्या)', color: 'Yellow', text: 'Take simple precautions for your crops.' };
+    return { title: '🟢 GOOD CONDITIONS (सुरक्षित)', color: 'Green', text: 'Weather is good. Follow regular crop care.' };
   };
 
   const status = getSimpleStatus(overallRiskScore);
 
-  const handleReadAloud = (textToRead) => {
-    if ('speechSynthesis' in window) {
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-        return;
-      }
-      const utterance = new SpeechSynthesisUtterance(textToRead);
-      utterance.rate = 0.9;
-      utterance.onend = () => setIsSpeaking(false);
-      setIsSpeaking(true);
-      window.speechSynthesis.speak(utterance);
+  // Non-Technical, Simple Voice Assistant for Farmers
+  const handleReadAloud = () => {
+    if (!('speechSynthesis' in window)) return;
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
     }
+
+    // Generate simple non-technical speech text
+    let simpleVoiceText = "";
+    
+    if (overallRiskScore >= 70) {
+      simpleVoiceText = `Hello Farmer brother! In ${village.villageName} village today, climate risk is high. For your ${selectedCrop} crop, irrigate only in early morning or evening. Spray Neem oil for pests, and stay alert. Thank you!`;
+    } else if (overallRiskScore >= 45) {
+      simpleVoiceText = `Hello Farmer brother! In ${village.villageName} village, weather requires care. For ${selectedCrop}, give light watering in evening and check leaves for pests. Thank you!`;
+    } else {
+      simpleVoiceText = `Hello Farmer brother! In ${village.villageName} village, weather is good today. Give normal water to your ${selectedCrop} crop and ensure proper field care. Thank you!`;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(simpleVoiceText);
+    utterance.rate = 0.85; // Slightly slower, easy to hear
+    utterance.pitch = 1.0;
+    
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
   };
 
   const cropInfo = cropVulnerability.find(c => c.cropName === selectedCrop) || cropVulnerability[0];
@@ -39,61 +56,66 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
     <div className="space-y-6">
       
       {/* 1. WEATHER STATUS BANNER */}
-      <div className={`p-6 sm:p-8 rounded-3xl border-2 shadow-xl transition-all ${status.bg}`}>
+      <div className="bg-slate-900 border-2 border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl transition-all">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-xs font-black bg-black/40 uppercase tracking-widest text-slate-100">
+              <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-950 text-emerald-400 border border-emerald-800 uppercase tracking-widest">
                 शेतकरी सल्ला / किसान सलाह
               </span>
-              <span className="text-xs font-semibold opacity-90">📍 {village.villageName} ({village.districtName})</span>
+              <span className="text-xs font-semibold text-slate-400">📍 {village.villageName} ({village.districtName})</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight my-1">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight my-1 text-slate-100">
               {status.title}
             </h2>
-            <p className="text-sm sm:text-base font-medium opacity-90 mt-1">
+            <p className="text-sm sm:text-base font-medium text-slate-300 mt-1">
               {status.text}
             </p>
           </div>
 
+          {/* Simple Voice Button */}
           <button
-            onClick={() => handleReadAloud(`Namaste. In ${village.villageName}, current weather risk level is ${status.title}. Recommended advice for ${selectedCrop}: ${cropInfo?.resilienceTip}`)}
-            className="flex items-center space-x-2 px-5 py-3 rounded-2xl bg-white text-slate-950 font-black text-sm shadow-xl hover:bg-slate-100 transition-all shrink-0 active:scale-95"
+            onClick={handleReadAloud}
+            className={`flex items-center space-x-2.5 px-6 py-3.5 rounded-2xl font-black text-sm transition-all shrink-0 active:scale-95 shadow-xl ${
+              isSpeaking
+                ? 'bg-rose-500 text-slate-950 animate-pulse'
+                : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
+            }`}
           >
-            <Volume2 className={`w-5 h-5 text-emerald-600 ${isSpeaking ? 'animate-pulse' : ''}`} />
-            <span>{isSpeaking ? 'Stop Voice' : '🔊 Listen Advice (ऐका / सुनें)'}</span>
+            {isSpeaking ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            <span>{isSpeaking ? 'Stop Voice (आवाज बंद करा)' : '🔊 Listen Voice (ऐका / सुनें)'}</span>
           </button>
         </div>
 
-        {/* Quick Weather Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10 text-xs sm:text-sm font-bold">
-          <div className="bg-black/30 p-3.5 rounded-2xl border border-white/10 flex items-center space-x-3">
+        {/* Quick Simple Weather Summary */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-slate-800 text-xs sm:text-sm font-bold">
+          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
             <Sun className="w-6 h-6 text-amber-400 shrink-0" />
             <div>
-              <div className="text-[11px] opacity-80">Drought (दुष्काळ)</div>
-              <div className="text-base font-extrabold">{subIndices.droughtIndex > 60 ? 'HIGH' : 'LOW'}</div>
+              <div className="text-[11px] text-slate-400">Drought (दुष्काळ)</div>
+              <div className="text-base font-extrabold text-slate-100">{subIndices.droughtIndex > 60 ? 'HIGH' : 'LOW'}</div>
             </div>
           </div>
-          <div className="bg-black/30 p-3.5 rounded-2xl border border-white/10 flex items-center space-x-3">
+          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
             <Droplets className="w-6 h-6 text-cyan-400 shrink-0" />
             <div>
-              <div className="text-[11px] opacity-80">Water (पाणी)</div>
-              <div className="text-base font-extrabold">{village.groundwaterStatus.split(' ')[0]}</div>
+              <div className="text-[11px] text-slate-400">Water (पाणी)</div>
+              <div className="text-base font-extrabold text-slate-100">{village.groundwaterStatus.split(' ')[0]}</div>
             </div>
           </div>
-          <div className="bg-black/30 p-3.5 rounded-2xl border border-white/10 flex items-center space-x-3">
+          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
             <Bug className="w-6 h-6 text-purple-400 shrink-0" />
             <div>
-              <div className="text-[11px] opacity-80">Pest (कीड)</div>
-              <div className="text-base font-extrabold">{subIndices.pestIndex > 60 ? 'HIGH' : 'SAFE'}</div>
+              <div className="text-[11px] text-slate-400">Pest Risk (कीड)</div>
+              <div className="text-base font-extrabold text-slate-100">{subIndices.pestIndex > 60 ? 'HIGH' : 'SAFE'}</div>
             </div>
           </div>
-          <div className="bg-black/30 p-3.5 rounded-2xl border border-white/10 flex items-center space-x-3">
+          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
             <Sprout className="w-6 h-6 text-emerald-400 shrink-0" />
             <div>
-              <div className="text-[11px] opacity-80">Rain (पाऊस)</div>
-              <div className="text-base font-extrabold">{village.annualRainfallNormal} mm</div>
+              <div className="text-[11px] text-slate-400">Rainfall (पाऊस)</div>
+              <div className="text-base font-extrabold text-slate-100">{village.annualRainfallNormal} mm</div>
             </div>
           </div>
         </div>
@@ -130,66 +152,66 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
         </div>
       </div>
 
-      {/* 3. 4-STEP ACTION PLAN FOR FARMERS */}
+      {/* 3. NON-TECHNICAL 4-STEP ACTION PLAN FOR FARMERS */}
       <div className="bg-slate-900/90 border border-slate-800 p-5 sm:p-6 rounded-3xl shadow-xl space-y-4">
         <h3 className="text-base sm:text-lg font-black text-slate-100 mb-1 flex items-center gap-2">
           <Sparkles className="w-6 h-6 text-amber-400" />
-          4 Action Steps for {selectedCrop} (शेतातील उपाय):
+          Key Farmer Actions for {selectedCrop} (सोपे उपाय):
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
-          {/* Step 1 */}
+          {/* Step 1: Watering */}
           <div className="bg-slate-950/80 border border-slate-800 p-5 rounded-2xl space-y-2">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black text-base">
                 1
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">💧 Watering (पाणी व्यवस्थापन)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">💧 Watering (पाणी कसे द्यावे)</h4>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
               {subIndices.droughtIndex > 50
-                ? 'Irrigate evening or early morning (6 PM - 8 AM). Use straw mulching to save 35% water.'
-                : 'Follow normal irrigation schedule. Avoid excess watering.'}
+                ? 'Give water only in early morning or evening. Cover soil around roots with dry grass.'
+                : 'Water your crops normally. Do not flood the roots.'}
             </p>
           </div>
 
-          {/* Step 2 */}
+          {/* Step 2: Soil & Fertilizer */}
           <div className="bg-slate-950/80 border border-slate-800 p-5 rounded-2xl space-y-2">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-base">
                 2
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">🌱 Soil & Fertilizer (खत आणि माती)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">🌱 Leaf & Soil Protection (झाडांची काळजी)</h4>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
-              Apply 1% Potassium Nitrate (KNO3) foliar spray during hot afternoon dry spells to protect leaves from heat.
+              Spray 1% Potassium Nitrate (KNO3) during hot afternoon hours to keep crop leaves green and fresh.
             </p>
           </div>
 
-          {/* Step 3 */}
+          {/* Step 3: Pest Control */}
           <div className="bg-slate-950/80 border border-slate-800 p-5 rounded-2xl space-y-2">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-black text-base">
                 3
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">🐛 Pest Control (कीड नियंत्रण)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">🐛 Simple Insect Spray (कीड नियंत्रण)</h4>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
-              {cropInfo?.resilienceTip || 'Install 8-10 Sticky Traps per acre. Spray 5% Neem Seed Kernel Extract (NSKE).'}
+              Hang yellow sticky cards in field. Spray 5% organic Neem seed extract to stop insects.
             </p>
           </div>
 
-          {/* Step 4 */}
+          {/* Step 4: Crop Insurance */}
           <div className="bg-slate-950/80 border border-slate-800 p-5 rounded-2xl space-y-2">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-black text-base">
                 4
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">🛡️ Crop Insurance (पिक विमा)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">🛡️ Crop Insurance (पिक विमा मदत)</h4>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
-              In case of drought/flood damage, inform your bank or call toll-free **1800-180-1551** within 72 hours.
+              If rain or drought damages your crop, inform your bank or call **1800-180-1551** within 72 hours.
             </p>
           </div>
 

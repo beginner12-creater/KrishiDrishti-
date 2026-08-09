@@ -15,7 +15,7 @@ import BottomNavBar from './components/BottomNavBar';
 import AIVoicePanelModal from './components/AIVoicePanelModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
-import { Sprout, RefreshCw } from 'lucide-react';
+import { Sprout, RefreshCw, ArrowLeft } from 'lucide-react';
 
 export default function App() {
   const [allVillages, setAllVillages] = useState([]);
@@ -78,6 +78,11 @@ export default function App() {
     setActiveTab('advisory');
   };
 
+  const handleBackToFarmerHome = () => {
+    setViewMode('farmer');
+    setActiveTab('dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950 pb-16 md:pb-0">
       
@@ -95,7 +100,7 @@ export default function App() {
       />
 
       {/* Main Container Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6">
         
         {/* Village Location Selector Banner */}
         <VillageSelector
@@ -114,7 +119,7 @@ export default function App() {
         ) : selectedVillage && riskMetrics ? (
           <div>
             
-            {/* FARMER SIMPLE MODE (STAYS ON SAME PAGE, NO REDIRECT!) */}
+            {/* FARMER SIMPLE MODE (DEFAULT EASY VIEW FOR FARMERS) */}
             {viewMode === 'farmer' ? (
               <div className="space-y-6">
                 <FarmerSimpleView
@@ -133,6 +138,18 @@ export default function App() {
             ) : (
               /* DETAILED AGRONOMIST MODE */
               <div>
+                
+                {/* Prominent Back Button to Farmer Home on Every Sub-Tab */}
+                <div className="mb-4">
+                  <button
+                    onClick={handleBackToFarmerHome}
+                    className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-emerald-400 hover:text-emerald-300 font-extrabold text-xs shadow-lg transition-all active:scale-95 cursor-pointer"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>← Back to Farmer Home (मागे जा / मुख्य पृष्ठ)</span>
+                  </button>
+                </div>
+
                 {/* TAB 1: DASHBOARD VIEW */}
                 {activeTab === 'dashboard' && (
                   <div>

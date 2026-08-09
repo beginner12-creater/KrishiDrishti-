@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, Volume2 } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode }) {
+export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode, onOpenVoicePanel }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const languages = [
@@ -16,6 +16,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'profit', label: '💰 Profit Crops', icon: IndianRupee },
     { id: 'advisory', label: 'AI Advisory', icon: ShieldAlert },
     { id: 'map', label: 'Geo Map', icon: MapPin },
     { id: 'compare', label: 'Compare', icon: GitCompare },
@@ -59,7 +60,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-950" />
-            <span>🌾 Farmer Mode (शेतकरी मोड)</span>
+            <span>🌾 Farmer Mode</span>
           </button>
           <button
             onClick={() => setViewMode('detailed')}
@@ -99,6 +100,16 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
 
         {/* Right Tools & Language & Mobile Hamburger */}
         <div className="flex items-center space-x-1.5 sm:space-x-2">
+          
+          {/* AI Voice Panel Trigger Button */}
+          <button
+            onClick={onOpenVoicePanel}
+            className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-800/60 text-xs font-bold transition-all hover:bg-amber-500/30"
+          >
+            <Volume2 className="w-3.5 h-3.5 animate-pulse text-amber-400" />
+            <span className="hidden sm:inline">Voice AI</span>
+          </button>
+
           {/* Language Selector */}
           <div className="relative flex items-center bg-slate-900 border border-slate-800 rounded-lg px-1.5 py-1 text-xs text-slate-300">
             <Globe className="w-3.5 h-3.5 mr-1 text-emerald-400 shrink-0" />

@@ -11,6 +11,8 @@ import VillageCompare from './components/VillageCompare';
 import PrintReportModal from './components/PrintReportModal';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
+import BottomNavBar from './components/BottomNavBar';
+import AIVoicePanelModal from './components/AIVoicePanelModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { Sprout, RefreshCw } from 'lucide-react';
@@ -20,11 +22,12 @@ export default function App() {
   const [hierarchy, setHierarchy] = useState({});
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'advisory' | 'map' | 'compare' | 'chat'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'advisory' | 'map' | 'compare' | 'chat'
   const [viewMode, setViewMode] = useState('farmer'); // 'farmer' | 'detailed'
   const [currentLang, setCurrentLang] = useState('en');
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isVoicePanelOpen, setIsVoicePanelOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // 1. Initial load of village database and hierarchy
@@ -74,7 +77,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950 pb-16 md:pb-0">
       
       {/* Top Navbar Header */}
       <Navbar
@@ -86,6 +89,7 @@ export default function App() {
         activeVillage={selectedVillage}
         viewMode={viewMode}
         setViewMode={setViewMode}
+        onOpenVoicePanel={() => setIsVoicePanelOpen(true)}
       />
 
       {/* Main Container Body */}
@@ -130,11 +134,6 @@ export default function App() {
                 {/* TAB 1: DASHBOARD VIEW */}
                 {activeTab === 'dashboard' && (
                   <div>
-                    <CropProfitRecommendation
-                      village={selectedVillage}
-                      riskMetrics={riskMetrics}
-                      onSelectCrop={handleSelectCropForAdvisory}
-                    />
                     <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
                     <ClimateCharts village={selectedVillage} riskMetrics={riskMetrics} />
                     <CropVulnerabilityMatrix
@@ -145,7 +144,16 @@ export default function App() {
                   </div>
                 )}
 
-                {/* TAB 2: AI ADVISORY VIEW */}
+                {/* SEPARATE TAB 2: PROFIT CROPS */}
+                {activeTab === 'profit' && (
+                  <CropProfitRecommendation
+                    village={selectedVillage}
+                    riskMetrics={riskMetrics}
+                    onSelectCrop={handleSelectCropForAdvisory}
+                  />
+                )}
+
+                {/* TAB 3: AI ADVISORY VIEW */}
                 {activeTab === 'advisory' && (
                   <AIAdvisorySection
                     village={selectedVillage}
@@ -155,7 +163,7 @@ export default function App() {
                   />
                 )}
 
-                {/* TAB 3: GEO MAP VIEW */}
+                {/* TAB 4: GEO MAP VIEW */}
                 {activeTab === 'map' && (
                   <div>
                     <InteractiveMap village={selectedVillage} riskMetrics={riskMetrics} />
@@ -163,7 +171,7 @@ export default function App() {
                   </div>
                 )}
 
-                {/* TAB 4: COMPARE VILLAGES VIEW */}
+                {/* TAB 5: COMPARE VILLAGES VIEW */}
                 {activeTab === 'compare' && (
                   <VillageCompare
                     allVillages={allVillages}
@@ -171,7 +179,7 @@ export default function App() {
                   />
                 )}
 
-                {/* TAB 5: KRISHI MITR AI CHATBOT */}
+                {/* TAB 6: KRISHI MITR AI CHATBOT */}
                 {activeTab === 'chat' && (
                   <KrishiMitrChat village={selectedVillage} riskMetrics={riskMetrics} />
                 )}
@@ -187,8 +195,26 @@ export default function App() {
 
       </main>
 
+      {/* YouTube-style Mobile Bottom Navigation Bar */}
+      <BottomNavBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        onOpenVoicePanel={() => setIsVoicePanelOpen(true)}
+      />
+
+      {/* Dedicated AI Voice Panel Modal */}
+      {isVoicePanelOpen && (
+        <AIVoicePanelModal
+          village={selectedVillage}
+          riskMetrics={riskMetrics}
+          onClose={() => setIsVoicePanelOpen(false)}
+        />
+      )}
+
       {/* Footer Banner */}
-      <footer className="glass-panel border-t border-slate-800/80 py-6 px-4 text-center text-xs text-slate-500">
+      <footer className="glass-panel border-t border-slate-800/80 py-6 px-4 text-center text-xs text-slate-500 mb-12 md:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <Sprout className="w-4 h-4 text-emerald-400" />

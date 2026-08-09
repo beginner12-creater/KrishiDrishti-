@@ -12,6 +12,7 @@ import PrintReportModal from './components/PrintReportModal';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
 import BottomNavBar from './components/BottomNavBar';
+import AuthModal from './components/AuthModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { t } from './data/translations';
@@ -27,6 +28,8 @@ export default function App() {
   const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // 1. Initial load of village database and hierarchy
@@ -95,6 +98,9 @@ export default function App() {
         activeVillage={selectedVillage}
         viewMode={viewMode}
         setViewMode={setViewMode}
+        user={user}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onLogout={() => setUser(null)}
       />
 
       {/* Main Container Body */}
@@ -251,6 +257,13 @@ export default function App() {
           onClose={() => setIsReportModalOpen(false)}
         />
       )}
+
+      {/* User Login Modal with Google Sign-In & Mobile OTP */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={(loggedInUser) => setUser(loggedInUser)}
+      />
 
     </div>
   );

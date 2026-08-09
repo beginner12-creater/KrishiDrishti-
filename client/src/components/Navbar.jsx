@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, User, LogOut, LogIn } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode }) {
+export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode, user, onOpenAuthModal, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const languages = [
@@ -11,7 +11,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
     { code: 'pa', label: 'ਪੰਜਾਬੀ' },
     { code: 'ta', label: 'தமிழ்' },
     { code: 'te', label: 'తెలుగు' },
-    { code: 'gu', label: 'ગુજરાતી' }
+    { code: 'gu', label: '<ctrl42>ગુજરાતી' }
   ];
 
   const navItems = [
@@ -93,7 +93,7 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
           </nav>
         )}
 
-        {/* Right Tools & Language & Mobile Hamburger */}
+        {/* Right Tools & Language & User Auth & Mobile Hamburger */}
         <div className="flex items-center space-x-1 shrink-0">
           
           {/* Language Selector Dropdown */}
@@ -111,6 +111,35 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
               ))}
             </select>
           </div>
+
+          {/* User Auth Profile / Login Button */}
+          {user ? (
+            <div className="flex items-center space-x-1 bg-slate-100 border border-slate-200 p-1 rounded-xl">
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-6 h-6 rounded-lg object-cover shrink-0"
+              />
+              <span className="text-[11px] font-black text-slate-900 hidden sm:inline max-w-[90px] truncate">
+                {user.name.split(' ')[0]}
+              </span>
+              <button
+                onClick={onLogout}
+                className="p-1 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-slate-200 cursor-pointer"
+                title="Logout"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuthModal}
+              className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition-all shadow-xs shrink-0 cursor-pointer min-h-[30px]"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span className="text-[11px] sm:text-xs">Login (लॉगिन)</span>
+            </button>
+          )}
 
           {/* Export Report Button */}
           {activeVillage && (

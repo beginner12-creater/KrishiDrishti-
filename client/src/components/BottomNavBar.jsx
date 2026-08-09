@@ -1,7 +1,7 @@
 import React from 'react';
-import { Home, IndianRupee, BarChart3, MapPin, Bot, Volume2 } from 'lucide-react';
+import { Home, IndianRupee, BarChart3, MapPin, Bot } from 'lucide-react';
 
-export default function BottomNavBar({ activeTab, setActiveTab, viewMode, setViewMode, onOpenVoicePanel }) {
+export default function BottomNavBar({ activeTab, setActiveTab, viewMode, setViewMode }) {
   const navItems = [
     { id: 'farmer', label: 'Farmer Home', icon: Home, isMode: true },
     { id: 'profit', label: 'Profit Crops', icon: IndianRupee, isMode: false },
@@ -42,15 +42,6 @@ export default function BottomNavBar({ activeTab, setActiveTab, viewMode, setVie
             </button>
           );
         })}
-
-        {/* Floating Voice Assistant Trigger Pill */}
-        <button
-          onClick={onOpenVoicePanel}
-          className="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-amber-900 hover:text-amber-950 transition-all min-w-[55px] min-h-[48px] bg-amber-100 border border-amber-300 shadow-xs"
-        >
-          <Volume2 className="w-5 h-5 mb-0.5 animate-pulse text-amber-700" />
-          <span className="text-[10px] font-extrabold">Voice AI</span>
-        </button>
       </div>
     </div>
   );

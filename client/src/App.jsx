@@ -12,7 +12,6 @@ import PrintReportModal from './components/PrintReportModal';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
 import BottomNavBar from './components/BottomNavBar';
-import AIVoicePanelModal from './components/AIVoicePanelModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { Sprout, RefreshCw, ArrowLeft } from 'lucide-react';
@@ -27,7 +26,6 @@ export default function App() {
   const [currentLang, setCurrentLang] = useState('en');
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isVoicePanelOpen, setIsVoicePanelOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // 1. Initial load of village database and hierarchy
@@ -96,7 +94,6 @@ export default function App() {
         activeVillage={selectedVillage}
         viewMode={viewMode}
         setViewMode={setViewMode}
-        onOpenVoicePanel={() => setIsVoicePanelOpen(true)}
       />
 
       {/* Main Container Body */}
@@ -220,17 +217,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         viewMode={viewMode}
         setViewMode={setViewMode}
-        onOpenVoicePanel={() => setIsVoicePanelOpen(true)}
       />
-
-      {/* Dedicated AI Voice Panel Modal */}
-      {isVoicePanelOpen && (
-        <AIVoicePanelModal
-          village={selectedVillage}
-          riskMetrics={riskMetrics}
-          onClose={() => setIsVoicePanelOpen(false)}
-        />
-      )}
 
       {/* Footer Banner */}
       <footer className="bg-white border-t border-slate-200 py-6 px-4 text-center text-xs text-slate-500 mb-12 md:mb-0">

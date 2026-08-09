@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee, Volume2 } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode, onOpenVoicePanel }) {
+export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const languages = [
@@ -96,15 +96,6 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
         {/* Right Tools & Language & Mobile Hamburger */}
         <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
           
-          {/* AI Voice Panel Trigger Button */}
-          <button
-            onClick={onOpenVoicePanel}
-            className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition-all hover:bg-amber-200 min-h-[32px]"
-          >
-            <Volume2 className="w-3.5 h-3.5 animate-pulse text-amber-700" />
-            <span className="text-[11px]">Voice</span>
-          </button>
-
           {/* Language Selector Dropdown */}
           <div className="relative flex items-center bg-slate-100 border border-slate-200 rounded-lg px-1.5 py-1 text-xs text-slate-800 min-h-[32px]">
             <Globe className="w-3.5 h-3.5 mr-1 text-emerald-600 shrink-0" />

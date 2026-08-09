@@ -13,6 +13,7 @@ import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
 import BottomNavBar from './components/BottomNavBar';
 import PlatformImpactFeatures from './components/PlatformImpactFeatures';
+import FloatingAIAssistant from './components/FloatingAIAssistant';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { t } from './data/translations';
@@ -222,6 +223,15 @@ export default function App() {
         )}
 
       </main>
+
+      {/* Floating AI Assistant Button & Chat Popup (Bottom Right Front Page) */}
+      {selectedVillage && riskMetrics && (
+        <FloatingAIAssistant
+          village={selectedVillage}
+          riskMetrics={riskMetrics}
+          currentLang={currentLang}
+        />
+      )}
 
       {/* YouTube-style Mobile Bottom Navigation Bar */}
       <BottomNavBar

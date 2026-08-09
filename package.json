@@ -1,0 +1,23 @@
+{
+  "name": "climate-risk-india",
+  "version": "1.0.0",
+  "description": "AI-based Climate Risk Advisory Platform for Indian Villages (Agriculture Focus)",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "server": "node server/index.js",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix client"
+  },
+  "keywords": [
+    "climate-risk",
+    "india-villages",
+    "agriculture",
+    "ai-advisory",
+    "crop-resilience",
+    "krishidrishti"
+  ],
+  "author": "Antigravity AI",
+  "license": "MIT"
+}

@@ -1,0 +1,191 @@
+import React, { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import VillageSelector from './components/VillageSelector';
+import RiskSummaryCards from './components/RiskSummaryCards';
+import ClimateCharts from './components/ClimateCharts';
+import CropVulnerabilityMatrix from './components/CropVulnerabilityMatrix';
+import AIAdvisorySection from './components/AIAdvisorySection';
+import InteractiveMap from './components/InteractiveMap';
+import KrishiMitrChat from './components/KrishiMitrChat';
+import VillageCompare from './components/VillageCompare';
+import PrintReportModal from './components/PrintReportModal';
+
+import { Sprout, RefreshCw, ShieldAlert, Sparkles, MapPin, Info, ArrowRight } from 'lucide-react';
+
+export default function App() {
+  const [allVillages, setAllVillages] = useState([]);
+  const [hierarchy, setHierarchy] = useState({});
+  const [selectedVillage, setSelectedVillage] = useState(null);
+  const [riskMetrics, setRiskMetrics] = useState(null);
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'advisory' | 'map' | 'compare' | 'chat'
+  const [currentLang, setCurrentLang] = useState('en');
+  const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // 1. Initial load of village database and hierarchy
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  const fetchInitialData = async () => {
+    setLoading(true);
+    try {
+      // Fetch hierarchy
+      const hierRes = await fetch('/api/villages/hierarchy');
+      const hierData = await hierRes.json();
+      if (hierData.hierarchy) {
+        setHierarchy(hierData.hierarchy);
+      }
+
+      // Fetch all villages list
+      const villRes = await fetch('/api/villages');
+      const villData = await villRes.json();
+      if (villData.villages && villData.villages.length > 0) {
+        setAllVillages(villData.villages);
+        // Select first village (e.g. Ralegaon - Vidarbha) by default
+        loadVillageDetails(villData.villages[0].id);
+      }
+    } catch (err) {
+      console.error('Failed to initialize app data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2. Load detailed analysis for a selected village
+  const loadVillageDetails = async (villageId) => {
+    try {
+      const res = await fetch(`/api/villages/${villageId}`);
+      const data = await res.json();
+      if (data.village && data.riskMetrics) {
+        setSelectedVillage(data.village);
+        setRiskMetrics(data.riskMetrics);
+        setSelectedCropForAdvisory(data.village.primaryCrops[0]);
+      }
+    } catch (err) {
+      console.error('Failed to load village risk metrics:', err);
+    }
+  };
+
+  const handleSelectVillage = (villageObj) => {
+    loadVillageDetails(villageObj.id);
+  };
+
+  const handleSelectCropForAdvisory = (cropName) => {
+    setSelectedCropForAdvisory(cropName);
+    setActiveTab('advisory');
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+      
+      {/* Top Navbar Header */}
+      <Navbar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        currentLang={currentLang}
+        setCurrentLang={setCurrentLang}
+        onOpenReportModal={() => setIsReportModalOpen(true)}
+        activeVillage={selectedVillage}
+      />
+
+      {/* Main Container Body */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        {/* Village Location Selector Banner */}
+        <VillageSelector
+          villages={allVillages}
+          hierarchy={hierarchy}
+          selectedVillage={selectedVillage}
+          onSelectVillage={handleSelectVillage}
+        />
+
+        {loading ? (
+          <div className="py-24 text-center">
+            <RefreshCw className="w-10 h-10 text-emerald-400 animate-spin mx-auto mb-4" />
+            <h3 className="text-base font-bold text-slate-200">Loading Indian Agricultural Climate Database...</h3>
+            <p className="text-xs text-slate-500 mt-1">Connecting to risk index calculator & agro-met forecast server</p>
+          </div>
+        ) : selectedVillage && riskMetrics ? (
+          <div>
+            
+            {/* TAB 1: DASHBOARD VIEW */}
+            {activeTab === 'dashboard' && (
+              <div>
+                <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
+                <ClimateCharts village={selectedVillage} riskMetrics={riskMetrics} />
+                <CropVulnerabilityMatrix
+                  village={selectedVillage}
+                  riskMetrics={riskMetrics}
+                  onSelectCropForAdvisory={handleSelectCropForAdvisory}
+                />
+              </div>
+            )}
+
+            {/* TAB 2: AI ADVISORY VIEW */}
+            {activeTab === 'advisory' && (
+              <AIAdvisorySection
+                village={selectedVillage}
+                riskMetrics={riskMetrics}
+                selectedCrop={selectedCropForAdvisory}
+                onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+              />
+            )}
+
+            {/* TAB 3: GEO MAP VIEW */}
+            {activeTab === 'map' && (
+              <div>
+                <InteractiveMap village={selectedVillage} riskMetrics={riskMetrics} />
+                <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
+              </div>
+            )}
+
+            {/* TAB 4: COMPARE VILLAGES VIEW */}
+            {activeTab === 'compare' && (
+              <VillageCompare
+                allVillages={allVillages}
+                defaultVillage={selectedVillage}
+              />
+            )}
+
+            {/* TAB 5: KRISHI MITR AI CHATBOT */}
+            {activeTab === 'chat' && (
+              <KrishiMitrChat village={selectedVillage} riskMetrics={riskMetrics} />
+            )}
+
+          </div>
+        ) : (
+          <div className="text-center py-20 text-slate-400">
+            Select a village to view climate risk advisory.
+          </div>
+        )}
+
+      </main>
+
+      {/* Footer Banner */}
+      <footer className="glass-panel border-t border-slate-800/80 py-6 px-4 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center space-x-2">
+            <Sprout className="w-4 h-4 text-emerald-400" />
+            <span className="font-semibold text-slate-300">KrishiDrishti AI</span>
+            <span>— AI Agricultural Climate Vulnerability & Resilience Platform</span>
+          </div>
+          <div>
+            Data Sources: ICAR Agro-Climatic Zones • IMD Weather Baseline • Central Ground Water Board (CGWB)
+          </div>
+        </div>
+      </footer>
+
+      {/* Printable Report Modal */}
+      {isReportModalOpen && (
+        <PrintReportModal
+          village={selectedVillage}
+          riskMetrics={riskMetrics}
+          onClose={() => setIsReportModalOpen(false)}
+        />
+      )}
+
+    </div>
+  );
+}

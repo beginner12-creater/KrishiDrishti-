@@ -71,8 +71,10 @@ export default function App() {
     loadVillageDetails(villageObj.id);
   };
 
+  // Handle clicking "Get Advisory Guide" from Profit Cards or Crop Matrix
   const handleSelectCropForAdvisory = (cropName) => {
     setSelectedCropForAdvisory(cropName);
+    setViewMode('detailed');
     setActiveTab('advisory');
   };
 
@@ -118,7 +120,7 @@ export default function App() {
                 <FarmerSimpleView
                   village={selectedVillage}
                   riskMetrics={riskMetrics}
-                  onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+                  onSelectCrop={(crop) => handleSelectCropForAdvisory(crop)}
                 />
                 
                 {/* Profit Maximizing Crop Suggestions */}

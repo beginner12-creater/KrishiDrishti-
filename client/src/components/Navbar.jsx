@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage }) {
+export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const languages = [
@@ -48,26 +48,54 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
           </div>
         </div>
 
+        {/* Mode Toggle: Farmer Mode vs Detailed Analytics */}
+        <div className="flex items-center space-x-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+          <button
+            onClick={() => setViewMode('farmer')}
+            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+              viewMode === 'farmer'
+                ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-950" />
+            <span>🌾 Farmer Mode (शेतकरी मोड)</span>
+          </button>
+          <button
+            onClick={() => setViewMode('detailed')}
+            className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              viewMode === 'detailed'
+                ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20'
+                : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Detailed View</span>
+          </button>
+        </div>
+
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs sm:text-sm font-medium">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabClick(item.id)}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition-all ${
-                  activeTab === item.id
-                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
+        {viewMode === 'detailed' && (
+          <nav className="hidden lg:flex items-center space-x-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs sm:text-sm font-medium">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleTabClick(item.id)}
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                    activeTab === item.id
+                      ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        )}
 
         {/* Right Tools & Language & Mobile Hamburger */}
         <div className="flex items-center space-x-1.5 sm:space-x-2">

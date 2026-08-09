@@ -9,6 +9,7 @@ import InteractiveMap from './components/InteractiveMap';
 import KrishiMitrChat from './components/KrishiMitrChat';
 import VillageCompare from './components/VillageCompare';
 import PrintReportModal from './components/PrintReportModal';
+import FarmerSimpleView from './components/FarmerSimpleView';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { Sprout, RefreshCw } from 'lucide-react';
@@ -19,6 +20,7 @@ export default function App() {
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'advisory' | 'map' | 'compare' | 'chat'
+  const [viewMode, setViewMode] = useState('farmer'); // 'farmer' | 'detailed'
   const [currentLang, setCurrentLang] = useState('en');
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -42,7 +44,7 @@ export default function App() {
       }
     } catch (err) {
       console.error('Failed to initialize app data:', err);
-    } fontally: {
+    } finally {
       setLoading(false);
     }
   };
@@ -81,6 +83,8 @@ export default function App() {
         setCurrentLang={setCurrentLang}
         onOpenReportModal={() => setIsReportModalOpen(true)}
         activeVillage={selectedVillage}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
 
       {/* Main Container Body */}
@@ -103,48 +107,60 @@ export default function App() {
         ) : selectedVillage && riskMetrics ? (
           <div>
             
-            {/* TAB 1: DASHBOARD VIEW */}
-            {activeTab === 'dashboard' && (
-              <div>
-                <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
-                <ClimateCharts village={selectedVillage} riskMetrics={riskMetrics} />
-                <CropVulnerabilityMatrix
-                  village={selectedVillage}
-                  riskMetrics={riskMetrics}
-                  onSelectCropForAdvisory={handleSelectCropForAdvisory}
-                />
-              </div>
-            )}
-
-            {/* TAB 2: AI ADVISORY VIEW */}
-            {activeTab === 'advisory' && (
-              <AIAdvisorySection
+            {/* FARMER SIMPLE MODE (DEFAULT EASY VIEW FOR FARMERS) */}
+            {viewMode === 'farmer' ? (
+              <FarmerSimpleView
                 village={selectedVillage}
                 riskMetrics={riskMetrics}
-                selectedCrop={selectedCropForAdvisory}
                 onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
               />
-            )}
-
-            {/* TAB 3: GEO MAP VIEW */}
-            {activeTab === 'map' && (
+            ) : (
+              /* DETAILED AGRONOMIST MODE */
               <div>
-                <InteractiveMap village={selectedVillage} riskMetrics={riskMetrics} />
-                <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
+                {/* TAB 1: DASHBOARD VIEW */}
+                {activeTab === 'dashboard' && (
+                  <div>
+                    <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
+                    <ClimateCharts village={selectedVillage} riskMetrics={riskMetrics} />
+                    <CropVulnerabilityMatrix
+                      village={selectedVillage}
+                      riskMetrics={riskMetrics}
+                      onSelectCropForAdvisory={handleSelectCropForAdvisory}
+                    />
+                  </div>
+                )}
+
+                {/* TAB 2: AI ADVISORY VIEW */}
+                {activeTab === 'advisory' && (
+                  <AIAdvisorySection
+                    village={selectedVillage}
+                    riskMetrics={riskMetrics}
+                    selectedCrop={selectedCropForAdvisory}
+                    onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+                  />
+                )}
+
+                {/* TAB 3: GEO MAP VIEW */}
+                {activeTab === 'map' && (
+                  <div>
+                    <InteractiveMap village={selectedVillage} riskMetrics={riskMetrics} />
+                    <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
+                  </div>
+                )}
+
+                {/* TAB 4: COMPARE VILLAGES VIEW */}
+                {activeTab === 'compare' && (
+                  <VillageCompare
+                    allVillages={allVillages}
+                    defaultVillage={selectedVillage}
+                  />
+                )}
+
+                {/* TAB 5: KRISHI MITR AI CHATBOT */}
+                {activeTab === 'chat' && (
+                  <KrishiMitrChat village={selectedVillage} riskMetrics={riskMetrics} />
+                )}
               </div>
-            )}
-
-            {/* TAB 4: COMPARE VILLAGES VIEW */}
-            {activeTab === 'compare' && (
-              <VillageCompare
-                allVillages={allVillages}
-                defaultVillage={selectedVillage}
-              />
-            )}
-
-            {/* TAB 5: KRISHI MITR AI CHATBOT */}
-            {activeTab === 'chat' && (
-              <KrishiMitrChat village={selectedVillage} riskMetrics={riskMetrics} />
             )}
 
           </div>

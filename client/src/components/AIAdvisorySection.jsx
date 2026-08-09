@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Sprout, Droplets, Mountain, Bug, FileCheck, CheckSquare, Square, RefreshCw, Sparkles, ChevronRight } from 'lucide-react';
+import { generateAdvisory } from '../services/apiService';
+import { ShieldAlert, Sprout, Droplets, Mountain, Bug, FileCheck, CheckSquare, Square, RefreshCw, Sparkles } from 'lucide-react';
 
 export default function AIAdvisorySection({ village, riskMetrics, selectedCrop, onSelectCrop }) {
   const [advisoryData, setAdvisoryData] = useState(null);
@@ -15,18 +16,9 @@ export default function AIAdvisorySection({ village, riskMetrics, selectedCrop, 
   const fetchAIAdvisory = async (crop) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/ai-advisory', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          villageId: village.id,
-          selectedCrop: crop,
-          lang: 'en'
-        })
-      });
-      const data = await res.json();
-      if (data.advisoryReport) {
-        setAdvisoryData(data.advisoryReport);
+      const data = await generateAdvisory(village.id, crop, 'en');
+      if (data) {
+        setAdvisoryData(data);
       }
     } catch (err) {
       console.error('Failed to fetch AI advisory:', err);
@@ -65,16 +57,16 @@ export default function AIAdvisorySection({ village, riskMetrics, selectedCrop, 
   };
 
   return (
-    <div className="glass-panel p-6 rounded-2xl border border-slate-800/80 mb-6 shadow-xl relative">
+    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-slate-800/80 mb-6 shadow-xl relative">
       
       {/* Header & Crop Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
         <div>
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5 text-emerald-400" />
             </div>
-            <h2 className="text-lg font-bold text-slate-100">
+            <h2 className="text-base sm:text-lg font-bold text-slate-100">
               5-Pillar Agricultural Climate Advisory Engine
             </h2>
           </div>
@@ -102,7 +94,7 @@ export default function AIAdvisorySection({ village, riskMetrics, selectedCrop, 
           <button
             onClick={() => fetchAIAdvisory(selectedCrop || village.primaryCrops[0])}
             disabled={loading}
-            className="p-1.5 rounded-xl bg-slate-800 text-emerald-400 hover:bg-slate-700 transition-all border border-slate-700 disabled:opacity-50"
+            className="p-1.5 rounded-xl bg-slate-800 text-emerald-400 hover:bg-slate-700 transition-all border border-slate-700 disabled:opacity-50 shrink-0"
             title="Re-synthesis AI Advisory"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -122,11 +114,11 @@ export default function AIAdvisorySection({ village, riskMetrics, selectedCrop, 
           {advisoryData.advisories.map((adv) => (
             <div
               key={adv.id}
-              className="glass-card p-5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all"
+              className="glass-card p-4 sm:p-5 rounded-xl border border-slate-800 hover:border-slate-700 transition-all"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 shrink-0">
                     {getIcon(adv.icon)}
                   </div>
                   <div>
@@ -141,12 +133,10 @@ export default function AIAdvisorySection({ village, riskMetrics, selectedCrop, 
                 </span>
               </div>
 
-              {/* Summary Text */}
               <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 mb-4">
                 {adv.summary}
               </p>
 
-              {/* Action Checklist */}
               <div>
                 <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <FileCheck className="w-3.5 h-3.5 text-emerald-400" /> Agronomic Action Checklist

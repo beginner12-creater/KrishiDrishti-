@@ -10,7 +10,8 @@ import KrishiMitrChat from './components/KrishiMitrChat';
 import VillageCompare from './components/VillageCompare';
 import PrintReportModal from './components/PrintReportModal';
 
-import { Sprout, RefreshCw, ShieldAlert, Sparkles, MapPin, Info, ArrowRight } from 'lucide-react';
+import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
+import { Sprout, RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [allVillages, setAllVillages] = useState([]);
@@ -31,24 +32,17 @@ export default function App() {
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      // Fetch hierarchy
-      const hierRes = await fetch('/api/villages/hierarchy');
-      const hierData = await hierRes.json();
-      if (hierData.hierarchy) {
-        setHierarchy(hierData.hierarchy);
-      }
+      const hier = await fetchHierarchy();
+      if (hier) setHierarchy(hier);
 
-      // Fetch all villages list
-      const villRes = await fetch('/api/villages');
-      const villData = await villRes.json();
-      if (villData.villages && villData.villages.length > 0) {
-        setAllVillages(villData.villages);
-        // Select first village (e.g. Ralegaon - Vidarbha) by default
-        loadVillageDetails(villData.villages[0].id);
+      const villList = await fetchVillages();
+      if (villList && villList.length > 0) {
+        setAllVillages(villList);
+        loadVillageDetails(villList[0].id);
       }
     } catch (err) {
       console.error('Failed to initialize app data:', err);
-    } finally {
+    } fontally: {
       setLoading(false);
     }
   };
@@ -56,9 +50,8 @@ export default function App() {
   // 2. Load detailed analysis for a selected village
   const loadVillageDetails = async (villageId) => {
     try {
-      const res = await fetch(`/api/villages/${villageId}`);
-      const data = await res.json();
-      if (data.village && data.riskMetrics) {
+      const data = await fetchVillageDetails(villageId);
+      if (data && data.village && data.riskMetrics) {
         setSelectedVillage(data.village);
         setRiskMetrics(data.riskMetrics);
         setSelectedCropForAdvisory(data.village.primaryCrops[0]);
@@ -105,7 +98,7 @@ export default function App() {
           <div className="py-24 text-center">
             <RefreshCw className="w-10 h-10 text-emerald-400 animate-spin mx-auto mb-4" />
             <h3 className="text-base font-bold text-slate-200">Loading Indian Agricultural Climate Database...</h3>
-            <p className="text-xs text-slate-500 mt-1">Connecting to risk index calculator & agro-met forecast server</p>
+            <p className="text-xs text-slate-500 mt-1">Connecting to risk index calculator & agro-met forecast engine</p>
           </div>
         ) : selectedVillage && riskMetrics ? (
           <div>

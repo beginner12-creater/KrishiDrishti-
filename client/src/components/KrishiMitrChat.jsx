@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { sendChatMessage } from '../services/apiService';
 import { Bot, Send, User, Sparkles, RefreshCw } from 'lucide-react';
 
 export default function KrishiMitrChat({ village, riskMetrics }) {
@@ -28,18 +29,10 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/krishi-mitr/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: query,
-          villageId: village?.id
-        })
-      });
-      const data = await res.json();
-      setMessages(prev => [...prev, { sender: 'bot', text: data.reply || 'I am ready to help you with crop advice.' }]);
+      const reply = await sendChatMessage(query, village?.id);
+      setMessages(prev => [...prev, { sender: 'bot', text: reply || 'I am ready to help you with crop advice.' }]);
     } catch (err) {
-      setMessages(prev => [...prev, { sender: 'bot', text: 'Sorry, I am having trouble connecting to the advisory server.' }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: 'Sorry, I am having trouble connecting to the advisory engine.' }]);
     } finally {
       setLoading(false);
     }

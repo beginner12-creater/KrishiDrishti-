@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { GitCompare, MapPin, Activity, Droplets, Sun, Flame, Bug, Check, Plus, Trash2 } from 'lucide-react';
+import { compareVillages } from '../services/apiService';
+import { GitCompare, Sun, Flame, Droplets, Bug, Trash2 } from 'lucide-react';
 
 export default function VillageCompare({ allVillages, defaultVillage }) {
   const [selectedVillageIds, setSelectedVillageIds] = useState([]);
@@ -8,7 +9,6 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
 
   useEffect(() => {
     if (defaultVillage && selectedVillageIds.length === 0) {
-      // Default compare selected village with 1 or 2 others
       const defaultOther = allVillages.find(v => v.id !== defaultVillage.id) || allVillages[1];
       setSelectedVillageIds([defaultVillage.id, defaultOther?.id].filter(Boolean));
     }
@@ -23,14 +23,9 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
   const fetchComparison = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/compare', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ villageIds: selectedVillageIds })
-      });
-      const data = await res.json();
-      if (data.comparison) {
-        setComparisonData(data.comparison);
+      const comp = await compareVillages(selectedVillageIds);
+      if (comp) {
+        setComparisonData(comp);
       }
     } catch (err) {
       console.error('Failed to compare villages:', err);
@@ -49,7 +44,7 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
   };
 
   return (
-    <div className="glass-panel p-6 rounded-2xl border border-slate-800/80 mb-6 shadow-xl">
+    <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-slate-800/80 mb-6 shadow-xl">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div>
           <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
@@ -61,7 +56,6 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
           </p>
         </div>
 
-        {/* Add Village Dropdown */}
         {selectedVillageIds.length < 3 && (
           <div className="flex items-center space-x-2">
             <select
@@ -82,7 +76,6 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
         )}
       </div>
 
-      {/* Comparison Grid */}
       {loading ? (
         <div className="py-12 text-center text-xs text-slate-400">
           Comparing village climate risks...
@@ -92,7 +85,6 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
           {comparisonData.map(({ village, riskMetrics }) => (
             <div key={village.id} className="glass-card p-5 rounded-xl border border-slate-800 relative flex flex-col justify-between">
               
-              {/* Header */}
               <div>
                 <div className="flex items-start justify-between">
                   <div>
@@ -110,7 +102,6 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
                   )}
                 </div>
 
-                {/* Score Gauge */}
                 <div className="my-4 p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-center">
                   <span className="text-xs text-slate-400 block font-medium">Agri Climate Risk Index</span>
                   <div className="text-3xl font-extrabold my-1" style={{ color: riskMetrics.riskBadgeColor }}>
@@ -121,7 +112,6 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
                   </span>
                 </div>
 
-                {/* Sub Indices */}
                 <div className="space-y-2 text-xs mb-4">
                   <div className="flex justify-between items-center bg-slate-900/50 p-2 rounded-lg">
                     <span className="text-slate-400 flex items-center gap-1.5"><Sun className="w-3.5 h-3.5 text-amber-400" /> Drought Risk:</span>
@@ -141,7 +131,6 @@ export default function VillageCompare({ allVillages, defaultVillage }) {
                   </div>
                 </div>
 
-                {/* Baseline Agro Attributes */}
                 <div className="border-t border-slate-800 pt-3 text-xs space-y-1.5 text-slate-300">
                   <div>Soil: <strong className="text-slate-100">{village.soilType}</strong></div>
                   <div>Groundwater: <strong className="text-amber-400">{village.groundwaterStatus}</strong></div>

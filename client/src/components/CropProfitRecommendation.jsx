@@ -18,9 +18,9 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
       recommendations.push({
         cropName: "Pomegranate",
         displayName: "Bhagwa Pomegranate (डाळिंब)",
-        category: "High-Value Horticulture",
+        category: "High-Value Horticulture (फळबाग फलोत्पादन)",
         estProfitPerAcre: "₹ 1,80,000 - ₹ 3,20,000",
-        waterSavings: "55% Less Water (Drip Irrigated)",
+        waterSavings: "55% Less Water (ठिबक सिंचन)",
         resilienceScore: 88,
         marketDemand: 5,
         whyBest: `Perfect for ${village.villageName}'s light/medium soil & dry climate. Requires minimal drip irrigation.`
@@ -29,9 +29,9 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
       recommendations.push({
         cropName: "Bajra",
         displayName: "Pearl Millet (बाजरी / बाजरा)",
-        category: "Climate Resilient Grain",
+        category: "Climate Resilient Grain (हवामान सहनशील धान्य)",
         estProfitPerAcre: "₹ 45,000 - ₹ 75,000",
-        waterSavings: "65% Less Water",
+        waterSavings: "65% Less Water (कमी पाणी)",
         resilienceScore: 94,
         marketDemand: 4,
         whyBest: "Requires only 2 protective irrigations. High market demand for healthy millet flour."
@@ -40,9 +40,9 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
       recommendations.push({
         cropName: "Dragon Fruit",
         displayName: "Dragon Fruit / Kamalam (कमलम)",
-        category: "Exotic High-Profit Crop",
+        category: "Exotic High-Profit Crop (नफा देणारे फळ)",
         estProfitPerAcre: "₹ 3,50,000 - ₹ 5,00,000",
-        waterSavings: "70% Less Water",
+        waterSavings: "70% Less Water (फार कमी पाणी)",
         resilienceScore: 92,
         marketDemand: 5,
         whyBest: "Thrives in arid/semi-arid regions with gravelly soil. 25-year plantation lifespan."
@@ -50,10 +50,10 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
     } else if (isHighRain) {
       recommendations.push({
         cropName: "Paddy",
-        displayName: "Indrayani / Wada Kolam Paddy (भात)",
-        category: "Premium Scented Rice",
+        displayName: "Indrayani / Wada Kolam Paddy (भात / धान)",
+        category: "Premium Scented Rice (सुवासिक भात)",
         estProfitPerAcre: "₹ 90,000 - ₹ 1,40,000",
-        waterSavings: "Abundant Rainfall Suited",
+        waterSavings: "Abundant Rainfall (पाऊस अनुकूल)",
         resilienceScore: 85,
         marketDemand: 5,
         whyBest: `Utilizes ${village.villageName}'s ${village.annualRainfallNormal}mm high monsoon rainfall effectively.`
@@ -61,10 +61,10 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
 
       recommendations.push({
         cropName: "Cashew Nut",
-        displayName: "Cashew Nut (काजू)",
-        category: "Coastal Plantation",
+        displayName: "Cashew Nut (काजू बागायती)",
+        category: "Coastal Plantation (किनारपट्टी फळबाग)",
         estProfitPerAcre: "₹ 1,50,000 - ₹ 2,40,000",
-        waterSavings: "Rainfed Plantation",
+        waterSavings: "Rainfed Plantation (पावसावर)",
         resilienceScore: 90,
         marketDemand: 5,
         whyBest: "Suited for lateritic hilly slopes. Low maintenance with high export market demand."
@@ -72,10 +72,10 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
     } else if (isCanalIrrigated) {
       recommendations.push({
         cropName: "Grapes",
-        displayName: "Export Quality Grapes (द्राक्ष)",
-        category: "Export Cash Crop",
+        displayName: "Export Quality Grapes (द्राक्ष बागा)",
+        category: "Export Cash Crop (नगदी पीक / निर्यात)",
         estProfitPerAcre: "₹ 2,50,000 - ₹ 4,50,000",
-        waterSavings: "Precision Drip Irrigation",
+        waterSavings: "Precision Drip (ठिबक सिंचन)",
         resilienceScore: 82,
         marketDemand: 5,
         whyBest: `Ideal for ${village.districtName}'s climate. High returns from raisin processing & export.`
@@ -84,9 +84,9 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
       recommendations.push({
         cropName: "Turmeric",
         displayName: "Rajapuri Turmeric (हळद)",
-        category: "High-Curcumin Spice",
+        category: "High-Curcumin Spice (मसाले पीक)",
         estProfitPerAcre: "₹ 1,60,000 - ₹ 2,80,000",
-        waterSavings: "Medium Water Requirement",
+        waterSavings: "Medium Water (मध्यम पाणी)",
         resilienceScore: 86,
         marketDemand: 5,
         whyBest: "High market price per quintal. Intercropping compatible with soybean."
@@ -95,9 +95,9 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
       recommendations.push({
         cropName: "Soybean",
         displayName: "Soybean + Pigeonpea (सोयाबीन + तूर)",
-        category: "Balanced Intercropping",
+        category: "Balanced Intercropping (आंतरपीक पद्धत)",
         estProfitPerAcre: "₹ 70,000 - ₹ 1,20,000",
-        waterSavings: "35% Water Savings",
+        waterSavings: "35% Water Savings (पाणी बचत)",
         resilienceScore: 89,
         marketDemand: 4,
         whyBest: "Double income security. Pigeonpea acts as climate buffer if monsoon dry spell occurs."
@@ -105,10 +105,10 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
 
       recommendations.push({
         cropName: "Guava",
-        displayName: "VNR Bihi Guava (पेरू)",
-        category: "High-Density Horticulture",
+        displayName: "VNR Bihi Guava (पेरू फळबाग)",
+        category: "High-Density Horticulture (सघन फळबाग)",
         estProfitPerAcre: "₹ 2,00,000 - ₹ 3,50,000",
-        waterSavings: "50% Less Water",
+        waterSavings: "50% Less Water (कमी पाणी)",
         resilienceScore: 91,
         marketDemand: 5,
         whyBest: "Bears fruit within 1.5 years. High market price per kg (Jumbo 500g fruit)."
@@ -131,7 +131,7 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
               <TrendingUp className="w-5 h-5" />
             </div>
             <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              Profit-Maximizing Crop Recommendations
+              Profit-Maximizing Crop Recommendations (अधिक नफा देणारी पिके)
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-extrabold">Max Profit</span>
             </h3>
           </div>
@@ -141,7 +141,7 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
         </div>
 
         <span className="text-xs text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 self-start sm:self-auto font-bold">
-          Climate Resilience: <strong className="text-emerald-700">{100 - overallRiskScore}/100</strong>
+          Climate Resilience (हवामान सहनशीलता): <strong className="text-emerald-700">{100 - overallRiskScore}/100</strong>
         </span>
       </div>
 
@@ -169,7 +169,7 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
               {/* Profit Metric Pill */}
               <div className="bg-emerald-100/70 border border-emerald-300 p-3 rounded-xl mb-3">
                 <div className="text-[11px] text-emerald-900 font-black uppercase tracking-wider flex items-center gap-1">
-                  <IndianRupee className="w-3.5 h-3.5" /> Estimated Net Profit / Acre:
+                  <IndianRupee className="w-3.5 h-3.5" /> Estimated Net Profit / Acre (निव्वळ नफा / एकर):
                 </div>
                 <div className="text-lg font-black text-emerald-900 mt-0.5">
                   {crop.estProfitPerAcre}
@@ -178,11 +178,11 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
 
               <div className="space-y-1.5 text-xs font-semibold text-slate-700">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600 flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-cyan-600" /> Water Savings:</span>
+                  <span className="text-slate-600 flex items-center gap-1"><Droplets className="w-3.5 h-3.5 text-cyan-600" /> Water Savings (पाणी बचत):</span>
                   <span className="font-bold text-cyan-700">{crop.waterSavings}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-600 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Resilience:</span>
+                  <span className="text-slate-600 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Resilience (सहनशीलता):</span>
                   <span className="font-bold text-emerald-700">{crop.resilienceScore} / 100</span>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
               onClick={() => onSelectCrop(crop.cropName)}
               className="w-full py-3 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm mt-2 active:scale-95 cursor-pointer"
             >
-              <span>Get Full Advisory Guide</span>
+              <span>Get Full Advisory Guide (सल्ला मार्गदर्शक)</span>
               <ArrowUpRight className="w-4 h-4" />
             </button>
           </div>

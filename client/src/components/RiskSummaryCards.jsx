@@ -21,7 +21,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
           <div className="flex items-center space-x-2">
             <Activity className="w-5 h-5 text-emerald-600 shrink-0" />
             <span className="text-xs font-black uppercase tracking-wider text-slate-700">
-              Agri-Climate Risk Score
+              Agri-Climate Risk Score (हवामान धोका गुण)
             </span>
           </div>
           <span
@@ -68,9 +68,9 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
 
         {/* Core Agro Baseline Bar */}
         <div className="pt-3 border-t border-slate-200 text-xs flex flex-wrap items-center justify-between gap-1 text-slate-600 font-medium">
-          <div>Rainfall: <span className="text-slate-900 font-bold">{village.annualRainfallNormal} mm</span></div>
-          <div>Irrigation: <span className="text-slate-900 font-bold">{village.irrigationCoveragePercent}%</span></div>
-          <div>Soil: <span className="text-emerald-700 font-bold">{village.soilType.split(' ')[0]}</span></div>
+          <div>Rainfall (पाऊस): <span className="text-slate-900 font-bold">{village.annualRainfallNormal} mm</span></div>
+          <div>Irrigation (सिंचन): <span className="text-slate-900 font-bold">{village.irrigationCoveragePercent}%</span></div>
+          <div>Soil (माती): <span className="text-emerald-700 font-bold">{village.soilType.split(' ')[0]}</span></div>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
       <div className="bg-white border border-slate-200 p-4 rounded-3xl flex flex-col justify-between shadow-sm">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-            <Sun className="w-4 h-4 text-amber-500 shrink-0" /> Drought Risk
+            <Sun className="w-4 h-4 text-amber-500 shrink-0" /> Drought Risk (दुष्काळ धोका)
           </span>
           <span className={`text-xs font-extrabold ${getMeterColor(subIndices.droughtIndex).split(' ')[1]}`}>
             {subIndices.droughtIndex}%
@@ -93,7 +93,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
           </div>
         </div>
         <p className="text-[11px] text-slate-600 font-medium">
-          {subIndices.droughtIndex > 60 ? 'Severe dry spells risk' : 'Moderate rainfall deficit'}
+          {subIndices.droughtIndex > 60 ? 'Severe dry spells risk (मोठा ताण)' : 'Moderate rainfall deficit (मध्यम)'}
         </p>
       </div>
 
@@ -101,7 +101,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
       <div className="bg-white border border-slate-200 p-4 rounded-3xl flex flex-col justify-between shadow-sm">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-            <Flame className="w-4 h-4 text-rose-500 shrink-0" /> Heat Stress
+            <Flame className="w-4 h-4 text-rose-500 shrink-0" /> Heat Stress (उष्णता ताण)
           </span>
           <span className={`text-xs font-extrabold ${getMeterColor(subIndices.heatwaveIndex).split(' ')[1]}`}>
             {subIndices.heatwaveIndex}%
@@ -116,7 +116,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
           </div>
         </div>
         <p className="text-[11px] text-slate-600 font-medium">
-          {subIndices.heatwaveIndex > 65 ? 'High thermal stress' : 'Normal GDD anomaly'}
+          {subIndices.heatwaveIndex > 65 ? 'High thermal stress (कडक ऊन)' : 'Normal temperature (साधारण)'}
         </p>
       </div>
 
@@ -124,7 +124,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
       <div className="bg-white border border-slate-200 p-4 rounded-3xl flex flex-col justify-between shadow-sm">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-            <CloudRain className="w-4 h-4 text-cyan-600 shrink-0" /> Flood Hazard
+            <CloudRain className="w-4 h-4 text-cyan-600 shrink-0" /> Flood Hazard (पूर धोका)
           </span>
           <span className={`text-xs font-extrabold ${getMeterColor(subIndices.floodIndex).split(' ')[1]}`}>
             {subIndices.floodIndex}%
@@ -139,7 +139,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
           </div>
         </div>
         <p className="text-[11px] text-slate-600 font-medium">
-          {subIndices.floodIndex > 60 ? 'High inundation risk' : 'Low runoff risk'}
+          {subIndices.floodIndex > 60 ? 'High inundation risk (पाणी साचणे)' : 'Low runoff risk (कमी)'}
         </p>
       </div>
 
@@ -147,7 +147,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
       <div className="bg-white border border-slate-200 p-4 rounded-3xl flex flex-col justify-between shadow-sm">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-            <Bug className="w-4 h-4 text-purple-600 shrink-0" /> Pest Threat
+            <Bug className="w-4 h-4 text-purple-600 shrink-0" /> Pest Threat (कीड उपद्रव)
           </span>
           <span className={`text-xs font-extrabold ${getMeterColor(subIndices.pestIndex).split(' ')[1]}`}>
             {subIndices.pestIndex}%
@@ -162,7 +162,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
           </div>
         </div>
         <p className="text-[11px] text-slate-600 font-medium">
-          {subIndices.pestIndex > 65 ? 'Elevated pest threat' : 'Controlled humidity'}
+          {subIndices.pestIndex > 65 ? 'Elevated pest threat (कीड शक्यता)' : 'Controlled humidity (सुरक्षित)'}
         </p>
       </div>
 

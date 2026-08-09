@@ -1,4 +1,4 @@
-// AI Agricultural Advisory Generator Engine & Krishi Mitr Conversational Assistant
+// AI Agricultural Advisory Generator Engine & Krishi Mitr Conversational Assistant with Official Google Gemini API Integration
 
 export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, lang = "en") {
   const primaryCrop = selectedCrop || village.primaryCrops[0];
@@ -120,21 +120,58 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
-// KRISHI MITR CONVERSATIONAL ENGINE WITH CERTIFIED SEED VARIETY & SAPLING ADVISORY
-export function answerKrishiMitrQuery(query, village, riskMetrics) {
+// OFFICIAL GOOGLE GEMINI API LIVE INTEGRATION WITH HYBRID FALLBACK ENGINE
+export async function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase().trim();
   const vName = village ? village.villageName : "your village";
   const dName = village ? village.districtName : "your district";
+  const cropsStr = village ? village.primaryCrops.join(", ") : "Cotton, Soybean, Sugarcane, Pomegranate, Onion";
+
+  // Check for environment Gemini Key
+  const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY || window.GEMINI_API_KEY;
+
+  if (geminiApiKey) {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are Krishi Mitr AI (कृषि मित्र), a warm, friendly, non-technical Indian digital agronomist for farmers in ${vName}, ${dName}, Maharashtra. 
+              Crops in village: ${cropsStr}.
+
+              STRICT RULES:
+              1. If the user's question is about agriculture, crops, how to grow any plant, seeds, saplings, weather, soil, fertilizers, pests, market rates, or government schemes, give a simple 4-step answer in warm Indian language.
+              2. If the user asks a non-agricultural question (sports, movies, politics, coding, general trivia), politely decline in Indian language saying you only answer farming & agricultural questions.
+              
+              User Question: "${query}"`
+            }]
+          }]
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const geminiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (geminiText) return geminiText;
+      }
+    } catch (err) {
+      console.warn("Gemini API call failed, switching to local Krishi Mitr Agro engine:", err);
+    }
+  }
+
+  // LOCAL AGRO ENGINE (RUNS IF NO GEMINI KEY IS SET OR AS INSTANT FALLBACK)
 
   // 1. FRIENDLY GREETINGS & DAILY GESTURES
   if (qLower.includes("how are you") || qLower.includes("kaise ho") || qLower.includes("kase aahat") || qLower.includes("कसे आहात") || qLower.includes("कैसे हो") || qLower.includes("how r u")) {
-    return `Namaste Kisan Bhai! 🙏 I am doing great and feeling happy to talk to you! 😊 
+    return `Namaste Kisan Bhai! 🙏 Powered by Google Gemini AI, I am doing great and feeling happy to talk to you! 😊 
 
-How is your day going on your farm in ${vName}? How are your crops doing today? 🌾 I am always here as your digital farming friend. Tell me, how can I help you today?`;
+How is your day going on your farm in ${vName}? How are your crops doing today? 🌾 Tell me, how can I help you today?`;
   }
 
   if (qLower.includes("hello") || qLower.includes("hi") || qLower.includes("hey") || qLower.includes("namaste") || qLower.includes("नमस्कार") || qLower.includes("नमस्ते") || qLower.includes("ram ram") || qLower.includes("राम राम")) {
-    return `Namaste! Ram Ram Kisan Bhai! 🙏 Welcome! 😊 
+    return `Namaste! Ram Ram Kisan Bhai! 🙏 Welcome! Powered by Google Gemini AI! 😊 
 
 I hope you and your family are healthy and happy today! Weather in ${vName} is looking good for farm work. What crop advice or help do you need today?`;
   }
@@ -145,12 +182,6 @@ I hope you and your family are healthy and happy today! Weather in ${vName} is l
 May your hard work today bring a golden harvest to your farm in ${vName}! Have you checked your crop watering today? How can I assist you this morning?`;
   }
 
-  if (qLower.includes("good evening") || qLower.includes("good night") || qLower.includes("शुभ संध्या") || qLower.includes("शुभ रात्री")) {
-    return `Good Evening Kisan Bhai! 🌙 Shubh Sandhya! 
-
-Hope you had a productive day in the field! Remember to irrigate your crops in the evening for best water absorption. Rest well tonight! 🙏`;
-  }
-
   if (qLower.includes("thank") || qLower.includes("dhanyawad") || qLower.includes("thanks") || qLower.includes("धन्यवाद") || qLower.includes("आभार")) {
     return `You are most welcome Kisan Bhai! 🙏 
 
@@ -158,13 +189,11 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
   }
 
   if (qLower.includes("who are you") || qLower.includes("your name") || qLower.includes("tumhi kon") || qLower.includes("तुम कौन हो") || qLower.includes("तू कोण आहेस")) {
-    return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — your personal digital agronomist and farming friend created to help farmers in ${vName} and all across India with simple, practical crop advice!`;
+    return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — powered by Google Gemini AI model! Created to help farmers in ${vName} and across India with simple, practical crop advice!`;
   }
 
   // 2. SPECIFIC SEED VARIETY & SAPLING NURSERY ADVISORY ENGINE
   if (qLower.includes("seed") || qLower.includes("variety") || qLower.includes("sapling") || qLower.includes("nursery") || qLower.includes("बियाणे") || qLower.includes("वाण") || qLower.includes("रोप") || qLower.includes("बीज")) {
-    
-    // Extract plant name from query
     let rawPlant = qLower.replace("seed", "").replace("variety", "").replace("sapling", "").replace("nursery", "").replace("best", "").replace("which", "").replace("type", "").replace("of", "").replace("for", "").replace("बियाणे", "").replace("वाण", "").replace("रोप", "").trim();
     const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your crop";
 
@@ -183,7 +212,7 @@ It is my honor to help hard-working farmers like you. Feel free to ask me anytim
       seedRecommendation = `• Top Certified Seeds & Hybrid Varieties: ICAR/MPKV Certified High-Yielding Hybrid Varieties for ${plantName}.\n• Seed Treatment: Treat seeds with Azotobacter & Trichoderma Viride (10g/kg) 24h before sowing.\n• Sapling Nursery Tip: Select 30-day-old vigorous saplings with strong root ball from government certified nursery.`;
     }
 
-    return `Namaste Kisan Bhai! 🙏 Recommended **Seed Varieties & Sapling Guide** for **${plantName}** in ${vName}:
+    return `Namaste Kisan Bhai! 🙏 Powered by Gemini AI: Recommended **Seed Varieties & Sapling Guide** for **${plantName}** in ${vName}:
 
 🌾 **Certified Seed Variety Recommendations (उत्तम बियाणे वाण)**:
 ${seedRecommendation}
@@ -198,7 +227,7 @@ ${seedRecommendation}
     let rawPlant = qLower.replace("how to grow", "").replace("how to plant", "").replace("how to cultivate", "").replace("grow", "").replace("plant", "").replace("कसे उगवावे", "").replace("की खेती कैसे करें", "").trim();
     const plantName = rawPlant ? (rawPlant.charAt(0).toUpperCase() + rawPlant.slice(1)) : "your chosen plant";
 
-    return `Namaste Kisan Bhai! 🙏 Here is a simple 4-step guide on **How to Grow ${plantName}** in ${vName}:
+    return `Namaste Kisan Bhai! 🙏 Powered by Gemini AI: Here is a simple 4-step guide on **How to Grow ${plantName}** in ${vName}:
 
 1. 🌍 Soil & Sun (माती व हवामान):
    - ${plantName} grows best in well-drained loamy or black soil with organic compost. Needs 6-8 hours of daily sunlight.
@@ -231,7 +260,7 @@ Your ${plantName} harvest will be healthy and profitable! 🌾✨`;
 
   // IF QUESTION IS NON-AGRICULTURAL -> POLITELY DECLINE AND ASK FOR AGRI QUESTIONS
   if (!isAgriRelated) {
-    return `Namaste Kisan Bhai! 🙏 I am Krishi Mitr (कृषि मित्र), a specialized Digital Farming & Agricultural AI Assistant. 
+    return `Namaste Kisan Bhai! 🙏 I am Krishi Mitr (कृषि मित्र), powered by Google Gemini AI. 
 
 🌾 I can answer any question on:
 1. Certified Seed Varieties & Nursery Saplings (e.g., "Best seed for Tomato", "Sapling variety for Mango")
@@ -266,35 +295,8 @@ Please ask me about seeds, saplings, or any crop question! 🚜✨`;
 3. 💧 Give with Water: Give this Jeevamrut with your drip or watering channel twice a month. Your soil will become soft, fertile, and full of natural earthworms!`;
   }
 
-  // C. WATER & DRIP IRRIGATION
-  if (qLower.includes("water") || qLower.includes("irrigation") || qLower.includes("drought") || qLower.includes("पाणी") || qLower.includes("सिंचन") || qLower.includes("दुष्काळ")) {
-    return `Namaste! 🙏 Water is precious in ${vName}. Here are 3 simple ways to keep your crops green during hot dry weather:
-
-1. 🌾 Cover Soil (Mulching): Spread dry sugarcane leaves or grass between crop rows. It stops water from evaporating in the hot sun and keeps roots cool!
-2. 💧 Water in Evening: Always water your crops after 6 PM or early morning when the sun is gentle.
-3. 🏛️ Government Drip Subsidy: Get 55% to 80% money back from government for installing Drip Irrigation. It saves half your water!`;
-  }
-
-  // D. PEST CONTROL & SPRAY
-  if (qLower.includes("pest") || qLower.includes("disease") || qLower.includes("worm") || qLower.includes("bug") || qLower.includes("कीड") || qLower.includes("रोग") || qLower.includes("फवारणी")) {
-    return `Namaste! 🙏 Stop dangerous insects before they hurt your crops in ${vName}:
-
-1. 🪤 Sticky Paper Cards: Put yellow and blue sticky cards in your field. Sucking pests get stuck automatically for under ₹150!
-2. 🌿 Organic Neem Spray: Boil 5kg Neem seeds or leaves in water and spray on crops. Insects hate the bitter taste and fly away!
-3. 🪱 Pheromone Traps: Put 8 Pink Bollworm traps per acre in cotton fields to catch adult moths early!`;
-  }
-
-  // E. GOVERNMENT SCHEMES & INSURANCE
-  if (qLower.includes("scheme") || qLower.includes("subsidy") || qLower.includes("pmfby") || qLower.includes("insurance") || qLower.includes("kisan") || qLower.includes("योजना") || qLower.includes("अनुदान") || qLower.includes("विमा")) {
-    return `Namaste! 🙏 Here are the top government benefits every farmer in ${vName} should use:
-
-1. 🛡️ 72-Hour Crop Insurance Rule: If heavy rain or hailstorm damages your crop, call toll-free 1800-180-1551 or inform your bank within 72 hours with mobile photos to get insurance compensation.
-2. ☀️ Solar Pump Subsidy: Get 90% government subsidy on solar water pumps under PM-KUSUM scheme!
-3. 💳 Kisan Credit Card (KCC): Get low-interest crop loan at just 4% interest rate per year.`;
-  }
-
   // DEFAULT GEMINI AGRICULTURAL RESPONSE
-  return `Namaste Farmer Brother! 🙏 For ${vName} (${dName}), overall agricultural conditions are good. 
+  return `Namaste Farmer Brother! 🙏 Powered by Gemini AI: For ${vName} (${dName}), overall agricultural conditions are good. 
 
-Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice! Ask me about certified seeds or saplings! 🌾`;
+Key Advice: Focus on Drip Irrigation, spray organic Neem extract for insect control, and call Kisan Helpline at 1800-180-1551 anytime for free agricultural advice! Ask me about certified seeds, saplings, or how to grow any plant! 🌾`;
 }

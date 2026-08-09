@@ -130,6 +130,14 @@ export default function App() {
             {/* FARMER SIMPLE MODE (DEFAULT EASY VIEW FOR FARMERS) */}
             {viewMode === 'farmer' ? (
               <div className="space-y-6">
+                
+                {/* 1. TOP HERO: EXPECTED OUTCOMES & CORE PLATFORM FEATURES (PRIMARY FOCUS) */}
+                <PlatformImpactFeatures
+                  village={selectedVillage}
+                  riskMetrics={riskMetrics}
+                />
+
+                {/* 2. HYPERLOCAL WEATHER STATUS & CROP ACTION PLAN */}
                 <FarmerSimpleView
                   village={selectedVillage}
                   riskMetrics={riskMetrics}
@@ -137,7 +145,7 @@ export default function App() {
                   currentLang={currentLang}
                 />
                 
-                {/* Profit Maximizing Crop Suggestions */}
+                {/* 3. PROFIT MAXIMIZING CROPS */}
                 <CropProfitRecommendation
                   village={selectedVillage}
                   riskMetrics={riskMetrics}
@@ -145,13 +153,7 @@ export default function App() {
                   currentLang={currentLang}
                 />
 
-                {/* Expected Outcomes & Platform Core Features Showcase */}
-                <PlatformImpactFeatures
-                  village={selectedVillage}
-                  riskMetrics={riskMetrics}
-                />
-
-                {/* Farmer Review System */}
+                {/* 4. FARMER REVIEWS */}
                 <ReviewSystem
                   village={selectedVillage}
                   user={user}
@@ -175,7 +177,8 @@ export default function App() {
 
                 {/* TAB 1: DASHBOARD VIEW */}
                 {activeTab === 'dashboard' && (
-                  <div>
+                  <div className="space-y-6">
+                    <PlatformImpactFeatures village={selectedVillage} riskMetrics={riskMetrics} />
                     <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
                     <ClimateCharts village={selectedVillage} riskMetrics={riskMetrics} />
                     <CropVulnerabilityMatrix
@@ -183,7 +186,6 @@ export default function App() {
                       riskMetrics={riskMetrics}
                       onSelectCropForAdvisory={handleSelectCropForAdvisory}
                     />
-                    <PlatformImpactFeatures village={selectedVillage} riskMetrics={riskMetrics} />
                   </div>
                 )}
 

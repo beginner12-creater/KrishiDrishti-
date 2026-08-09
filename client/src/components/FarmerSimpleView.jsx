@@ -20,14 +20,118 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
   const status = getSimpleStatus(overallRiskScore);
 
+  // Dynamic Crop-Specific 4-Step Actions Engine
+  const getCropSpecificActions = (cropName) => {
+    const name = cropName.toLowerCase();
+
+    if (name.includes('cotton') || name.includes('कापूस')) {
+      return {
+        water: "Irrigate during square formation & boll opening. Avoid waterlogging in heavy black soil.",
+        fertilizer: "Spray 1% Magnesium Sulphate (MgSO4) + 19:19:19 to prevent leaf reddening (Lalya disease).",
+        pest: "Install 8 Pink Bollworm pheromone traps/acre. Spray 5% Neem seed kernel extract (NSKE).",
+        insurance: "Inform bank within 72h if unseasonal rain damages open cotton bolls in the field."
+      };
+    }
+    if (name.includes('soybean') || name.includes('सोयाबीन')) {
+      return {
+        water: "Critical irrigation during pod initiation and pod filling stage during monsoon dry spells.",
+        fertilizer: "Spray 2% DAP or Potassium Nitrate (13:0:45) at pod development to increase grain weight.",
+        pest: "Watch for Girdle Beetle & Stem Fly. Spray Chlorantraniliprole 18.5% SC (3ml/10L).",
+        insurance: "Trigger PMFBY insurance claim if dry spell causes severe pod shedding."
+      };
+    }
+    if (name.includes('sugarcane') || name.includes('ऊस')) {
+      return {
+        water: "Drip irrigate every 4-6 days. Trash mulching between rows saves 40% water.",
+        fertilizer: "Apply Zinc Sulphate (25kg/ha) + Ferrous Sulphate to correct iron chlorosis in ratoon cane.",
+        pest: "Release Trichogramma chilonis parasite cards (2 cards/acre) against Early Shoot Borer.",
+        insurance: "Report flood inundation submergence (>48h) to bank for crop insurance claim."
+      };
+    }
+    if (name.includes('pomegranate') || name.includes('डाळिंब') || name.includes('अनार')) {
+      return {
+        water: "Drip irrigate 20-30 liters/tree/day during fruit development. Avoid irregular watering.",
+        fertilizer: "Spray Calcium Nitrate (3g/L) + Boron (1g/L) to prevent fruit cracking during harvest.",
+        pest: "Spray Streptocycline (0.5g/L) + Copper Oxychloride (2.5g/L) for Bacterial Oily Spot (Telya).",
+        insurance: "Claim weather-based crop insurance if hailstorms crack or damage fruit skins."
+      };
+    }
+    if (name.includes('onion') || name.includes('कांदा')) {
+      return {
+        water: "Stop irrigation 15 days before harvesting to improve onion bulb storage and shelf life.",
+        fertilizer: "Apply Sulphur 80% WDG (3g/L) for dark red color, pungency, and disease protection.",
+        pest: "Spray Fipronil 5% SC (2ml/L) for Thrips control. Hang yellow & blue sticky traps.",
+        insurance: "Report unseasonal harvest rain that rots harvested onions in field within 72 hours."
+      };
+    }
+    if (name.includes('grape') || name.includes('द्राक्ष') || name.includes('अंगूर')) {
+      return {
+        water: "Micro-drip irrigation regulated strictly according to cane maturity and berry diameter.",
+        fertilizer: "Spray Gibberellic Acid (GA3) for uniform berry elongation and bunch development.",
+        pest: "Spray Potassium Bicarbonate (5g/L) for Downy Mildew & Powdery Mildew protection.",
+        insurance: "Trigger crop insurance claim for unseasonal Oct-Nov rainfall or frost damage."
+      };
+    }
+    if (name.includes('tomato') || name.includes('टोमॅटो')) {
+      return {
+        water: "Maintain steady soil moisture using drip lines to prevent Blossom End Rot disease.",
+        fertilizer: "Spray Calcium Boron (1.5ml/L) to strengthen fruit walls and prevent fruit cracking.",
+        pest: "Install Pheromone traps for Tomato Pinworm (Tuta absoluta) and yellow traps for Whitefly.",
+        insurance: "Report heavy rain or early blight outbreak damage to insurance officer within 72h."
+      };
+    }
+    if (name.includes('paddy') || name.includes('rice') || name.includes('भात') || name.includes('धान')) {
+      return {
+        water: "Maintain 2-5cm standing water during tillering & flowering. Drain field 10 days before harvest.",
+        fertilizer: "Apply Zinc Sulphate (25kg/ha) baseline to prevent Khaira disease in young rice seedlings.",
+        pest: "Use light traps for Stem Borer and spray Buprofezin 25% SC for Brown Plant Hopper (BPH).",
+        insurance: "Claim PMFBY insurance if floods submerge paddy nursery for more than 5 consecutive days."
+      };
+    }
+    if (name.includes('banana') || name.includes('केळी')) {
+      return {
+        water: "Provide 20-25 liters water/plant/day through drip. Mulch with sugarcane trash around base.",
+        fertilizer: "Spray 1% Potassium Nitrate on banana bunches after flower emergence for bigger fingers.",
+        pest: "Inject Phorate granules into pseudostem to prevent Banana Stem Weevil damage.",
+        insurance: "Trigger crop insurance claim within 72h if summer windstorms blow down trees."
+      };
+    }
+    if (name.includes('guava') || name.includes('पेरू')) {
+      return {
+        water: "Irrigate every 7-10 days during fruit set. Reduce watering during flower induction (Bahar).",
+        fertilizer: "Spray Zinc Sulphate + Borax (0.2%) for larger, sweeter guava fruit development.",
+        pest: "Wrap individual fruits in foam bags to prevent Fruit Fly (Bactrocera) infestation.",
+        insurance: "Claim crop insurance if severe drought causes early fruit drop."
+      };
+    }
+    if (name.includes('turmeric') || name.includes('हळद')) {
+      return {
+        water: "Provide broad bed furrow irrigation every 7 days. Ensure good drainage during monsoon.",
+        fertilizer: "Apply Ferrous Sulphate (10kg/acre) + Micronutrient mixture for deep orange curcumin color.",
+        pest: "Spray Mancozeb (2.5g/L) for Leaf Spot & Rhizome Rot prevention.",
+        insurance: "Inform bank within 72 hours if waterlogging rots turmeric rhizomes in heavy rain."
+      };
+    }
+
+    // Default fallback advice
+    return {
+      water: `Provide protective irrigation during critical flowering & grain formation stages of ${cropName}.`,
+      fertilizer: `Spray 1% Potassium Nitrate (KNO3) during hot dry spells to protect ${cropName} leaves.`,
+      pest: `Install 8-10 Sticky Traps per acre and spray 5% organic Neem seed extract against sucking pests.`,
+      insurance: `Inform bank or call toll-free 1800-180-1551 within 72 hours if weather damages ${cropName}.`
+    };
+  };
+
+  const currentActions = getCropSpecificActions(selectedCrop);
+
   // Get simple language script for Voice Panel
   const getVoiceScript = () => {
     if (voiceLang === 'mr') {
-      return `नमस्कार शेतकरी बंधूंनो! ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'धोकादायक' : 'सुरक्षित'} आहे. ${selectedCrop} पिकाला संध्याकाळी पाणी द्या आणि कडुनिंब अर्काची फवारणी करा. धन्यवाद!`;
+      return `नमस्कार शेतकरी बंधूंनो! ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'धोकादायक' : 'सुरक्षित'} आहे. ${selectedCrop} पिकाला: ${currentActions.water} धन्यवाद!`;
     } else if (voiceLang === 'hi') {
-      return `नमस्कार किसान भाइयों! ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'जोखिम भरा' : 'सुरक्षित'} है। ${selectedCrop} फसल को शाम को पानी दें और नीम अर्क छिड़कें। धन्यवाद!`;
+      return `नमस्कार किसान भाइयों! ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'जोखिम भरा' : 'सुरक्षित'} है। ${selectedCrop} फसल के लिए: ${currentActions.water} धन्यवाद!`;
     } else {
-      return `Hello Farmer brother! In ${village.villageName} village today, climate conditions are ${overallRiskScore > 65 ? 'risky' : 'good'}. Irrigate ${selectedCrop} in evening and spray organic Neem extract. Thank you!`;
+      return `Hello Farmer brother! In ${village.villageName} village today, climate conditions are ${overallRiskScore > 65 ? 'risky' : 'good'}. For your ${selectedCrop} crop: ${currentActions.water} Thank you!`;
     }
   };
 
@@ -51,8 +155,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
     setIsSpeaking(true);
     window.speechSynthesis.speak(utterance);
   };
-
-  const cropInfo = cropVulnerability.find(c => c.cropName === selectedCrop) || cropVulnerability[0];
 
   return (
     <div className="space-y-6">
@@ -203,12 +305,17 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
         </div>
       </div>
 
-      {/* 3. NON-TECHNICAL 4-STEP ACTION PLAN FOR FARMERS */}
+      {/* 3. DYNAMIC 4-STEP ACTION PLAN FOR SELECTED CROP */}
       <div className="bg-slate-900/90 border border-slate-800 p-5 sm:p-6 rounded-3xl shadow-xl space-y-4">
-        <h3 className="text-base sm:text-lg font-black text-slate-100 mb-1 flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-amber-400" />
-          Key Farmer Actions for {selectedCrop} (सोपे उपाय):
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-amber-400" />
+            Key Actions for <span className="text-emerald-400 underline decoration-emerald-500/50">{selectedCrop}</span> (उपाय):
+          </h3>
+          <span className="text-xs bg-emerald-950 text-emerald-400 px-3 py-1 rounded-full border border-emerald-800 font-bold hidden sm:inline">
+            Custom Advice for {selectedCrop}
+          </span>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
@@ -218,12 +325,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black text-base">
                 1
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">💧 Watering (पाणी कसे द्यावे)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">💧 Watering ({selectedCrop} पाणी)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
-              {subIndices.droughtIndex > 50
-                ? 'Give water only in early morning or evening. Cover soil around roots with dry grass.'
-                : 'Water your crops normally. Do not flood the roots.'}
+            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3.5 rounded-xl border border-slate-800/80">
+              {currentActions.water}
             </p>
           </div>
 
@@ -233,10 +338,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-base">
                 2
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">🌱 Leaf & Soil Protection (झाडांची काळजी)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">🌱 Soil & Spray ({selectedCrop} खत फवारणी)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
-              Spray 1% Potassium Nitrate (KNO3) during hot afternoon hours to keep crop leaves green and fresh.
+            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3.5 rounded-xl border border-slate-800/80">
+              {currentActions.fertilizer}
             </p>
           </div>
 
@@ -246,10 +351,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-black text-base">
                 3
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">🐛 Simple Insect Spray (कीड नियंत्रण)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">🐛 Insect Spray ({selectedCrop} कीड नियंत्रण)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
-              Hang yellow sticky cards in field. Spray 5% organic Neem seed extract to stop insects.
+            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3.5 rounded-xl border border-slate-800/80">
+              {currentActions.pest}
             </p>
           </div>
 
@@ -259,10 +364,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-black text-base">
                 4
               </div>
-              <h4 className="text-sm font-extrabold text-slate-100">🛡️ Crop Insurance (पिक विमा मदत)</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">🛡️ Crop Insurance ({selectedCrop} पिक विमा)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800/80">
-              If rain or drought damages your crop, inform your bank or call **1800-180-1551** within 72 hours.
+            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3.5 rounded-xl border border-slate-800/80">
+              {currentActions.insurance}
             </p>
           </div>
 

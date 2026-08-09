@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Sprout, Droplets, Bug, Sun, PhoneCall, Volume2, ArrowRight, Sparkles, VolumeX } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, PhoneCall, Volume2, VolumeX, ArrowRight, Sparkles, Play, Pause, Globe } from 'lucide-react';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop }) {
   const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceLang, setVoiceLang] = useState('mr'); // 'mr' | 'hi' | 'en'
+  const [speechSpeed, setSpeechSpeed] = useState(0.85);
 
   if (!village || !riskMetrics) return null;
 
@@ -11,15 +13,28 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
   // Simple Clean Status Badge for Farmers
   const getSimpleStatus = (score) => {
-    if (score >= 70) return { title: '🔴 HIGH RISK (धोका)', color: 'Red', text: 'Weather warning! Follow protection steps below.' };
-    if (score >= 45) return { title: '🟡 MODERATE RISK (काळजी घ्या)', color: 'Yellow', text: 'Take simple precautions for your crops.' };
-    return { title: '🟢 GOOD CONDITIONS (सुरक्षित)', color: 'Green', text: 'Weather is good. Follow regular crop care.' };
+    if (score >= 70) return { title: '🔴 HIGH RISK (धोका)', text: 'Weather warning! Follow protection steps below.' };
+    if (score >= 45) return { title: '🟡 MODERATE RISK (काळजी घ्या)', text: 'Take simple precautions for your crops.' };
+    return { title: '🟢 GOOD CONDITIONS (सुरक्षित)', text: 'Weather is good. Follow regular crop care.' };
   };
 
   const status = getSimpleStatus(overallRiskScore);
 
-  // Non-Technical, Simple Voice Assistant for Farmers
-  const handleReadAloud = () => {
+  // Get simple language script for Voice Panel
+  const getVoiceScript = () => {
+    if (voiceLang === 'mr') {
+      return `नमस्कार शेतकरी बंधूंनो! ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'धोकादायक' : 'सुरक्षित'} आहे. ${selectedCrop} पिकाला संध्याकाळी पाणी द्या आणि कडुनिंब अर्काची फवारणी करा. धन्यवाद!`;
+    } else if (voiceLang === 'hi') {
+      return `नमस्कार किसान भाइयों! ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'जोखिम भरा' : 'सुरक्षित'} है। ${selectedCrop} फसल को शाम को पानी दें और नीम अर्क छिड़कें। धन्यवाद!`;
+    } else {
+      return `Hello Farmer brother! In ${village.villageName} village today, climate conditions are ${overallRiskScore > 65 ? 'risky' : 'good'}. Irrigate ${selectedCrop} in evening and spray organic Neem extract. Thank you!`;
+    }
+  };
+
+  const scriptText = getVoiceScript();
+
+  // Voice Speech Function
+  const handleToggleSpeech = () => {
     if (!('speechSynthesis' in window)) return;
 
     if (isSpeaking) {
@@ -28,21 +43,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
       return;
     }
 
-    // Generate simple non-technical speech text
-    let simpleVoiceText = "";
-    
-    if (overallRiskScore >= 70) {
-      simpleVoiceText = `Hello Farmer brother! In ${village.villageName} village today, climate risk is high. For your ${selectedCrop} crop, irrigate only in early morning or evening. Spray Neem oil for pests, and stay alert. Thank you!`;
-    } else if (overallRiskScore >= 45) {
-      simpleVoiceText = `Hello Farmer brother! In ${village.villageName} village, weather requires care. For ${selectedCrop}, give light watering in evening and check leaves for pests. Thank you!`;
-    } else {
-      simpleVoiceText = `Hello Farmer brother! In ${village.villageName} village, weather is good today. Give normal water to your ${selectedCrop} crop and ensure proper field care. Thank you!`;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(simpleVoiceText);
-    utterance.rate = 0.85; // Slightly slower, easy to hear
-    utterance.pitch = 1.0;
-    
+    const utterance = new SpeechSynthesisUtterance(scriptText);
+    utterance.rate = speechSpeed;
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
 
@@ -55,63 +57,111 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
   return (
     <div className="space-y-6">
       
-      {/* 1. WEATHER STATUS BANNER */}
-      <div className="bg-slate-900 border-2 border-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl transition-all">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* 1. FRONT EMBEDDED AI VOICE PANEL HERO SECTION */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950/40 border-2 border-emerald-500/40 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden">
+        
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
           <div>
             <div className="flex items-center space-x-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-950 text-emerald-400 border border-emerald-800 uppercase tracking-widest">
-                शेतकरी सल्ला / किसान सलाह
+              <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-950 text-emerald-400 border border-emerald-800 uppercase tracking-widest flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Krishi AI Voice Assistant
               </span>
               <span className="text-xs font-semibold text-slate-400">📍 {village.villageName} ({village.districtName})</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight my-1 text-slate-100">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-100">
               {status.title}
             </h2>
-            <p className="text-sm sm:text-base font-medium text-slate-300 mt-1">
+            <p className="text-sm text-slate-300 mt-1">
               {status.text}
             </p>
           </div>
 
-          {/* Simple Voice Button */}
+          {/* Language & Speed Selector Pills */}
+          <div className="flex items-center space-x-2 bg-slate-950 p-2 rounded-2xl border border-slate-800 text-xs shrink-0">
+            <div className="flex items-center space-x-1">
+              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              <select
+                value={voiceLang}
+                onChange={(e) => setVoiceLang(e.target.value)}
+                className="bg-transparent text-slate-200 font-bold focus:outline-none cursor-pointer text-xs"
+              >
+                <option value="mr">मराठी</option>
+                <option value="hi">हिन्दी</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <span className="text-slate-700">|</span>
+            <select
+              value={speechSpeed}
+              onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
+              className="bg-transparent text-slate-200 font-bold focus:outline-none cursor-pointer text-xs"
+            >
+              <option value="0.7">Slow</option>
+              <option value="0.85">Normal</option>
+              <option value="1.0">Fast</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Animated Sound Wave Visualizer & Live Transcript */}
+        <div className="bg-slate-950 p-5 sm:p-6 rounded-2xl border border-slate-800/90 flex flex-col md:flex-row items-center justify-between gap-5">
+          <div className="space-y-3 flex-1 w-full">
+            <div className="flex items-center space-x-1.5 h-8">
+              {[40, 70, 30, 90, 50, 80, 40, 60, 100, 50, 70, 30, 90, 40, 80].map((h, i) => (
+                <div
+                  key={i}
+                  style={{ height: isSpeaking ? `${h}%` : '25%' }}
+                  className={`w-1.5 rounded-full transition-all duration-300 ${
+                    isSpeaking ? 'bg-emerald-400 animate-pulse' : 'bg-slate-800'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <p className="text-sm font-semibold text-slate-200 leading-relaxed bg-slate-900/90 p-3.5 rounded-xl border border-slate-800">
+              "{scriptText}"
+            </p>
+          </div>
+
+          {/* Prominent Play Voice Button */}
           <button
-            onClick={handleReadAloud}
-            className={`flex items-center space-x-2.5 px-6 py-3.5 rounded-2xl font-black text-sm transition-all shrink-0 active:scale-95 shadow-xl ${
+            onClick={handleToggleSpeech}
+            className={`w-full md:w-auto px-8 py-4 rounded-2xl font-black text-base transition-all flex items-center justify-center space-x-2 shrink-0 shadow-xl ${
               isSpeaking
-                ? 'bg-rose-500 text-slate-950 animate-pulse'
+                ? 'bg-rose-500 hover:bg-rose-400 text-slate-950 animate-pulse'
                 : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
             }`}
           >
-            {isSpeaking ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-            <span>{isSpeaking ? 'Stop Voice (आवाज बंद करा)' : '🔊 Listen Voice (ऐका / सुनें)'}</span>
+            {isSpeaking ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+            <span>{isSpeaking ? 'Stop Voice' : '▶ Listen Voice (ऐका)'}</span>
           </button>
         </div>
 
-        {/* Quick Simple Weather Summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-slate-800 text-xs sm:text-sm font-bold">
-          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
+        {/* Quick Weather Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm font-bold pt-2">
+          <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
             <Sun className="w-6 h-6 text-amber-400 shrink-0" />
             <div>
               <div className="text-[11px] text-slate-400">Drought (दुष्काळ)</div>
               <div className="text-base font-extrabold text-slate-100">{subIndices.droughtIndex > 60 ? 'HIGH' : 'LOW'}</div>
             </div>
           </div>
-          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
+          <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
             <Droplets className="w-6 h-6 text-cyan-400 shrink-0" />
             <div>
               <div className="text-[11px] text-slate-400">Water (पाणी)</div>
               <div className="text-base font-extrabold text-slate-100">{village.groundwaterStatus.split(' ')[0]}</div>
             </div>
           </div>
-          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
+          <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
             <Bug className="w-6 h-6 text-purple-400 shrink-0" />
             <div>
               <div className="text-[11px] text-slate-400">Pest Risk (कीड)</div>
               <div className="text-base font-extrabold text-slate-100">{subIndices.pestIndex > 60 ? 'HIGH' : 'SAFE'}</div>
             </div>
           </div>
-          <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center space-x-3">
+          <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 flex items-center space-x-3">
             <Sprout className="w-6 h-6 text-emerald-400 shrink-0" />
             <div>
               <div className="text-[11px] text-slate-400">Rainfall (पाऊस)</div>
@@ -119,6 +169,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
             </div>
           </div>
         </div>
+
       </div>
 
       {/* 2. CHOOSE CROP */}

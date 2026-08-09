@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, GitCompare, FileText, Globe, Menu, X, Sparkles, IndianRupee } from 'lucide-react';
+import { Sprout, ShieldAlert, MapPin, BarChart3, Bot, Globe, Menu, X, Sparkles, IndianRupee } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, onOpenReportModal, activeVillage, viewMode, setViewMode }) {
+export default function Navbar({ activeTab, setActiveTab, currentLang, setCurrentLang, activeVillage, viewMode, setViewMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const languages = [
@@ -28,148 +28,70 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-200 px-3 sm:px-6 py-2 transition-all w-full max-w-full overflow-hidden">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 w-full min-w-0">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 sm:px-8 py-3 transition-all w-full max-w-full overflow-hidden shadow-xs">
+      <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 w-full">
         
-        {/* Row 1: Brand Logo + Language Dropdown + Hamburger */}
-        <div className="flex items-center justify-between w-full sm:w-auto min-w-0 gap-2">
-          
-          {/* Brand Logo */}
-          <div className="flex items-center space-x-2 shrink-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-md shrink-0">
-              <Sprout className="w-4 h-4 sm:w-6 sm:h-6 text-white font-bold" />
-            </div>
-            <div>
-              <h1 className="text-sm sm:text-lg font-black tracking-tight text-slate-900 leading-none">
-                KrishiDrishti <span className="text-[9px] sm:text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">AI</span>
-              </h1>
-              <p className="text-[10px] text-slate-500 font-medium hidden sm:block">Climate Advisory Platform</p>
-            </div>
+        {/* Minimalist Brand Logo */}
+        <div className="flex items-center space-x-2.5 shrink-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-sm shrink-0">
+            <Sprout className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
-
-          {/* Right Mobile Actions: Language Dropdown + Mobile Menu Toggle */}
-          <div className="flex items-center space-x-1.5 sm:hidden shrink-0">
-            {/* Language Dropdown */}
-            <div className="relative flex items-center bg-slate-100 border border-slate-200 rounded-lg px-1.5 py-1 text-xs text-slate-800">
-              <Globe className="w-3 h-3 mr-1 text-emerald-600 shrink-0" />
-              <select
-                value={currentLang}
-                onChange={(e) => setCurrentLang(e.target.value)}
-                className="bg-transparent border-none text-slate-900 text-xs font-bold focus:outline-none cursor-pointer"
-              >
-                {languages.map(l => (
-                  <option key={l.code} value={l.code} className="bg-white text-slate-900">
-                    {l.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Mobile Menu Toggle Button */}
-            {viewMode === 'detailed' && (
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 min-h-[30px] min-w-[30px] flex items-center justify-center"
-                aria-label="Toggle Navigation Menu"
-              >
-                {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-              </button>
-            )}
+          <div>
+            <h1 className="text-base sm:text-xl font-black text-slate-900 leading-none tracking-tight">
+              KrishiDrishti <span className="text-emerald-700 text-xs font-bold">AI</span>
+            </h1>
+            <p className="text-[11px] text-slate-500 font-semibold mt-0.5">Simple Agriculture Platform</p>
           </div>
-
         </div>
 
-        {/* Row 2 on Mobile / Middle Desktop: Mode Toggle: Farmer Mode vs Detailed Analytics */}
-        <div className="flex items-center justify-between sm:justify-center w-full sm:w-auto gap-2">
-          
-          <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold w-full sm:w-auto justify-center">
-            <button
-              onClick={() => setViewMode('farmer')}
-              className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 min-h-[32px] ${
-                viewMode === 'farmer'
-                  ? 'bg-emerald-600 text-white font-extrabold shadow-sm'
-                  : 'text-slate-700 hover:text-slate-900'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-              <span className="text-xs">🌾 Farmer Mode (शेतकरी)</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode('detailed')}
-              className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 min-h-[32px] ${
-                viewMode === 'detailed'
-                  ? 'bg-emerald-600 text-white font-extrabold shadow-sm'
-                  : 'text-slate-700 hover:text-slate-900'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5 shrink-0" />
-              <span className="text-xs">📊 Full Analytics</span>
-            </button>
-          </div>
-
+        {/* Minimal Mode Switcher: Farmer vs Full */}
+        <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-2xl border border-slate-200/80 text-xs font-extrabold shrink-0">
+          <button
+            onClick={() => setViewMode('farmer')}
+            className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+              viewMode === 'farmer'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-700 hover:text-slate-900'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+            <span>🌾 Farmer Mode</span>
+          </button>
+          <button
+            onClick={() => setViewMode('detailed')}
+            className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+              viewMode === 'detailed'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-700 hover:text-slate-900'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5 shrink-0" />
+            <span>📊 Detailed</span>
+          </button>
         </div>
 
-        {/* Desktop Navigation */}
-        {viewMode === 'detailed' && (
-          <nav className="hidden xl:flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-medium">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleTabClick(item.id)}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition-all ${
-                    activeTab === item.id
-                      ? 'bg-emerald-600 text-white font-bold shadow-sm'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        )}
-
-        {/* Desktop Only Right Tools: Language Dropdown & Export */}
-        <div className="hidden sm:flex items-center space-x-2 shrink-0">
-          
-          {/* Language Selector Dropdown */}
-          <div className="relative flex items-center bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-800 min-h-[32px]">
-            <Globe className="w-3.5 h-3.5 mr-1 text-emerald-600 shrink-0" />
+        {/* Right Tools: Language Dropdown */}
+        <div className="flex items-center space-x-2 shrink-0">
+          <div className="flex items-center bg-slate-100 border border-slate-200/80 rounded-xl px-2.5 py-1.5 text-xs font-extrabold text-slate-800">
+            <Globe className="w-3.5 h-3.5 mr-1.5 text-emerald-600 shrink-0" />
             <select
               value={currentLang}
               onChange={(e) => setCurrentLang(e.target.value)}
-              className="bg-transparent border-none text-slate-900 text-xs font-bold focus:outline-none cursor-pointer pr-1"
+              className="bg-transparent border-none text-slate-900 font-bold focus:outline-none cursor-pointer"
             >
               {languages.map(l => (
-                <option key={l.code} value={l.code} className="bg-white text-slate-900">
+                <option key={l.code} value={l.code} className="bg-white text-slate-900 font-bold">
                   {l.label}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Export Report Button */}
-          {activeVillage && (
-            <button
-              onClick={onOpenReportModal}
-              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-semibold transition-all min-h-[32px]"
-              title="Print or Export Village Climate Audit"
-            >
-              <FileText className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Export</span>
-            </button>
-          )}
-
-          {/* Mobile Menu Toggle Button */}
+          {/* Desktop Navigation */}
           {viewMode === 'detailed' && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 min-h-[32px] min-w-[32px] flex items-center justify-center"
-              aria-label="Toggle Navigation Menu"
+              className="xl:hidden p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -178,19 +100,19 @@ export default function Navbar({ activeTab, setActiveTab, currentLang, setCurren
 
       </div>
 
-      {/* Mobile Menu Drawer Overlay */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && viewMode === 'detailed' && (
-        <div className="xl:hidden mt-2 pt-2 border-t border-slate-200 grid grid-cols-2 gap-1.5 animate-fadeIn">
+        <div className="xl:hidden mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 animate-fadeIn">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
-                className={`flex items-center space-x-2 p-2 rounded-xl text-xs font-bold transition-all min-h-[42px] ${
+                className={`flex items-center space-x-2 p-2.5 rounded-2xl text-xs font-extrabold transition-all ${
                   activeTab === item.id
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-800 border border-slate-200'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-800'
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />

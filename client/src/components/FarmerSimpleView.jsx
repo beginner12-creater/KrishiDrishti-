@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { Sprout, Droplets, Bug, Sun, PhoneCall, Volume2, VolumeX, ArrowRight, Sparkles, Play, Pause, Globe } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, PhoneCall, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop }) {
   const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [voiceLang, setVoiceLang] = useState('mr'); // 'mr' | 'hi' | 'en'
-  const [speechSpeed, setSpeechSpeed] = useState(0.85);
 
   if (!village || !riskMetrics) return null;
 
@@ -84,39 +81,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
   const currentActions = getCropSpecificActions(selectedCrop);
 
-  // ENJOYABLE, CHEERFUL & PLEASANT AUDIO VOICE SCRIPT (MARATHI, HINDI, ENGLISH)
-  const getVoiceScript = () => {
-    if (voiceLang === 'mr') {
-      return `नमस्कार शेतकरी दादा! 🙏 ${village.villageName} गावात आज हवामान ${overallRiskScore > 65 ? 'थोडे काळजीचे' : 'उत्तम आणि छान'} आहे! आपल्या ${selectedCrop} पिकाला संध्याकाळी थंड हवेत हलके पाणी द्या. जैविक कडुनिंब फवारणी करा आणि निश्चिंत राहा! तुमची शेती सुफलाम होवो! धन्यवाद! 🌾`;
-    } else if (voiceLang === 'hi') {
-      return `नमस्कार किसान भाई! 🙏 ${village.villageName} गाँव में आज मौसम ${overallRiskScore > 65 ? 'सावधानी का' : 'बहुत ही बढ़िया'} है! अपनी ${selectedCrop} फसल को शाम के समय पानी दें। हल्की जैविक नीम फवारणी करें और खुश रहें! आपकी फसल लहराएगी! धन्यवाद! 🌾`;
-    } else {
-      return `Hello Farmer Brother! 🙏 Weather in ${village.villageName} village today is ${overallRiskScore > 65 ? 'requiring care' : 'favorable and good'}! Irrigate your ${selectedCrop} crop in the gentle evening breeze. Apply organic neem spray and enjoy a joyful harvest! Thank you! 🌾`;
-    }
-  };
-
-  const scriptText = getVoiceScript();
-
-  // Voice Speech Function with Pitch & Rate Tuning
-  const handleToggleSpeech = () => {
-    if (!('speechSynthesis' in window)) return;
-
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(scriptText);
-    utterance.rate = speechSpeed;
-    utterance.pitch = 1.05; // Cheerful natural pitch
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  };
-
   const handleCropButtonClick = (crop) => {
     setSelectedCrop(crop);
     if (onSelectCrop) onSelectCrop(crop);
@@ -125,8 +89,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
   return (
     <div className="space-y-6">
       
-      {/* 1. FRONT AI VOICE PANEL HERO BANNER */}
-      <div className={`p-5 sm:p-7 rounded-3xl border shadow-sm space-y-5 transition-all ${status.cardBg}`}>
+      {/* 1. FRONT HERO WEATHER STATUS BANNER */}
+      <div className={`p-5 sm:p-7 rounded-3xl border shadow-sm space-y-4 transition-all ${status.cardBg}`}>
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
           <div>
@@ -144,65 +108,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               {status.desc}
             </p>
           </div>
-
-          {/* Language & Speed Selector */}
-          <div className="flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-300 text-xs shrink-0 shadow-sm">
-            <div className="flex items-center space-x-1">
-              <Globe className="w-3.5 h-3.5 text-emerald-600" />
-              <select
-                value={voiceLang}
-                onChange={(e) => setVoiceLang(e.target.value)}
-                className="bg-transparent text-slate-900 font-bold focus:outline-none cursor-pointer text-xs"
-              >
-                <option value="mr">मराठी (Marathi)</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="en">English</option>
-              </select>
-            </div>
-            <span className="text-slate-300">|</span>
-            <select
-              value={speechSpeed}
-              onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
-              className="bg-transparent text-slate-900 font-bold focus:outline-none cursor-pointer text-xs"
-            >
-              <option value="0.7">Slow (हळू)</option>
-              <option value="0.85">Normal (छान)</option>
-              <option value="1.0">Fast (जलद)</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Audio Transcript & Big Play Button */}
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-          <div className="space-y-2 flex-1 w-full">
-            <div className="flex items-center space-x-1.5 h-6">
-              {[40, 70, 30, 90, 50, 80, 40, 60, 100, 50, 70, 30].map((h, i) => (
-                <div
-                  key={i}
-                  style={{ height: isSpeaking ? `${h}%` : '30%' }}
-                  className={`w-1.5 rounded-full transition-all duration-300 ${
-                    isSpeaking ? 'bg-emerald-600 animate-pulse' : 'bg-slate-300'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <p className="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200 shadow-xs">
-              "{scriptText}"
-            </p>
-          </div>
-
-          <button
-            onClick={handleToggleSpeech}
-            className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center space-x-2 shrink-0 shadow-md cursor-pointer ${
-              isSpeaking
-                ? 'bg-red-600 hover:bg-red-500 text-white animate-pulse'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-            }`}
-          >
-            {isSpeaking ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            <span>{isSpeaking ? 'Stop Voice (थांबवा)' : '▶ 🔊 सल्ला ऐका (Listen Audio)'}</span>
-          </button>
         </div>
 
         {/* Quick Weather Metrics */}

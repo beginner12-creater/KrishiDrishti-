@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { sendChatMessage } from '../services/apiService';
-import { Bot, Send, User, Sparkles, RefreshCw, Volume2, VolumeX, Lightbulb, HeartHandshake } from 'lucide-react';
+import { Bot, Send, User, RefreshCw, HeartHandshake } from 'lucide-react';
 
 export default function KrishiMitrChat({ village, riskMetrics }) {
   const [messages, setMessages] = useState([
@@ -11,7 +11,6 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
   ]);
   const [inputQuery, setInputQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [speakingIdx, setSpeakingIdx] = useState(null);
 
   const samplePrompts = [
     `😊 How are you today, Krishi Mitr?`,
@@ -38,25 +37,6 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSpeakMessage = (text, idx) => {
-    if (!('speechSynthesis' in window)) return;
-
-    if (speakingIdx === idx) {
-      window.speechSynthesis.cancel();
-      setSpeakingIdx(null);
-      return;
-    }
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.85;
-    utterance.onend = () => setSpeakingIdx(null);
-    utterance.onerror = () => setSpeakingIdx(null);
-
-    setSpeakingIdx(idx);
-    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -119,21 +99,6 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
               >
                 {m.text}
               </div>
-
-              {/* Speak Audio Button for AI Responses */}
-              {m.sender === 'bot' && (
-                <button
-                  onClick={() => handleSpeakMessage(m.text, idx)}
-                  className={`self-start text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-all flex items-center space-x-1 cursor-pointer ${
-                    speakingIdx === idx
-                      ? 'bg-rose-100 text-rose-800 border-rose-300 animate-pulse'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{speakingIdx === idx ? 'Stop Audio' : '▶ 🔊 Listen Answer (ऐका)'}</span>
-                </button>
-              )}
             </div>
 
             {m.sender === 'user' && (

@@ -15,6 +15,7 @@ import BottomNavBar from './components/BottomNavBar';
 import AuthModal from './components/AuthModal';
 import ReviewSystem from './components/ReviewSystem';
 import AdminHub from './components/AdminHub';
+import PlatformImpactFeatures from './components/PlatformImpactFeatures';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { t } from './data/translations';
@@ -144,6 +145,12 @@ export default function App() {
                   currentLang={currentLang}
                 />
 
+                {/* Expected Outcomes & Platform Core Features Showcase */}
+                <PlatformImpactFeatures
+                  village={selectedVillage}
+                  riskMetrics={riskMetrics}
+                />
+
                 {/* Farmer Review System */}
                 <ReviewSystem
                   village={selectedVillage}
@@ -176,6 +183,7 @@ export default function App() {
                       riskMetrics={riskMetrics}
                       onSelectCropForAdvisory={handleSelectCropForAdvisory}
                     />
+                    <PlatformImpactFeatures village={selectedVillage} riskMetrics={riskMetrics} />
                   </div>
                 )}
 

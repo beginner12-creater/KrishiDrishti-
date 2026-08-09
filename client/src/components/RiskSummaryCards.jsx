@@ -21,7 +21,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
           <div className="flex items-center space-x-2">
             <Activity className="w-5 h-5 text-emerald-600 shrink-0" />
             <span className="text-xs font-black uppercase tracking-wider text-slate-700">
-              Agri-Climate Risk Score (हवामान धोका गुण)
+              Agri-Climate Risk & Vulnerability (हवामान संवेदनशीलता / धोका गुण)
             </span>
           </div>
           <span
@@ -39,7 +39,7 @@ export default function RiskSummaryCards({ village, riskMetrics }) {
               <span className="text-sm sm:text-base font-bold text-slate-500"> / 100</span>
             </div>
             <p className="text-xs text-slate-600 font-medium mt-1">
-              Multi-hazard risk index for <span className="text-slate-900 font-bold">{village.villageName}</span>
+              Vulnerability Index (संवेदनशीलता) for <span className="text-slate-900 font-bold">{village.villageName}</span>
             </p>
           </div>
           

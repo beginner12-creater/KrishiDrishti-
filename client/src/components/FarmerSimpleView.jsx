@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { t } from '../data/translations';
 import { Sprout, Droplets, Bug, Sun, PhoneCall, ArrowRight, Sparkles } from 'lucide-react';
 
-export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop }) {
+export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
   const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
 
   if (!village || !riskMetrics) return null;
@@ -115,28 +116,28 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
           <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
             <Sun className="w-5 h-5 text-amber-500 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-500">Drought (दुष्काळ)</div>
-              <div className="text-sm font-black text-slate-900">{subIndices.droughtIndex > 60 ? 'HIGH' : 'LOW'}</div>
+              <div className="text-[11px] text-slate-500">{t('drought', currentLang)} (दुष्काळ)</div>
+              <div className="text-sm font-black text-slate-900">{subIndices.droughtIndex > 60 ? t('high', currentLang) : t('low', currentLang)}</div>
             </div>
           </div>
           <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
             <Droplets className="w-5 h-5 text-cyan-600 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-500">Water (पाणी)</div>
+              <div className="text-[11px] text-slate-500">{t('water', currentLang)} (पाणी)</div>
               <div className="text-sm font-black text-slate-900">{village.groundwaterStatus.split(' ')[0]}</div>
             </div>
           </div>
           <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
             <Bug className="w-5 h-5 text-purple-600 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-500">Pest Risk (कीड)</div>
-              <div className="text-sm font-black text-slate-900">{subIndices.pestIndex > 60 ? 'HIGH' : 'SAFE'}</div>
+              <div className="text-[11px] text-slate-500">{t('pestRisk', currentLang)} (कीड)</div>
+              <div className="text-sm font-black text-slate-900">{subIndices.pestIndex > 60 ? t('high', currentLang) : t('safe', currentLang)}</div>
             </div>
           </div>
           <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
             <Sprout className="w-5 h-5 text-emerald-600 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-500">Rainfall (पाऊस)</div>
+              <div className="text-[11px] text-slate-500">{t('rainfall', currentLang)} (पाऊस)</div>
               <div className="text-sm font-black text-slate-900">{village.annualRainfallNormal} mm</div>
             </div>
           </div>
@@ -148,7 +149,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
       <div className="bg-white border border-slate-200 p-5 sm:p-6 rounded-3xl shadow-sm space-y-3">
         <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
           <Sprout className="w-5 h-5 text-emerald-600" />
-          Select Your Crop (आपले पीक निवडा):
+          {t('selectCropTitle', currentLang)}
         </h3>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -177,10 +178,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
         <div className="flex items-center justify-between">
           <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            Key Actions for <span className="text-emerald-700 underline decoration-emerald-500/50">{selectedCrop}</span> (उपाय):
+            {t('keyActionsTitle', currentLang)} <span className="text-emerald-700 underline decoration-emerald-500/50">{selectedCrop}</span>:
           </h3>
           <span className="text-xs bg-emerald-100 text-emerald-800 px-3 py-0.5 rounded-full border border-emerald-300 font-bold hidden sm:inline">
-            Advice for {selectedCrop}
+            {t('adviceFor', currentLang)} {selectedCrop}
           </span>
         </div>
 
@@ -192,7 +193,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-sm">
                 1
               </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">💧 Watering ({selectedCrop} पाणी)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">💧 {t('watering', currentLang)} ({selectedCrop})</h4>
             </div>
             <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.water}
@@ -205,7 +206,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-sm">
                 2
               </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">🌱 Soil & Spray ({selectedCrop} खत फवारणी)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">🌱 {t('soilSpray', currentLang)} ({selectedCrop})</h4>
             </div>
             <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.fertilizer}
@@ -218,7 +219,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-sm">
                 3
               </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">🐛 Insect Spray ({selectedCrop} कीड नियंत्रण)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">🐛 {t('insectSpray', currentLang)} ({selectedCrop})</h4>
             </div>
             <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.pest}
@@ -231,7 +232,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
               <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-sm">
                 4
               </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">🛡️ Crop Insurance ({selectedCrop} पिक विमा)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">🛡️ {t('cropInsurance', currentLang)} ({selectedCrop})</h4>
             </div>
             <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.insurance}
@@ -248,8 +249,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
             <PhoneCall className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-sm sm:text-base font-black">Kisan Call Centre Helpline (किसान हेल्पलाइन)</h4>
-            <p className="text-xs font-semibold text-emerald-100">Free Government Helpline for Farmers</p>
+            <h4 className="text-sm sm:text-base font-black">{t('helplineTitle', currentLang)}</h4>
+            <p className="text-xs font-semibold text-emerald-100">{t('helplineSub', currentLang)}</p>
           </div>
         </div>
 
@@ -257,7 +258,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
           href="tel:18001801551"
           className="px-5 py-2.5 bg-white text-emerald-800 font-black text-xs rounded-xl shadow-sm hover:bg-emerald-50 transition-all shrink-0 flex items-center space-x-2"
         >
-          <span>Call 1800-180-1551</span>
+          <span>{t('callNow', currentLang)}</span>
           <ArrowRight className="w-4 h-4" />
         </a>
       </div>

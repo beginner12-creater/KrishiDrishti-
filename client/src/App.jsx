@@ -14,6 +14,7 @@ import CropProfitRecommendation from './components/CropProfitRecommendation';
 import BottomNavBar from './components/BottomNavBar';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
+import { t } from './data/translations';
 import { Sprout, RefreshCw, ArrowLeft } from 'lucide-react';
 
 export default function App() {
@@ -23,7 +24,7 @@ export default function App() {
   const [riskMetrics, setRiskMetrics] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'advisory' | 'map' | 'compare' | 'chat'
   const [viewMode, setViewMode] = useState('farmer'); // 'farmer' | 'detailed'
-  const [currentLang, setCurrentLang] = useState('en');
+  const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -105,6 +106,7 @@ export default function App() {
           hierarchy={hierarchy}
           selectedVillage={selectedVillage}
           onSelectVillage={handleSelectVillage}
+          currentLang={currentLang}
         />
 
         {loading ? (
@@ -123,6 +125,7 @@ export default function App() {
                   village={selectedVillage}
                   riskMetrics={riskMetrics}
                   onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+                  currentLang={currentLang}
                 />
                 
                 {/* Profit Maximizing Crop Suggestions */}
@@ -130,6 +133,7 @@ export default function App() {
                   village={selectedVillage}
                   riskMetrics={riskMetrics}
                   onSelectCrop={handleSelectCropForAdvisory}
+                  currentLang={currentLang}
                 />
               </div>
             ) : (
@@ -143,7 +147,7 @@ export default function App() {
                     className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-emerald-700 hover:bg-slate-100 font-extrabold text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
                   >
                     <ArrowLeft className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>← Back to Farmer Home (मागे जा / मुख्य पृष्ठ)</span>
+                    <span>{t('backToFarmerHome', currentLang)}</span>
                   </button>
                 </div>
 
@@ -166,6 +170,7 @@ export default function App() {
                     village={selectedVillage}
                     riskMetrics={riskMetrics}
                     onSelectCrop={handleSelectCropForAdvisory}
+                    currentLang={currentLang}
                   />
                 )}
 
@@ -197,7 +202,11 @@ export default function App() {
 
                 {/* TAB 6: KRISHI MITR AI CHATBOT */}
                 {activeTab === 'chat' && (
-                  <KrishiMitrChat village={selectedVillage} riskMetrics={riskMetrics} />
+                  <KrishiMitrChat
+                    village={selectedVillage}
+                    riskMetrics={riskMetrics}
+                    currentLang={currentLang}
+                  />
                 )}
               </div>
             )}
@@ -217,6 +226,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         viewMode={viewMode}
         setViewMode={setViewMode}
+        currentLang={currentLang}
       />
 
       {/* Footer Banner */}

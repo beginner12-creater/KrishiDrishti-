@@ -120,14 +120,49 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
-// GEMINI-STYLE FRIENDLY, WARM, EMPATHETIC, NON-TECHNICAL CONVERSATIONAL ENGINE
+// GEMINI-STYLE FRIENDLY, WARM, EMPATHETIC, NON-TECHNICAL & DAILY GESTURES CONVERSATIONAL ENGINE
 export function answerKrishiMitrQuery(query, village, riskMetrics) {
-  const qLower = query.toLowerCase();
+  const qLower = query.toLowerCase().trim();
   const vName = village ? village.villageName : "your village";
   const dName = village ? village.districtName : "your district";
   const cropsStr = village ? village.primaryCrops.join(", ") : "Cotton, Soybean, Sugarcane, Pomegranate, Onion";
 
-  // 1. PROFIT & HIGH RETURN CROPS (GEMINI STYLE)
+  // 1. DAILY GESTURES & GREETINGS ("How are you?", "Hello", "Kasale aahat", "Kaise ho")
+  if (qLower.includes("how are you") || qLower.includes("kaise ho") || qLower.includes("kase aahat") || qLower.includes("कसे आहात") || qLower.includes("कैसे हो") || qLower.includes("how r u")) {
+    return `Namaste Kisan Bhai! 🙏 I am doing great and feeling happy to talk to you! 😊 
+
+How is your day going on your farm in ${vName}? How are your crops doing today? 🌾 I am always here as your digital farming friend. Tell me, how can I help you today?`;
+  }
+
+  if (qLower.includes("hello") || qLower.includes("hi") || qLower.includes("hey") || qLower.includes("namaste") || qLower.includes("नमस्कार") || qLower.includes("नमस्ते") || qLower.includes("ram ram") || qLower.includes("राम राम")) {
+    return `Namaste! Ram Ram Kisan Bhai! 🙏 Welcome! 😊 
+
+I hope you and your family are healthy and happy today! Weather in ${vName} is looking good for farm work. What crop advice or help do you need today?`;
+  }
+
+  if (qLower.includes("good morning") || qLower.includes("subhashok") || qLower.includes("शुभ प्रभात") || qLower.includes("शुभ सकाळ")) {
+    return `Good Morning Kisan Mitra! ☀️ Shubh Prabhat! 
+
+May your hard work today bring a golden harvest to your farm in ${vName}! Have you checked your crop watering today? How can I assist you this morning?`;
+  }
+
+  if (qLower.includes("good evening") || qLower.includes("good night") || qLower.includes("शुभ संध्या") || qLower.includes("शुभ रात्री")) {
+    return `Good Evening Kisan Bhai! 🌙 Shubh Sandhya! 
+
+Hope you had a productive day in the field! Remember to irrigate your crops in the evening for best water absorption. Rest well tonight! 🙏`;
+  }
+
+  if (qLower.includes("thank") || qLower.includes("dhanyawad") || qLower.includes("thanks") || qLower.includes("धन्यवाद") || qLower.includes("आभार")) {
+    return `You are most welcome Kisan Bhai! 🙏 
+
+It is my honor to help hard-working farmers like you. Feel free to ask me anytime about crops, water, or fertilizers. May God bless your harvest! 🌾✨`;
+  }
+
+  if (qLower.includes("who are you") || qLower.includes("your name") || qLower.includes("tumhi kon") || qLower.includes("तुम कौन हो") || qLower.includes("तू कोण आहेस")) {
+    return `Namaste! 🙏 I am Krishi Mitr AI (कृषि मित्र) — your personal digital agronomist and farming friend created to help farmers in ${vName} and all across India with simple, practical crop advice!`;
+  }
+
+  // 2. PROFIT & HIGH RETURN CROPS (GEMINI STYLE)
   if (qLower.includes("profit") || qLower.includes("money") || qLower.includes("earn") || qLower.includes("income") || qLower.includes("नफा") || qLower.includes("कमाई")) {
     return `Namaste Farmer Brother! 🙏 In ${vName}, here is how you can earn maximum profit from your land without stress:
 
@@ -137,7 +172,7 @@ export function answerKrishiMitrQuery(query, village, riskMetrics) {
 4. 📱 APMC Mandi Tip: Always check market prices on your phone before selling so buyers give you top rates!`;
   }
 
-  // 2. ORGANIC / ZERO COST NATURAL FARMING (GEMINI STYLE)
+  // 3. ORGANIC / ZERO COST NATURAL FARMING (GEMINI STYLE)
   if (qLower.includes("organic") || qLower.includes("jeevamrut") || qLower.includes("natural") || qLower.includes("जैविक") || qLower.includes("सेंद्रिय") || qLower.includes("zero cost")) {
     return `Namaste! 🙏 You can easily save ₹4,000 per acre on chemical fertilizers using simple home-made Jeevamrut:
 
@@ -146,7 +181,7 @@ export function answerKrishiMitrQuery(query, village, riskMetrics) {
 3. 💧 Give with Water: Give this Jeevamrut with your drip or watering channel twice a month. Your soil will become soft, fertile, and full of natural earthworms!`;
   }
 
-  // 3. WATER CONSERVATION & DRIP IRRIGATION HACKS (GEMINI STYLE)
+  // 4. WATER CONSERVATION & DRIP IRRIGATION HACKS (GEMINI STYLE)
   if (qLower.includes("water") || qLower.includes("irrigation") || qLower.includes("drought") || qLower.includes("पाणी") || qLower.includes("सिंचन") || qLower.includes("दुष्काळ")) {
     return `Namaste! 🙏 Water is precious in ${vName}. Here are 3 simple ways to keep your crops green during hot dry weather:
 
@@ -155,7 +190,7 @@ export function answerKrishiMitrQuery(query, village, riskMetrics) {
 3. 🏛️ Government Drip Subsidy: Get 55% to 80% money back from government for installing Drip Irrigation. It saves half your water!`;
   }
 
-  // 4. PEST CONTROL & INSECT HACKS (GEMINI STYLE)
+  // 5. PEST CONTROL & INSECT HACKS (GEMINI STYLE)
   if (qLower.includes("pest") || qLower.includes("disease") || qLower.includes("worm") || qLower.includes("bug") || qLower.includes("कीड") || qLower.includes("रोग") || qLower.includes("फवारणी")) {
     return `Namaste! 🙏 Stop dangerous insects before they hurt your crops in ${vName}:
 
@@ -164,7 +199,7 @@ export function answerKrishiMitrQuery(query, village, riskMetrics) {
 3. 🪱 Pheromone Traps: Put 8 Pink Bollworm traps per acre in cotton fields to catch adult moths early!`;
   }
 
-  // 5. GOVERNMENT SCHEMES & SUBSIDIES (GEMINI STYLE)
+  // 6. GOVERNMENT SCHEMES & SUBSIDIES (GEMINI STYLE)
   if (qLower.includes("scheme") || qLower.includes("subsidy") || qLower.includes("pmfby") || qLower.includes("insurance") || qLower.includes("kisan") || qLower.includes("योजना") || qLower.includes("अनुदान") || qLower.includes("विमा")) {
     return `Namaste! 🙏 Here are the top government benefits every farmer in ${vName} should use:
 
@@ -173,7 +208,7 @@ export function answerKrishiMitrQuery(query, village, riskMetrics) {
 3. 💳 Kisan Credit Card (KCC): Get low-interest crop loan at just 4% interest rate per year.`;
   }
 
-  // 6. SOIL HEALTH & FERTILIZER MATH (GEMINI STYLE)
+  // 7. SOIL HEALTH & FERTILIZER MATH (GEMINI STYLE)
   if (qLower.includes("soil") || qLower.includes("fertilizer") || qLower.includes("urea") || qLower.includes("dap") || qLower.includes("माती") || qLower.includes("खत")) {
     return `Namaste! 🙏 Keep your farm soil healthy and productive in ${vName}:
 
@@ -182,7 +217,7 @@ export function answerKrishiMitrQuery(query, village, riskMetrics) {
 3. ☘️ Green Manure: Sow Dhaincha or Sunnhemp before your main crop to naturally double soil fertility.`;
   }
 
-  // 7. CROP SELECTION & SOWING WINDOW (GEMINI STYLE)
+  // 8. CROP SELECTION & SOWING WINDOW (GEMINI STYLE)
   if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant") || qLower.includes("पीक") || qLower.includes("पेरणी")) {
     return `Namaste! 🙏 Best crops for ${vName} (${dName}):
 

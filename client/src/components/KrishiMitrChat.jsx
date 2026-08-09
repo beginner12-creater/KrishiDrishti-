@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { sendChatMessage } from '../services/apiService';
-import { Bot, Send, User, Sparkles, RefreshCw, Volume2, VolumeX, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { Bot, Send, User, Sparkles, RefreshCw, Volume2, VolumeX, Lightbulb, HeartHandshake } from 'lucide-react';
 
 export default function KrishiMitrChat({ village, riskMetrics }) {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: `Namaste! I am Krishi Mitr AI (कृषि मित्र). Ask me any out-of-the-box question about high-profit crops, organic Jeevamrut, water-saving hacks, PMFBY insurance claims, or pest control for ${village ? village.villageName : 'your village'}!`
+      text: `Namaste Kisan Bhai! 🙏 I am Krishi Mitr AI (कृषि मित्र). How are you doing on your farm today? Feel free to ask me anything about your crops, water, or just say hello!`
     }
   ]);
   const [inputQuery, setInputQuery] = useState('');
@@ -14,10 +14,10 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
   const [speakingIdx, setSpeakingIdx] = useState(null);
 
   const samplePrompts = [
-    `💰 How to earn ₹3 Lakh/acre net profit in ${village?.villageName || 'village'}?`,
-    `🌱 Zero-cost organic Jeevamrut formula & application?`,
-    `💧 Save 50% water with Drip & Sugarcane Mulching?`,
-    `🐛 Organic pest control spray for Cotton & Soybean?`,
+    `😊 How are you today, Krishi Mitr?`,
+    `☀️ Good Morning! How is weather in ${village?.villageName || 'village'}?`,
+    `💰 How to earn ₹3 Lakh/acre net profit?`,
+    `🌱 Zero-cost organic Jeevamrut formula & recipe?`,
     `📜 How to claim PMFBY crop insurance within 72 hours?`
   ];
 
@@ -32,9 +32,9 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
 
     try {
       const reply = await sendChatMessage(query, village?.id);
-      setMessages(prev => [...prev, { sender: 'bot', text: reply || 'I am ready to help you with crop advice.' }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: reply || 'Namaste! I am ready to help you with crop advice.' }]);
     } catch (err) {
-      setMessages(prev => [...prev, { sender: 'bot', text: 'Namaste! I am Krishi Mitr AI. Please ask any question on crops, drip irrigation, or PMFBY insurance.' }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: 'Namaste! I am doing great and ready to help you with your farm questions.' }]);
     } finally {
       setLoading(false);
     }
@@ -73,18 +73,18 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
               Krishi Mitr AI (कृषि मित्र)
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">Online</span>
             </h3>
-            <p className="text-[11px] text-slate-500 font-medium">Out-of-the-Box Agronomist Advisor for {village ? village.villageName : 'Selected Village'}</p>
+            <p className="text-[11px] text-slate-500 font-medium">Conversational Digital Friend for {village ? village.villageName : 'Selected Village'}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-1 bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-1 rounded-xl text-xs font-extrabold shrink-0">
-          <Lightbulb className="w-4 h-4 text-amber-500 shrink-0" />
-          <span>Smart Advisor</span>
+        <div className="flex items-center space-x-1 bg-emerald-50 text-emerald-900 border border-emerald-200 px-2.5 py-1 rounded-xl text-xs font-extrabold shrink-0">
+          <HeartHandshake className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>Friendly AI</span>
         </div>
       </div>
 
       {/* Suggested Prompt Chips */}
       <div className="py-2.5 flex items-center gap-2 overflow-x-auto text-xs border-b border-slate-100 scrollbar-none">
-        <span className="text-slate-500 font-bold shrink-0 text-[11px]">Ask AI:</span>
+        <span className="text-slate-500 font-bold shrink-0 text-[11px]">Chat AI:</span>
         {samplePrompts.map((prompt, idx) => (
           <button
             key={idx}
@@ -147,7 +147,7 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
         {loading && (
           <div className="flex items-center space-x-2 text-xs text-slate-600 bg-slate-100 p-3 rounded-2xl w-fit border border-slate-200">
             <RefreshCw className="w-4 h-4 text-emerald-600 animate-spin" />
-            <span className="font-bold">Krishi Mitr is calculating out-of-the-box answer...</span>
+            <span className="font-bold">Krishi Mitr is drafting a warm response...</span>
           </div>
         )}
       </div>
@@ -156,7 +156,7 @@ export default function KrishiMitrChat({ village, riskMetrics }) {
       <div className="pt-2.5 border-t border-slate-200 flex items-center gap-2">
         <input
           type="text"
-          placeholder={`Ask Krishi Mitr anything about farming in ${village ? village.villageName : 'village'}...`}
+          placeholder={`Chat with Krishi Mitr (e.g. "How are you?", "Good morning", crop tips)...`}
           value={inputQuery}
           onChange={(e) => setInputQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}

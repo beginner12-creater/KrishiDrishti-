@@ -11,11 +11,11 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
   const { overallRiskScore, subIndices } = riskMetrics;
 
-  // Clean Weather Status Card
+  // Clean Weather Status Card (Light Theme)
   const getSimpleStatus = (score) => {
-    if (score >= 70) return { title: '🔴 HIGH RISK (धोका)', desc: 'Weather alert! Take crop protection steps below.' };
-    if (score >= 45) return { title: '🟡 MODERATE RISK (काळजी घ्या)', desc: 'Weather requires care. Follow simple crop advice.' };
-    return { title: '🟢 GOOD CONDITIONS (सुरक्षित)', desc: 'Weather is favorable. Regular crop care recommended.' };
+    if (score >= 70) return { title: '🔴 HIGH RISK (धोका)', desc: 'Weather alert! Take crop protection steps below.', cardBg: 'bg-red-50 border-red-200 text-red-900', badgeBg: 'bg-red-100 text-red-800 border-red-300' };
+    if (score >= 45) return { title: '🟡 MODERATE RISK (काळजी घ्या)', desc: 'Weather requires care. Follow simple crop advice.', cardBg: 'bg-amber-50 border-amber-200 text-amber-900', badgeBg: 'bg-amber-100 text-amber-800 border-amber-300' };
+    return { title: '🟢 GOOD CONDITIONS (सुरक्षित)', desc: 'Weather is favorable. Regular crop care recommended.', cardBg: 'bg-emerald-50 border-emerald-200 text-emerald-950', badgeBg: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
   };
 
   const status = getSimpleStatus(overallRiskScore);
@@ -124,45 +124,45 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
   return (
     <div className="space-y-6">
       
-      {/* 1. FRONT AI VOICE PANEL HERO BANNER */}
-      <div className="bg-slate-900 border border-slate-800 p-5 sm:p-7 rounded-3xl shadow-xl space-y-5">
+      {/* 1. FRONT AI VOICE PANEL HERO BANNER (LIGHT THEME) */}
+      <div className={`p-5 sm:p-7 rounded-3xl border shadow-sm space-y-5 transition-all ${status.cardBg}`}>
         
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
           <div>
             <div className="flex items-center space-x-2 mb-1.5">
-              <span className="px-3 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-950 text-emerald-400 border border-emerald-800 uppercase tracking-wider">
+              <span className={`px-3 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider ${status.badgeBg}`}>
                 🌾 शेतकरी मार्गदर्शक / Farmer Guide
               </span>
-              <span className="text-xs font-semibold text-slate-400">📍 {village.villageName} ({village.districtName})</span>
+              <span className="text-xs font-bold text-slate-700">📍 {village.villageName} ({village.districtName})</span>
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-black text-slate-100">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
               {status.title}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-700 font-medium mt-0.5">
               {status.desc}
             </p>
           </div>
 
           {/* Language & Speed Selector */}
-          <div className="flex items-center space-x-2 bg-slate-950 p-2 rounded-xl border border-slate-800 text-xs shrink-0">
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-300 text-xs shrink-0 shadow-sm">
             <div className="flex items-center space-x-1">
-              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              <Globe className="w-3.5 h-3.5 text-emerald-600" />
               <select
                 value={voiceLang}
                 onChange={(e) => setVoiceLang(e.target.value)}
-                className="bg-transparent text-slate-200 font-bold focus:outline-none cursor-pointer text-xs"
+                className="bg-transparent text-slate-900 font-bold focus:outline-none cursor-pointer text-xs"
               >
                 <option value="mr">मराठी</option>
                 <option value="hi">हिन्दी</option>
                 <option value="en">English</option>
               </select>
             </div>
-            <span className="text-slate-700">|</span>
+            <span className="text-slate-300">|</span>
             <select
               value={speechSpeed}
               onChange={(e) => setSpeechSpeed(parseFloat(e.target.value))}
-              className="bg-transparent text-slate-200 font-bold focus:outline-none cursor-pointer text-xs"
+              className="bg-transparent text-slate-900 font-bold focus:outline-none cursor-pointer text-xs"
             >
               <option value="0.7">Slow</option>
               <option value="0.85">Normal</option>
@@ -172,7 +172,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
         </div>
 
         {/* Audio Transcript & Big Play Button */}
-        <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="space-y-2 flex-1 w-full">
             <div className="flex items-center space-x-1.5 h-6">
               {[40, 70, 30, 90, 50, 80, 40, 60, 100, 50, 70, 30].map((h, i) => (
@@ -180,23 +180,23 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
                   key={i}
                   style={{ height: isSpeaking ? `${h}%` : '30%' }}
                   className={`w-1.5 rounded-full transition-all duration-300 ${
-                    isSpeaking ? 'bg-emerald-400 animate-pulse' : 'bg-slate-800'
+                    isSpeaking ? 'bg-emerald-600 animate-pulse' : 'bg-slate-300'
                   }`}
                 />
               ))}
             </div>
 
-            <p className="text-xs sm:text-sm font-medium text-slate-200 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <p className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
               "{scriptText}"
             </p>
           </div>
 
           <button
             onClick={handleToggleSpeech}
-            className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-extrabold text-sm transition-all flex items-center justify-center space-x-2 shrink-0 shadow-md ${
+            className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center space-x-2 shrink-0 shadow-md ${
               isSpeaking
-                ? 'bg-rose-500 hover:bg-rose-400 text-slate-950 animate-pulse'
-                : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
+                ? 'bg-red-600 hover:bg-red-500 text-white animate-pulse'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
             }`}
           >
             {isSpeaking ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
@@ -206,32 +206,32 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
 
         {/* Quick Weather Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold pt-1">
-          <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center space-x-2.5">
-            <Sun className="w-5 h-5 text-amber-400 shrink-0" />
+          <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
+            <Sun className="w-5 h-5 text-amber-500 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-400">Drought (दुष्काळ)</div>
-              <div className="text-sm font-black text-slate-100">{subIndices.droughtIndex > 60 ? 'HIGH' : 'LOW'}</div>
+              <div className="text-[11px] text-slate-500">Drought (दुष्काळ)</div>
+              <div className="text-sm font-black text-slate-900">{subIndices.droughtIndex > 60 ? 'HIGH' : 'LOW'}</div>
             </div>
           </div>
-          <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center space-x-2.5">
-            <Droplets className="w-5 h-5 text-cyan-400 shrink-0" />
+          <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
+            <Droplets className="w-5 h-5 text-cyan-600 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-400">Water (पाणी)</div>
-              <div className="text-sm font-black text-slate-100">{village.groundwaterStatus.split(' ')[0]}</div>
+              <div className="text-[11px] text-slate-500">Water (पाणी)</div>
+              <div className="text-sm font-black text-slate-900">{village.groundwaterStatus.split(' ')[0]}</div>
             </div>
           </div>
-          <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center space-x-2.5">
-            <Bug className="w-5 h-5 text-purple-400 shrink-0" />
+          <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
+            <Bug className="w-5 h-5 text-purple-600 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-400">Pest Risk (कीड)</div>
-              <div className="text-sm font-black text-slate-100">{subIndices.pestIndex > 60 ? 'HIGH' : 'SAFE'}</div>
+              <div className="text-[11px] text-slate-500">Pest Risk (कीड)</div>
+              <div className="text-sm font-black text-slate-900">{subIndices.pestIndex > 60 ? 'HIGH' : 'SAFE'}</div>
             </div>
           </div>
-          <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center space-x-2.5">
-            <Sprout className="w-5 h-5 text-emerald-400 shrink-0" />
+          <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center space-x-2.5 shadow-sm">
+            <Sprout className="w-5 h-5 text-emerald-600 shrink-0" />
             <div>
-              <div className="text-[11px] text-slate-400">Rainfall (पाऊस)</div>
-              <div className="text-sm font-black text-slate-100">{village.annualRainfallNormal} mm</div>
+              <div className="text-[11px] text-slate-500">Rainfall (पाऊस)</div>
+              <div className="text-sm font-black text-slate-900">{village.annualRainfallNormal} mm</div>
             </div>
           </div>
         </div>
@@ -239,9 +239,9 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
       </div>
 
       {/* 2. CHOOSE CROP */}
-      <div className="bg-slate-900 border border-slate-800 p-5 sm:p-6 rounded-3xl shadow-xl">
-        <h3 className="text-base sm:text-lg font-black text-slate-100 mb-3 flex items-center gap-2">
-          <Sprout className="w-5 h-5 text-emerald-400" />
+      <div className="bg-white border border-slate-200 p-5 sm:p-6 rounded-3xl shadow-sm space-y-3">
+        <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+          <Sprout className="w-5 h-5 text-emerald-600" />
           Select Your Crop (आपले पीक निवडा):
         </h3>
 
@@ -254,12 +254,12 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
                 onClick={() => handleCropButtonClick(crop)}
                 className={`p-3.5 rounded-2xl text-left border transition-all min-h-[75px] flex flex-col justify-between cursor-pointer ${
                   isSelected
-                    ? 'bg-emerald-500 text-slate-950 font-black border-emerald-400 shadow-md scale-[1.02]'
-                    : 'bg-slate-950 hover:bg-slate-800 text-slate-200 border-slate-800'
+                    ? 'bg-emerald-600 text-white font-black border-emerald-700 shadow-md scale-[1.02]'
+                    : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'
                 }`}
               >
-                <div className="text-[10px] font-semibold opacity-80 uppercase tracking-wider">Crop</div>
-                <div className="text-sm font-extrabold">{crop}</div>
+                <div className="text-[10px] font-bold opacity-80 uppercase tracking-wider">Crop</div>
+                <div className="text-sm font-black">{crop}</div>
               </button>
             );
           })}
@@ -267,13 +267,13 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
       </div>
 
       {/* 3. DYNAMIC 4-STEP ACTION PLAN FOR SELECTED CROP */}
-      <div className="bg-slate-900 border border-slate-800 p-5 sm:p-6 rounded-3xl shadow-xl space-y-4">
+      <div className="bg-white border border-slate-200 p-5 sm:p-6 rounded-3xl shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base sm:text-lg font-black text-slate-100 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-400" />
-            Key Actions for <span className="text-emerald-400 underline decoration-emerald-500/50">{selectedCrop}</span> (उपाय):
+          <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            Key Actions for <span className="text-emerald-700 underline decoration-emerald-500/50">{selectedCrop}</span> (उपाय):
           </h3>
-          <span className="text-xs bg-emerald-950 text-emerald-400 px-3 py-0.5 rounded-full border border-emerald-800 font-bold hidden sm:inline">
+          <span className="text-xs bg-emerald-100 text-emerald-800 px-3 py-0.5 rounded-full border border-emerald-300 font-bold hidden sm:inline">
             Advice for {selectedCrop}
           </span>
         </div>
@@ -281,53 +281,53 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           
           {/* Step 1: Watering */}
-          <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-black text-sm">
+              <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-sm">
                 1
               </div>
-              <h4 className="text-xs sm:text-sm font-extrabold text-slate-100">💧 Watering ({selectedCrop} पाणी)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">💧 Watering ({selectedCrop} पाणी)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.water}
             </p>
           </div>
 
           {/* Step 2: Soil & Fertilizer */}
-          <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-sm">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-sm">
                 2
               </div>
-              <h4 className="text-xs sm:text-sm font-extrabold text-slate-100">🌱 Soil & Spray ({selectedCrop} खत फवारणी)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">🌱 Soil & Spray ({selectedCrop} खत फवारणी)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.fertilizer}
             </p>
           </div>
 
           {/* Step 3: Pest Control */}
-          <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-black text-sm">
+              <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-sm">
                 3
               </div>
-              <h4 className="text-xs sm:text-sm font-extrabold text-slate-100">🐛 Insect Spray ({selectedCrop} कीड नियंत्रण)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">🐛 Insect Spray ({selectedCrop} कीड नियंत्रण)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.pest}
             </p>
           </div>
 
           {/* Step 4: Crop Insurance */}
-          <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-2">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-black text-sm">
+              <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-sm">
                 4
               </div>
-              <h4 className="text-xs sm:text-sm font-extrabold text-slate-100">🛡️ Crop Insurance ({selectedCrop} पिक विमा)</h4>
+              <h4 className="text-xs sm:text-sm font-black text-slate-900">🛡️ Crop Insurance ({selectedCrop} पिक विमा)</h4>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
               {currentActions.insurance}
             </p>
           </div>
@@ -336,20 +336,20 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop })
       </div>
 
       {/* 4. HELPLINE CARD */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-5 rounded-3xl text-slate-950 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+      <div className="bg-gradient-to-r from-emerald-700 to-teal-800 p-5 rounded-3xl text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-slate-950 text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-white text-emerald-700 flex items-center justify-center shrink-0 shadow-sm">
             <PhoneCall className="w-5 h-5" />
           </div>
           <div>
             <h4 className="text-sm sm:text-base font-black">Kisan Call Centre Helpline (किसान हेल्पलाइन)</h4>
-            <p className="text-xs font-semibold text-emerald-950">Free Government Helpline for Farmers</p>
+            <p className="text-xs font-semibold text-emerald-100">Free Government Helpline for Farmers</p>
           </div>
         </div>
 
         <a
           href="tel:18001801551"
-          className="px-5 py-2.5 bg-slate-950 text-emerald-400 font-extrabold text-xs rounded-xl shadow-md hover:bg-slate-900 transition-all shrink-0 flex items-center space-x-2"
+          className="px-5 py-2.5 bg-white text-emerald-800 font-black text-xs rounded-xl shadow-sm hover:bg-emerald-50 transition-all shrink-0 flex items-center space-x-2"
         >
           <span>Call 1800-180-1551</span>
           <ArrowRight className="w-4 h-4" />

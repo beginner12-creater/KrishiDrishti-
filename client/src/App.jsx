@@ -84,7 +84,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950 pb-16 md:pb-0">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-emerald-500 selection:text-white pb-16 md:pb-0">
       
       {/* Top Navbar Header */}
       <Navbar
@@ -100,7 +100,7 @@ export default function App() {
       />
 
       {/* Main Container Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Village Location Selector Banner */}
         <VillageSelector
@@ -112,8 +112,8 @@ export default function App() {
 
         {loading ? (
           <div className="py-24 text-center">
-            <RefreshCw className="w-10 h-10 text-emerald-400 animate-spin mx-auto mb-4" />
-            <h3 className="text-base font-bold text-slate-200">Loading Indian Agricultural Climate Database...</h3>
+            <RefreshCw className="w-10 h-10 text-emerald-600 animate-spin mx-auto mb-4" />
+            <h3 className="text-base font-bold text-slate-800">Loading Indian Agricultural Climate Database...</h3>
             <p className="text-xs text-slate-500 mt-1">Connecting to risk index calculator & agro-met forecast engine</p>
           </div>
         ) : selectedVillage && riskMetrics ? (
@@ -143,9 +143,9 @@ export default function App() {
                 <div className="mb-4">
                   <button
                     onClick={handleBackToFarmerHome}
-                    className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-emerald-400 hover:text-emerald-300 font-extrabold text-xs shadow-lg transition-all active:scale-95 cursor-pointer"
+                    className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-emerald-700 hover:bg-slate-100 font-extrabold text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
                   >
-                    <ArrowLeft className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <ArrowLeft className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>← Back to Farmer Home (मागे जा / मुख्य पृष्ठ)</span>
                   </button>
                 </div>
@@ -207,7 +207,7 @@ export default function App() {
 
           </div>
         ) : (
-          <div className="text-center py-20 text-slate-400">
+          <div className="text-center py-20 text-slate-500">
             Select a village to view climate risk advisory.
           </div>
         )}
@@ -233,11 +233,11 @@ export default function App() {
       )}
 
       {/* Footer Banner */}
-      <footer className="glass-panel border-t border-slate-800/80 py-6 px-4 text-center text-xs text-slate-500 mb-12 md:mb-0">
+      <footer className="bg-white border-t border-slate-200 py-6 px-4 text-center text-xs text-slate-500 mb-12 md:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
-            <Sprout className="w-4 h-4 text-emerald-400" />
-            <span className="font-semibold text-slate-300">KrishiDrishti AI</span>
+            <Sprout className="w-4 h-4 text-emerald-600" />
+            <span className="font-bold text-slate-800">KrishiDrishti AI</span>
             <span>— AI Agricultural Climate Vulnerability & Resilience Platform</span>
           </div>
           <div>

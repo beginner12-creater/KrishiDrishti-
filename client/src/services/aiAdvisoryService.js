@@ -120,26 +120,78 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
+// OUT-OF-THE-BOX SMART KRISHI MITR AI CONVERSATIONAL ENGINE
 export function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase();
-  const vName = village.villageName;
-  const dName = village.districtName;
+  const vName = village ? village.villageName : "your village";
+  const dName = village ? village.districtName : "your district";
+  const cropsStr = village ? village.primaryCrops.join(", ") : "Cotton, Soybean, Sugarcane, Pomegranate, Onion";
+  const waterStatus = village ? village.groundwaterStatus : "Semi-Critical";
+  const soilType = village ? village.soilType : "Medium Black Vertisol";
 
-  if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant")) {
-    return `Namaste! For ${vName} (${dName}), based on current risk score (${riskMetrics.overallRiskScore}/100) and soil type (${village.soilType}), we recommend growing climate-resilient crops like ${village.primaryCrops.join(", ")}. If drought stress persists, switch to short-duration Millets (Bajra/Jowar) or Pigeonpea which require 40% less water than paddy.`;
+  // 1. PROFIT & HIGH RETURN CROPS (OUT-OF-THE-BOX PROFIT ADVICE)
+  if (qLower.includes("profit") || qLower.includes("money") || qLower.includes("earn") || qLower.includes("income") || qLower.includes("नफा") || qLower.includes("कमाई")) {
+    return `💰 Out-of-the-Box High Profit Strategy for ${vName}:
+1. High-Value Horticulture: Shift 1-2 acres to Bhagwa Pomegranate ( Net Profit: ₹2.2 - ₹3.5 Lakhs/acre) or Export Grapes (Net Profit: ₹3.0 - ₹4.5 Lakhs/acre).
+2. Dragon Fruit (Kamalam): Requires 60% less water than sugarcane, yields for 20+ years, Net Profit ₹3.5 - ₹5.0 Lakhs/acre.
+3. High-Density Intercropping: Plant Turmeric + Maize or Onion + Cotton intercropping to double your income per acre.
+4. Market Timing: Use e-NAM portal to check APMC mandi rates across ${dName} and avoid distress sales during peak harvest glut.`;
   }
 
-  if (qLower.includes("water") || qLower.includes("irrigation") || qLower.includes("drought")) {
-    return `Water Advisory for ${vName}: Groundwater in your block is ${village.groundwaterStatus}. To combat dry spells, adopt Drip Irrigation (55% PMKSY government subsidy available) and apply 1% Potassium Nitrate foliar spray to prevent crop wilt during hot afternoons.`;
+  // 2. ORGANIC / ZERO COST NATURAL FARMING (JEEVAMRUT HACKS)
+  if (qLower.includes("organic") || qLower.includes("jeevamrut") || qLower.includes("natural") || qLower.includes("जैविक") || qLower.includes("सेंद्रिय") || qLower.includes("zero cost")) {
+    return `🌱 Out-of-the-Box Zero-Cost Natural Farming Hack for ${vName}:
+1. 200-Litre Jeevamrut Formula: Mix 10kg Desi Cow Dung + 10L Cow Urine + 2kg Jaggery + 2kg Gram Flour (Besan) + 1 handful fertile farm soil in 200L water. Ferment for 48 hours.
+2. Application: Apply via Drip or irrigation water twice a month. It multiplies beneficial soil micro-organisms by 100x and saves ₹4,000/acre on chemical urea/DAP!
+3. Ghanjeevamrut Dry Fertilizer: Mix 100kg dried cow dung with 10L Jeevamrut, dry in shade, and use as basal dose before sowing.`;
   }
 
-  if (qLower.includes("pest") || qLower.includes("disease") || qLower.includes("worm") || qLower.includes("bug")) {
-    return `Pest Alert for ${vName}: Regional pest threat index is at ${riskMetrics.subIndices.pestIndex}/100. Watch out for ${village.majorHazards.find(h => h.includes("Pest") || h.includes("Bollworm") || h.includes("Rot")) || "sucking pests"}. Install 8-10 Pheromone traps per acre and use 5% Neem Seed Kernel Extract (NSKE) spray immediately.`;
+  // 3. WATER CONSERVATION & DRIP IRRIGATION HACKS
+  if (qLower.includes("water") || qLower.includes("irrigation") || qLower.includes("drought") || qLower.includes("पाणी") || qLower.includes("सिंचन") || qLower.includes("दुष्काळ")) {
+    return `💧 Smart Water-Saving Hacks for ${vName} (Groundwater: ${waterStatus}):
+1. Sugarcane Trash Mulching: Spread 3-5 inches of dry sugarcane trash between rows. Reduces water evaporation by 45% and keeps soil 4°C cooler.
+2. Anti-Transpirant Spray: Spray 1% Potassium Nitrate (KNO3) or 5% Kaolin clay during dry spells to close plant leaf stomata and prevent wilting.
+3. Micro-Drip 55-80% Subsidy: Apply for PMKSY subsidy through your Tehsil Krishi Officer for 16mm inline drip laterals.
+4. Khet Talav (Farm Pond): Construct a 30m x 30m plastic-lined farm pond to store 15-20 lakh liters of rainwater for emergency protective watering.`;
   }
 
-  if (qLower.includes("insurance") || qLower.includes("pmfby") || qLower.includes("claim") || qLower.includes("subsidy")) {
-    return `Insurance Guidance for ${vName}: Under Pradhan Mantri Fasal Bima Yojana (PMFBY), in case of unseasonal rain, dry spell, or hailstorm loss, report damage to the bank or toll-free number 1800-180-1551 within 72 hours with geotagged farm photos.`;
+  // 4. PEST CONTROL & INSECT HACKS (IPM BIOLOGY)
+  if (qLower.includes("pest") || qLower.includes("disease") || qLower.includes("worm") || qLower.includes("bug") || qLower.includes("कीड") || qLower.includes("रोग") || qLower.includes("फवारणी")) {
+    return `🐛 Smart Bio-Pest Control Advice for ${vName}:
+1. Pink Bollworm in Cotton: Hang 8 Pheromone traps/acre. Spray 5% Neem Seed Kernel Extract (NSKE 50,000 PPM) at early stage.
+2. Sucking Pests (Thrips/Whitefly): Install 10 Yellow Sticky Cards + 10 Blue Sticky Cards per acre. Cost is under ₹200/acre.
+3. Biological Army: Release Trichogramma parasite cards (2 cards/acre) to destroy stem borer eggs naturally without harmful chemicals.
+4. Organic Bio-Fungicide: Spray Trichoderma Viride (5g/L) + Pseudomonas fluorescens to prevent root rot & wilt.`;
   }
 
-  return `In ${vName} (${village.stateName}), overall Climate Vulnerability Index is ${riskMetrics.overallRiskScore}/100 (${riskMetrics.riskCategory}). Main hazards include ${village.majorHazards.join(", ")}. Follow our 5-pillar advisory for optimum crop yield protection!`;
+  // 5. GOVERNMENT SCHEMES & SUBSIDIES (PMFBY, PM-KISAN, KCC, PM KUSUM)
+  if (qLower.includes("scheme") || qLower.includes("subsidy") || qLower.includes("pmfby") || qLower.includes("insurance") || qLower.includes("kisan") || qLower.includes("योजना") || qLower.includes("अनुदान") || qLower.includes("विमा")) {
+    return `📜 Government Subsidies & Insurance Triggers for ${vName}:
+1. PMFBY Crop Insurance 72h Rule: If unseasonal rain, hailstorm, or flood damages crops, report loss to insurance toll-free 1800-180-1551 or bank within 72 hours with photos.
+2. PM-KUSUM Solar Water Pump: Get 90% government subsidy (Central 30% + State 60%) to install 3HP/5HP Solar Irrigation Pump.
+3. KCC Kisan Credit Card: Get up to ₹3 Lakh crop loan at 4% effective interest rate with prompt repayment rebate.
+4. SMAM Tractor Implement Subsidy: 40% to 50% subsidy for Rotavator, Seed Drill, and Harvesters via MahaDBT portal.`;
+  }
+
+  // 6. SOIL HEALTH & FERTILIZER MATH
+  if (qLower.includes("soil") || qLower.includes("fertilizer") || qLower.includes("urea") || qLower.includes("dap") || qLower.includes("माती") || qLower.includes("खत")) {
+    return `🌱 Soil Health & Fertilizer Dose Math for ${vName} (${soilType}):
+1. Soil Carbon Boost: Incorporate green manure crop (Dhaincha / Sunnhemp) for 45 days before main crop, then plow into soil. Adds 15-20kg Nitrogen naturally.
+2. Balanced NPK Ratio: Avoid excess Urea. Use 19:19:19 foliar spray (5g/L) at vegetative stage and 0:52:34 at flowering stage for 25% higher yield.
+3. Micronutrient Trick: Apply Zinc Sulphate (25kg/ha) + Boron (10kg/ha) to stop blossom drop and fruit cracking.`;
+  }
+
+  // 7. CROP SELECTION & SOWING WINDOW
+  if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant") || qLower.includes("पीक") || qLower.includes("पेरणी")) {
+    return `🌾 Optimized Crop Strategy for ${vName} (${dName}):
+Primary Crops: ${cropsStr}.
+1. Delayed Monsoon Plan: If rain delays by 15 days, switch from long-duration crops to short-duration Bajra (Phule Maha Shakti), Soybean (JS 20-34), or Pigeonpea.
+2. Intercropping Profit Formula: Cotton + Pigeonpea (6:1 ratio) or Soybean + Pigeonpea (4:2 ratio) provides double protection against weather failure!`;
+  }
+
+  // DEFAULT COMPREHENSIVE OUT-OF-THE-BOX ANSWER
+  return `🌾 Out-of-the-Box Krishi Mitr Advisory for ${vName} (${dName}):
+• Climate Vulnerability Index: ${riskMetrics ? riskMetrics.overallRiskScore : '45'}/100.
+• Recommended Crop Strategy: Focus on high-profit alternative crops (${cropsStr}), install Drip Irrigation with 55% PMKSY subsidy, and apply 200L Jeevamrut to cut chemical fertilizer costs by ₹4,000/acre.
+• Call Kisan Call Centre at 1800-180-1551 for free expert telephone advice!`;
 }

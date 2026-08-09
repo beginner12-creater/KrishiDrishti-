@@ -10,6 +10,7 @@ import KrishiMitrChat from './components/KrishiMitrChat';
 import VillageCompare from './components/VillageCompare';
 import PrintReportModal from './components/PrintReportModal';
 import FarmerSimpleView from './components/FarmerSimpleView';
+import CropProfitRecommendation from './components/CropProfitRecommendation';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
 import { Sprout, RefreshCw } from 'lucide-react';
@@ -88,7 +89,7 @@ export default function App() {
       />
 
       {/* Main Container Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
         
         {/* Village Location Selector Banner */}
         <VillageSelector
@@ -109,17 +110,31 @@ export default function App() {
             
             {/* FARMER SIMPLE MODE (DEFAULT EASY VIEW FOR FARMERS) */}
             {viewMode === 'farmer' ? (
-              <FarmerSimpleView
-                village={selectedVillage}
-                riskMetrics={riskMetrics}
-                onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
-              />
+              <div className="space-y-6">
+                <FarmerSimpleView
+                  village={selectedVillage}
+                  riskMetrics={riskMetrics}
+                  onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+                />
+                
+                {/* Profit Maximizing Crop Suggestions */}
+                <CropProfitRecommendation
+                  village={selectedVillage}
+                  riskMetrics={riskMetrics}
+                  onSelectCrop={handleSelectCropForAdvisory}
+                />
+              </div>
             ) : (
               /* DETAILED AGRONOMIST MODE */
               <div>
                 {/* TAB 1: DASHBOARD VIEW */}
                 {activeTab === 'dashboard' && (
                   <div>
+                    <CropProfitRecommendation
+                      village={selectedVillage}
+                      riskMetrics={riskMetrics}
+                      onSelectCrop={handleSelectCropForAdvisory}
+                    />
                     <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
                     <ClimateCharts village={selectedVillage} riskMetrics={riskMetrics} />
                     <CropVulnerabilityMatrix

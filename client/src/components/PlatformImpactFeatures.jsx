@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, ChevronLeft, ChevronRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert } from 'lucide-react';
 
 export default function PlatformImpactFeatures({ village, riskMetrics }) {
   const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
+  const sliderRef = useRef(null);
+  const outcomeSliderRef = useRef(null);
 
   const vName = village ? village.villageName : 'Selected Village';
   const dName = village ? village.districtName : 'Selected District';
@@ -17,11 +19,11 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
   const todayForecast = forecastDays[0] || { maxTempC: 34, minTempC: 24, humidityPercent: 65, windSpeedKmh: 12, precipitationProbPercent: 20 };
 
   const outcomes = [
-    { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", icon: Bell, color: "text-amber-600 bg-amber-50/80 border-amber-200 hover:border-amber-400" },
-    { id: 'advisory', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", icon: ShieldCheck, color: "text-emerald-600 bg-emerald-50/80 border-emerald-200 hover:border-emerald-400" },
-    { id: 'risk', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", icon: Sprout, color: "text-teal-600 bg-teal-50/80 border-teal-200 hover:border-teal-400" },
-    { id: 'harvest', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", icon: Calendar, color: "text-blue-600 bg-blue-50/80 border-blue-200 hover:border-blue-400" },
-    { id: 'historical', text: "Better disaster preparedness", textMr: "आपत्ती पूर्वतयारी", icon: LineChart, color: "text-purple-600 bg-purple-50/80 border-purple-200 hover:border-purple-400" }
+    { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", icon: Bell, color: "text-amber-600 bg-amber-50/90 border-amber-200" },
+    { id: 'advisory', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", icon: ShieldCheck, color: "text-emerald-600 bg-emerald-50/90 border-emerald-200" },
+    { id: 'risk', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", icon: Sprout, color: "text-teal-600 bg-teal-50/90 border-teal-200" },
+    { id: 'harvest', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", icon: Calendar, color: "text-blue-600 bg-blue-50/90 border-blue-200" },
+    { id: 'historical', text: "Better disaster preparedness", textMr: "आपत्ती पूर्वतयारी", icon: LineChart, color: "text-purple-600 bg-purple-50/90 border-purple-200" }
   ];
 
   const features = [
@@ -33,105 +35,139 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
     { id: 'historical', title: "Historical weather analysis", subtitle: "मागील हवामान विश्लेषण", icon: ShieldCheck, badge: "10-Yr Trends", bgGradient: "from-purple-500/10 to-indigo-500/10" }
   ];
 
+  const scrollSlider = (direction, ref) => {
+    if (ref.current) {
+      const scrollAmount = direction === 'left' ? -280 : 280;
+      ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="space-y-6 mb-6 animate-slideUp">
+    <div className="space-y-5 mb-6 animate-slideUp">
       
-      {/* 1. EXPECTED OUTCOMES CARD (INTERACTIVE CLICKABLE WITH GLASSMORPHISM) */}
-      <div className="glass-card rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 relative overflow-hidden transition-all duration-300">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="flex items-center justify-between mb-4 relative z-10">
+      {/* 1. CORE PLATFORM FEATURE SLIDE BAR (HORIZONTAL CAROUSEL) */}
+      <div className="glass-card rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 relative overflow-hidden transition-all duration-300">
+        <div className="flex items-center justify-between mb-3.5 relative z-10">
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md animate-float">
-              <Sparkles className="w-5 h-5 text-amber-300" />
-            </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
-                Expected Outcomes <span className="text-xs font-bold text-emerald-700">(अपेक्षित फायदे)</span>
-              </h2>
-              <p className="text-xs text-slate-500 font-medium">Dynamic climate impact for <strong>{vName} ({bName}, {dName})</strong></p>
-            </div>
-          </div>
-          <span className="text-[10px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black px-3 py-1 rounded-full shadow-xs animate-pulseGlow">
-            Clickable Outcomes 👆
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 relative z-10">
-          {outcomes.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveModal(item.id)}
-                className={`glass-panel border p-3.5 rounded-2xl flex items-center space-x-3 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg cursor-pointer text-left ${item.color}`}
-              >
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${item.color}`}>
-                  <Icon className="w-4 h-4 font-bold" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-xs font-black text-slate-900 leading-tight truncate">{item.text}</h3>
-                  <p className="text-[10px] text-slate-500 font-bold mt-0.5 truncate">{item.textMr}</p>
-                </div>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0 group-hover:translate-x-1 transition-all" />
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 2. CORE PLATFORM FEATURES CARD (INTERACTIVE CLICKABLE WITH GRADIENT GLOWS) */}
-      <div className="glass-card rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 relative overflow-hidden transition-all duration-300">
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-400/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="flex items-center justify-between mb-4 relative z-10">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold shadow-md">
+            <div className="w-9 h-9 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md">
               <Star className="w-5 h-5 text-amber-300" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
-                Core Platform Features <span className="text-xs font-bold text-teal-700">(मुख्य वैशिष्ट्ये)</span>
+              <h2 className="text-sm sm:text-base font-black text-slate-900 leading-tight">
+                Platform Features Slide Bar <span className="text-xs font-bold text-emerald-700">(वैशिष्ट्ये स्लाइड बार)</span>
               </h2>
-              <p className="text-xs text-slate-500 font-medium">Click any feature below to launch dynamic region analysis for <strong>{vName}</strong></p>
+              <p className="text-[11px] text-slate-500 font-medium">Slide left/right to launch 6 interactive climate tools for <strong>{vName}</strong></p>
             </div>
           </div>
-          <span className="text-[10px] bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-black px-3 py-1 rounded-full shadow-xs">
-            6 Interactive Tools 🚀
-          </span>
+
+          {/* Slider Arrows */}
+          <div className="flex items-center space-x-1.5">
+            <button
+              onClick={() => scrollSlider('left', sliderRef)}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 transition-all shadow-2xs cursor-pointer active:scale-95"
+              aria-label="Previous Feature Slide"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => scrollSlider('right', sliderRef)}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 transition-all shadow-2xs cursor-pointer active:scale-95"
+              aria-label="Next Feature Slide"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 relative z-10">
+        {/* FEATURE SLIDE CAROUSEL CONTAINER */}
+        <div
+          ref={sliderRef}
+          className="flex space-x-3.5 overflow-x-auto scrollbar-none snap-x snap-mandatory py-1 px-0.5 relative z-10 scroll-smooth"
+        >
           {features.map((feat) => {
             const Icon = feat.icon;
             return (
               <button
                 key={feat.id}
                 onClick={() => setActiveModal(feat.id)}
-                className={`glass-panel border border-slate-200/80 hover:border-emerald-500 p-4 rounded-2xl flex items-center justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl cursor-pointer text-left group bg-gradient-to-r ${feat.bgGradient}`}
+                className={`snap-start shrink-0 w-64 sm:w-72 glass-panel border border-slate-200/80 hover:border-emerald-500 p-3.5 rounded-2xl flex items-center justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg cursor-pointer text-left group bg-gradient-to-r ${feat.bgGradient}`}
               >
-                <div className="flex items-center space-x-3.5 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-white border border-slate-200 group-hover:border-emerald-500 flex items-center justify-center shrink-0 text-emerald-700 shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
-                    <Icon className="w-5.5 h-5.5" />
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 group-hover:border-emerald-500 flex items-center justify-center shrink-0 text-emerald-700 shadow-2xs group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+                    <Icon className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-tight truncate">{feat.title}</h3>
-                    </div>
-                    <p className="text-[11px] text-slate-500 font-bold truncate">{feat.subtitle}</p>
+                    <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-tight truncate">{feat.title}</h3>
+                    <p className="text-[10px] text-slate-500 font-bold truncate mt-0.5">{feat.subtitle}</p>
                     <span className="inline-block mt-1 text-[9px] bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-md border border-emerald-300">
                       {feat.badge}
                     </span>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1.5 transition-all shrink-0 ml-2" />
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all shrink-0 ml-1" />
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* DYNAMIC FEATURE & OUTCOME MODALS WITH SMOOTH FADE-IN */}
+      {/* 2. EXPECTED OUTCOMES SLIDE BAR */}
+      <div className="glass-card rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 relative overflow-hidden transition-all duration-300">
+        <div className="flex items-center justify-between mb-3 relative z-10">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-emerald-700 font-bold" />
+            </div>
+            <div>
+              <h2 className="text-xs sm:text-sm font-black text-slate-900 leading-tight">
+                Expected Outcomes <span className="text-[11px] font-bold text-emerald-700">(अपेक्षित फायदे)</span>
+              </h2>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={() => scrollSlider('left', outcomeSliderRef)}
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 transition-all cursor-pointer"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => scrollSlider('right', outcomeSliderRef)}
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 transition-all cursor-pointer"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* OUTCOME HORIZONTAL SLIDER */}
+        <div
+          ref={outcomeSliderRef}
+          className="flex space-x-3 overflow-x-auto scrollbar-none snap-x snap-mandatory py-0.5 relative z-10 scroll-smooth"
+        >
+          {outcomes.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveModal(item.id)}
+                className={`snap-start shrink-0 glass-panel border p-3 rounded-2xl flex items-center space-x-2.5 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md cursor-pointer text-left ${item.color}`}
+              >
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-2xs">
+                  <Icon className="w-4 h-4 font-bold" />
+                </div>
+                <div className="min-w-0 pr-1">
+                  <h3 className="text-xs font-black text-slate-900 leading-tight whitespace-nowrap">{item.text}</h3>
+                  <p className="text-[9px] text-slate-500 font-bold mt-0.5 whitespace-nowrap">{item.textMr}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* DYNAMIC FEATURE & OUTCOME MODALS */}
       {activeModal === 'weather' && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="glass-panel bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">

@@ -1,77 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, AlertCircle } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
   const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
   const [cropStageIndex, setCropStageIndex] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
   const [liveWeather, setLiveWeather] = useState(null);
+  const [isWeatherLoading, setIsWeatherLoading] = useState(true);
   const [jokeIndex, setJokeIndex] = useState(0);
 
   if (!village || !riskMetrics) return null;
 
   const { overallRiskScore, subIndices } = riskMetrics;
 
-  // Expanded Catalog of Funny Weather Jokes for 1-Minute Rotation
-  const JOKES_LIST = [
-    {
-      type: 'sunny',
-      joke: "आज उकाडा इतका जास्त आहे की कोकिळा सुद्धा विहिरीत उडी मारण्याचा विचार करतेय! 🥚☀️",
-      mr: "उन्हाचा तडाखा: 'शेतकरी दादा, टोपी घाला आणि थंड ताक प्या!'"
-    },
-    {
-      type: 'rainy',
-      joke: "पाऊस पडताच शेतातील बेडूक म्हणतात - 'आम्हीसुद्धा बॉलिवूड गायक आहोत!' 🐸☔",
-      mr: "पावसाळी विनोद: 'गरम कांदा भजी आणि चहा रेडी ठेवा!'"
-    },
-    {
-      type: 'sunny',
-      joke: "आजच्या उन्हात कोंबडीने थेट उकडलेले अंडे दिले आहे! 🐔🥚",
-      mr: "उष्णतेचा विनोद: 'उन्हात काम करताना भरपूर पाणी प्या!'"
-    },
-    {
-      type: 'cloudy',
-      joke: "थंडीच्या दिवसात सकाळी अंघोळ करणे म्हणजे एका छोट्या युद्धावर जाण्यासारखे आहे! 🥶🚿",
-      mr: "हवामान मूड: 'कडक ऊन ना थंड वारा, शेतीत काम करूया मस्त सारा!'"
-    },
-    {
-      type: 'stormy',
-      joke: "विजांचा कडकडाट पाहून शेतातील बैल म्हणाला - 'दादा, आज रील नंतर बनवूया!' ⚡📱",
-      mr: "वादळी इशारा: 'सुरक्षित ठिकाणी थांबा आणि पीक सांभाळा!'"
-    },
-    {
-      type: 'rainy',
-      joke: "पावसात छत्री उघडली की वारा ती उलट करतो, जणू हवामान म्हणतेय - 'सरप्राईज!' ☔💨",
-      mr: "पाऊस मूड: 'शेतात पाणी साचू देऊ नका, ड्रेनेज स्वच्छ ठेवा!'"
-    },
-    {
-      type: 'sunny',
-      joke: "आज ऊन पाहून सूर्यदेवाला विचार वाटतोय - 'थोडं एसीचं बटण दाबतो!' ☀️❄️",
-      mr: "उष्णता सल्ला: 'दुपारी १२ ते ३ शेतात विश्रांती घ्या!'"
-    },
-    {
-      type: 'cloudy',
-      joke: "ढग जमा झाले की मोर नाचतात आणि शेतकरी दादा मस्त चहाचा कप शोधतात! ☕🦚",
-      mr: "आनंदी हवामान: 'पिकांची योग्य काळजी घ्या आणि उत्पन्न वाढवा!'"
-    }
-  ];
+  // Weather-Specific Jokes Master Catalog
+  const WEATHER_SPECIFIC_JOKES = {
+    sunny: [
+      { joke: "आज उकाडा इतका जास्त आहे की कोकिळा सुद्धा विहिरीत उडी मारण्याचा विचार करतेय! 🥚☀️", mr: "उन्हाचा तडाखा: 'शेतकरी दादा, टोपी घाला आणि थंड ताक प्या!'" },
+      { joke: "आजच्या उन्हात कोंबडीने थेट उकडलेले अंडे दिले आहे! 🐔🥚", mr: "उष्णतेचा विनोद: 'उन्हात काम करताना भरपूर पाणी प्या!'" },
+      { joke: "आज ऊन पाहून सूर्यदेवाला विचार वाटतोय - 'थोडं एसीचं बटण दाबतो!' ☀️❄️", mr: "उष्णता सल्ला: 'दुपारी १२ ते ३ शेतात विश्रांती घ्या!'" }
+    ],
+    rainy: [
+      { joke: "पाऊस पडताच शेतातील बेडूक म्हणतात - 'आम्हीसुद्धा बॉलिवूड गायक आहोत!' 🐸☔", mr: "पावसाळी विनोद: 'गरम कांदा भजी आणि चहा रेडी ठेवा!'" },
+      { joke: "पावसात छत्री उघडली की वारा ती उलट करतो, जणू हवामान म्हणतेय - 'सरप्राईज!' ☔💨", mr: "पाऊस मूड: 'शेतात पाणी साचू देऊ नका, ड्रेनेज स्वच्छ ठेवा!'" },
+      { joke: "पाऊस आल्यावर मोर नाचतात आणि शेतकरी दादा गरम चहा शोधतात! ☕🦚", mr: "आनंदी पाऊस: 'कांदा भजी मस्त फस्त करा!'" }
+    ],
+    stormy: [
+      { joke: "विजांचा कडकडाट पाहून शेतातील बैल म्हणाला - 'दादा, आज रील नंतर बनवूया!' ⚡📱", mr: "वादळी इशारा: 'सुरक्षित ठिकाणी थांबा आणि पीक सांभाळा!'" },
+      { joke: "वारा इतका वेगाने वाहतोय की शेतातील झाडे सुद्धा दांडिया खेळतात! 🌪️🌳", mr: "वादळ सुरक्षा: 'झाडांखाली उभे राहू नका!'" }
+    ],
+    cloudy: [
+      { joke: "थंडीच्या दिवसात सकाळी अंघोळ करणे म्हणजे एका छोट्या युद्धावर जाण्यासारखे आहे! 🥶🚿", mr: "हवामान मूड: 'कडक ऊन ना थंड वारा, शेतीत काम करूया मस्त सारा!'" },
+      { joke: "ढगाळ हवामानात चहाचा कप हा जगातील सर्वात मौल्यवान दागिना वाटतो! ☕☁️", mr: "ढगाळ हवामान: 'पिकांची नियमित तपासणी करा!'" }
+    ]
+  };
 
-  // Rotate joke every 1 minute (60,000 ms)
-  useEffect(() => {
-    const jokeInterval = setInterval(() => {
-      setJokeIndex((prevIndex) => (prevIndex + 1) % JOKES_LIST.length);
-    }, 60000); // 1 min
-
-    return () => clearInterval(jokeInterval);
-  }, []);
-
-  // Fetch real-time weather integration
+  // Fetch real-time weather integration with loading state
   useEffect(() => {
     if (village) {
+      setIsWeatherLoading(true);
       fetchLiveWeather(village.coordinates?.lat || 19.5, village.coordinates?.lng || 74.2, village.villageName)
-        .then(data => setLiveWeather(data))
-        .catch(err => console.error('Failed to fetch live weather:', err));
+        .then(data => {
+          setLiveWeather(data);
+          setIsWeatherLoading(false);
+        })
+        .catch(err => {
+          console.error('Failed to fetch live weather:', err);
+          setIsWeatherLoading(false);
+        });
     }
   }, [village]);
 
@@ -88,7 +65,19 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   const currentTemp = liveWeather?.tempC || 32;
   const rainProb = liveWeather?.rainProbability || 20;
   const isRainyCondition = conditionType === 'rainy' || rainProb > 50;
-  const currentJoke = JOKES_LIST[jokeIndex];
+
+  // Filter Jokes Strictly Specific to Active Weather Condition
+  const activeWeatherJokes = WEATHER_SPECIFIC_JOKES[conditionType] || WEATHER_SPECIFIC_JOKES.sunny;
+  const currentJoke = activeWeatherJokes[jokeIndex % activeWeatherJokes.length];
+
+  // Rotate joke every 1 minute
+  useEffect(() => {
+    const jokeInterval = setInterval(() => {
+      setJokeIndex((prevIndex) => (prevIndex + 1) % activeWeatherJokes.length);
+    }, 60000); // 1 min
+
+    return () => clearInterval(jokeInterval);
+  }, [activeWeatherJokes]);
 
   // Full Expanded Catalog of 8 Crops for 4-per-stage space saving
   const availableCropsCatalog = [
@@ -175,175 +164,199 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   return (
     <div className="space-y-6">
       
-      {/* 1. DYNAMIC WEATHER WIDGET WITH RAIN ALERT & SPECIFIC REGION NAME */}
-      <div className={`rounded-3xl border shadow-xl overflow-hidden relative transition-all duration-500 text-white ${
-        isRainyCondition
-          ? 'bg-gradient-to-r from-blue-700 via-teal-700 to-indigo-800 border-blue-400'
-          : conditionType === 'sunny'
-          ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 border-amber-400'
-          : conditionType === 'stormy'
-          ? 'bg-gradient-to-r from-purple-800 via-slate-800 to-red-900 border-red-500'
-          : 'bg-gradient-to-r from-slate-700 via-teal-800 to-slate-800 border-slate-400'
-      }`}>
-
-        {/* A. DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
-        {conditionType === 'sunny' && !isRainyCondition && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-            <div className="w-[500px] h-[500px] rounded-full border-[30px] border-amber-200/40 absolute -top-40 -right-40 animate-sunrays" />
-          </div>
-        )}
-
-        {isRainyCondition && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40 flex justify-around">
-            <span className="w-0.5 h-6 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.1s' }} />
-            <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.4s' }} />
-            <span className="w-0.5 h-6 bg-cyan-300 rounded-full animate-rain" style={{ animationDelay: '0.7s' }} />
-            <span className="w-0.5 h-7 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.2s' }} />
-            <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.9s' }} />
-          </div>
-        )}
-
-        {conditionType === 'cloudy' && !isRainyCondition && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 flex justify-between p-4">
-            <Snowflake className="w-6 h-6 text-white animate-snow" style={{ animationDelay: '0.2s' }} />
-            <Snowflake className="w-8 h-8 text-cyan-200 animate-snow" style={{ animationDelay: '0.8s' }} />
-            <Snowflake className="w-5 h-5 text-white animate-snow" style={{ animationDelay: '1.4s' }} />
-          </div>
-        )}
-
-        {/* B. MAIN WIDGET CONTENT */}
-        <div className="p-5 sm:p-7 relative z-10 space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/20 pb-4">
-            
-            <div className="flex items-center space-x-4">
-              
-              {/* DYNAMIC ANIMATED WEATHER ICON WIDGET */}
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-                {isRainyCondition ? (
-                  <div className="relative flex flex-col items-center justify-center">
-                    <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce" />
-                  </div>
-                ) : conditionType === 'sunny' ? (
-                  <div className="relative flex items-center justify-center">
-                    <Sun className="w-10 h-10 text-amber-200 animate-spin" style={{ animationDuration: '12s' }} />
-                    <Sparkles className="w-5 h-5 text-amber-100 absolute animate-pulse" />
-                  </div>
-                ) : conditionType === 'stormy' ? (
-                  <div className="relative flex items-center justify-center">
-                    <CloudLightning className="w-10 h-10 text-amber-300 animate-pulse" />
-                  </div>
-                ) : (
-                  <div className="relative flex items-center justify-center">
-                    <Cloud className="w-10 h-10 text-slate-100 animate-float" />
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <div className="flex items-center space-x-2 mb-1">
-                  <span className="px-3 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-sm">
-                    {liveWeather?.source || 'IMD + OpenWeatherMap Live Feed'}
-                  </span>
-                  <span className="text-xs font-bold text-white/90">📍 {village.villageName} ({village.districtName})</span>
-                </div>
-
-                <h2 className="text-xl sm:text-2xl font-black tracking-wide flex items-center gap-2">
-                  {isRainyCondition
-                    ? '🌧️ It May Be a Rainy Day Today! (आज पाऊस पडण्याची शक्यता आहे!)'
-                    : conditionType === 'sunny'
-                    ? '☀️ Sunny & Clear Sky (निरभ्र आकाश)'
-                    : conditionType === 'stormy'
-                    ? '⚡ Storm & Lightning Alert (वादळी इशारा)'
-                    : '☁️ Partly Cloudy (ढगाळ हवामान)'}
-                </h2>
-                <p className="text-xs sm:text-sm text-white/90 font-semibold mt-0.5">
-                  {isRainyCondition
-                    ? `Monsoon cloud cover active over ${village.villageName} (${village.blockName}, ${village.districtName})`
-                    : liveWeather?.conditionDesc || 'Live Micro-Climate Station Active'}
-                </p>
+      {/* 1. YOUTUBE-STYLE SKELETON LOADER OR DYNAMIC WEATHER WIDGET */}
+      {isWeatherLoading ? (
+        <div className="rounded-3xl bg-slate-200 border border-slate-300 p-6 shadow-md animate-pulse space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-16 h-16 rounded-2xl bg-slate-300 shrink-0" />
+              <div className="space-y-2">
+                <div className="w-32 h-4 bg-slate-300 rounded-md" />
+                <div className="w-48 h-6 bg-slate-300 rounded-md" />
               </div>
             </div>
-
-            {/* LIVE TEMP & RAIN PROBABILITY DISPLAY */}
-            <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/20 self-start sm:self-auto">
-              <div className="text-right">
-                <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
-                <div className="text-xl font-black text-white">{currentTemp}°C</div>
-              </div>
-              <div className="h-8 w-px bg-white/30" />
-              <div>
-                <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
-                <div className="text-xl font-black text-cyan-200">{rainProb}%</div>
-              </div>
-            </div>
-
+            <div className="w-24 h-10 bg-slate-300 rounded-2xl" />
           </div>
+          <div className="w-full h-10 bg-slate-300 rounded-xl" />
+          <div className="grid grid-cols-4 gap-3">
+            <div className="h-12 bg-slate-300 rounded-xl" />
+            <div className="h-12 bg-slate-300 rounded-xl" />
+            <div className="h-12 bg-slate-300 rounded-xl" />
+            <div className="h-12 bg-slate-300 rounded-xl" />
+          </div>
+        </div>
+      ) : (
+        <div className={`rounded-3xl border shadow-xl overflow-hidden relative transition-all duration-500 text-white ${
+          isRainyCondition
+            ? 'bg-gradient-to-r from-blue-700 via-teal-700 to-indigo-800 border-blue-400'
+            : conditionType === 'sunny'
+            ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 border-amber-400'
+            : conditionType === 'stormy'
+            ? 'bg-gradient-to-r from-purple-800 via-slate-800 to-red-900 border-red-500'
+            : 'bg-gradient-to-r from-slate-700 via-teal-800 to-slate-800 border-slate-400'
+        }`}>
 
-          {/* C. SPECIFIC RAINY REGION NAME ALERT BANNER */}
-          {isRainyCondition && (
-            <div className="bg-cyan-900/40 backdrop-blur-md border border-cyan-300/40 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-cyan-100 shadow-sm animate-pulseGlow">
-              <div className="w-8 h-8 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
-                <MapPin className="w-5 h-5 text-cyan-950" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <span className="text-[10px] text-cyan-200 uppercase font-black tracking-wider block">
-                  🌧️ Specific Rainy Region Alert (अचूक पाऊस क्षेत्र इशारा):
-                </span>
-                <p className="text-xs text-white font-black truncate mt-0.5">
-                  Real-time rain forecast active for <strong>{village.villageName}</strong> (Taluka: <strong>{village.blockName}</strong>, District: <strong>{village.districtName}</strong>)
-                </p>
-              </div>
+          {/* A. DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
+          {conditionType === 'sunny' && !isRainyCondition && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+              <div className="w-[500px] h-[500px] rounded-full border-[30px] border-amber-200/40 absolute -top-40 -right-40 animate-sunrays" />
             </div>
           )}
 
-          {/* D. 1-MINUTE AUTOMATIC ROTATING FUNNY WEATHER JOKE BANNER */}
-          <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
-            <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
-              <Laugh className="w-5 h-5" />
+          {isRainyCondition && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40 flex justify-around">
+              <span className="w-0.5 h-6 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.1s' }} />
+              <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.4s' }} />
+              <span className="w-0.5 h-6 bg-cyan-300 rounded-full animate-rain" style={{ animationDelay: '0.7s' }} />
+              <span className="w-0.5 h-7 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.2s' }} />
+              <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.9s' }} />
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">😂 Weather Fun Joke (1-Min Update):</span>
-                <span className="text-[9px] bg-white/20 px-2 py-0.5 rounded-full text-white/90 font-bold">Auto Rotates ⏱️</span>
+          )}
+
+          {conditionType === 'cloudy' && !isRainyCondition && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 flex justify-between p-4">
+              <Snowflake className="w-6 h-6 text-white animate-snow" style={{ animationDelay: '0.2s' }} />
+              <Snowflake className="w-8 h-8 text-cyan-200 animate-snow" style={{ animationDelay: '0.8s' }} />
+              <Snowflake className="w-5 h-5 text-white animate-snow" style={{ animationDelay: '1.4s' }} />
+            </div>
+          )}
+
+          {/* B. MAIN WIDGET CONTENT */}
+          <div className="p-5 sm:p-7 relative z-10 space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/20 pb-4">
+              
+              <div className="flex items-center space-x-4">
+                
+                {/* DYNAMIC ANIMATED WEATHER ICON WIDGET */}
+                <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+                  {isRainyCondition ? (
+                    <div className="relative flex flex-col items-center justify-center">
+                      <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce" />
+                    </div>
+                  ) : conditionType === 'sunny' ? (
+                    <div className="relative flex items-center justify-center">
+                      <Sun className="w-10 h-10 text-amber-200 animate-spin" style={{ animationDuration: '12s' }} />
+                      <Sparkles className="w-5 h-5 text-amber-100 absolute animate-pulse" />
+                    </div>
+                  ) : conditionType === 'stormy' ? (
+                    <div className="relative flex items-center justify-center">
+                      <CloudLightning className="w-10 h-10 text-amber-300 animate-pulse" />
+                    </div>
+                  ) : (
+                    <div className="relative flex items-center justify-center">
+                      <Cloud className="w-10 h-10 text-slate-100 animate-float" />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className="px-3 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-sm">
+                      {liveWeather?.source || 'IMD + OpenWeatherMap Live Feed'}
+                    </span>
+                    <span className="text-xs font-bold text-white/90">📍 {village.villageName} ({village.districtName})</span>
+                  </div>
+
+                  <h2 className="text-xl sm:text-2xl font-black tracking-wide flex items-center gap-2">
+                    {isRainyCondition
+                      ? '🌧️ It May Be a Rainy Day Today! (आज पाऊस पडण्याची शक्यता आहे!)'
+                      : conditionType === 'sunny'
+                      ? '☀️ Sunny & Clear Sky (निरभ्र आकाश)'
+                      : conditionType === 'stormy'
+                      ? '⚡ Storm & Lightning Alert (वादळी इशारा)'
+                      : '☁️ Partly Cloudy (ढगाळ हवामान)'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-white/90 font-semibold mt-0.5">
+                    {isRainyCondition
+                      ? `Monsoon cloud cover active over ${village.villageName} (${village.blockName}, ${village.districtName})`
+                      : liveWeather?.conditionDesc || 'Live Micro-Climate Station Active'}
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-white font-extrabold truncate mt-0.5">{currentJoke.joke}</p>
+
+              {/* LIVE TEMP & RAIN PROBABILITY DISPLAY */}
+              <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/20 self-start sm:self-auto">
+                <div className="text-right">
+                  <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
+                  <div className="text-xl font-black text-white">{currentTemp}°C</div>
+                </div>
+                <div className="h-8 w-px bg-white/30" />
+                <div>
+                  <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
+                  <div className="text-xl font-black text-cyan-200">{rainProb}%</div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* C. SPECIFIC RAINY REGION NAME ALERT BANNER */}
+            {isRainyCondition && (
+              <div className="bg-cyan-900/40 backdrop-blur-md border border-cyan-300/40 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-cyan-100 shadow-sm animate-pulseGlow">
+                <div className="w-8 h-8 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
+                  <MapPin className="w-5 h-5 text-cyan-950" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] text-cyan-200 uppercase font-black tracking-wider block">
+                    🌧️ Specific Rainy Region Alert (अचूक पाऊस क्षेत्र इशारा):
+                  </span>
+                  <p className="text-xs text-white font-black truncate mt-0.5">
+                    Real-time rain forecast active for <strong>{village.villageName}</strong> (Taluka: <strong>{village.blockName}</strong>, District: <strong>{village.districtName}</strong>)
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* D. WEATHER-STRICT ROTATING JOKE BANNER */}
+            <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
+              <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
+                <Laugh className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">
+                    😂 {conditionType.toUpperCase()} Weather Joke (1-Min Update):
+                  </span>
+                  <span className="text-[9px] bg-white/20 px-2 py-0.5 rounded-full text-white/90 font-bold">Auto Rotates ⏱️</span>
+                </div>
+                <p className="text-xs text-white font-extrabold truncate mt-0.5">{currentJoke.joke}</p>
+              </div>
+            </div>
+
+            {/* Quick Weather Metrics Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold text-slate-900 pt-1">
+              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
+                <Sun className="w-5 h-5 text-amber-500 shrink-0" />
+                <div>
+                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('drought', currentLang)} (दुष्काळ)</div>
+                  <div className="text-sm font-black">{subIndices.droughtIndex > 60 ? t('high', currentLang) : t('low', currentLang)}</div>
+                </div>
+              </div>
+              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
+                <Droplets className="w-5 h-5 text-cyan-600 shrink-0" />
+                <div>
+                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('water', currentLang)} (पाणी)</div>
+                  <div className="text-sm font-black">{village.groundwaterStatus.split(' ')[0]}</div>
+                </div>
+              </div>
+              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
+                <Bug className="w-5 h-5 text-purple-600 shrink-0" />
+                <div>
+                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('pestRisk', currentLang)} (कीड)</div>
+                  <div className="text-sm font-black">{subIndices.pestIndex > 60 ? t('high', currentLang) : t('safe', currentLang)}</div>
+                </div>
+              </div>
+              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
+                <Sprout className="w-5 h-5 text-emerald-600 shrink-0" />
+                <div>
+                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('rainfall', currentLang)} (पाऊस)</div>
+                  <div className="text-sm font-black">{village.annualRainfallNormal} mm</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Quick Weather Metrics Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold text-slate-900 pt-1">
-            <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-              <Sun className="w-5 h-5 text-amber-500 shrink-0" />
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase font-black">{t('drought', currentLang)} (दुष्काळ)</div>
-                <div className="text-sm font-black">{subIndices.droughtIndex > 60 ? t('high', currentLang) : t('low', currentLang)}</div>
-              </div>
-            </div>
-            <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-              <Droplets className="w-5 h-5 text-cyan-600 shrink-0" />
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase font-black">{t('water', currentLang)} (पाणी)</div>
-                <div className="text-sm font-black">{village.groundwaterStatus.split(' ')[0]}</div>
-              </div>
-            </div>
-            <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-              <Bug className="w-5 h-5 text-purple-600 shrink-0" />
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase font-black">{t('pestRisk', currentLang)} (कीड)</div>
-                <div className="text-sm font-black">{subIndices.pestIndex > 60 ? t('high', currentLang) : t('safe', currentLang)}</div>
-              </div>
-            </div>
-            <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-              <Sprout className="w-5 h-5 text-emerald-600 shrink-0" />
-              <div>
-                <div className="text-[10px] text-slate-500 uppercase font-black">{t('rainfall', currentLang)} (पाऊस)</div>
-                <div className="text-sm font-black">{village.annualRainfallNormal} mm</div>
-              </div>
-            </div>
-          </div>
         </div>
-
-      </div>
+      )}
 
       {/* 2. CROP SELECTION WITH MOBILE-STYLE PAGINATED TRANSITION LINE SLIDER */}
       <div className="glass-card border border-slate-200/80 p-5 sm:p-6 rounded-3xl shadow-sm space-y-3.5">

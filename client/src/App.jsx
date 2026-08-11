@@ -1,37 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import VillageSelector from './components/VillageSelector';
-import RiskSummaryCards from './components/RiskSummaryCards';
-import ClimateCharts from './components/ClimateCharts';
-import CropVulnerabilityMatrix from './components/CropVulnerabilityMatrix';
-import AIAdvisorySection from './components/AIAdvisorySection';
-import InteractiveMap from './components/InteractiveMap';
-import KrishiMitrChat from './components/KrishiMitrChat';
-import VillageCompare from './components/VillageCompare';
-import PrintReportModal from './components/PrintReportModal';
+import PlatformImpactFeatures from './components/PlatformImpactFeatures';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
-import BottomNavBar from './components/BottomNavBar';
-import PlatformImpactFeatures from './components/PlatformImpactFeatures';
+import KrishiMitrChat from './components/KrishiMitrChat';
 import FloatingAIAssistant from './components/FloatingAIAssistant';
+import PrintReportModal from './components/PrintReportModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
-import { t } from './data/translations';
-import { Sprout, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Sprout, RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [allVillages, setAllVillages] = useState([]);
   const [hierarchy, setHierarchy] = useState({});
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'profit' | 'advisory' | 'map' | 'chat'
-  const [viewMode, setViewMode] = useState('farmer'); // 'farmer' | 'detailed'
   const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 1. Initial load of village database and hierarchy
+  // Initial load of village database
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -54,7 +44,7 @@ export default function App() {
     }
   };
 
-  // 2. Load detailed analysis for a selected village
+  // Load detailed analysis for selected village
   const loadVillageDetails = async (villageId) => {
     try {
       const data = await fetchVillageDetails(villageId);
@@ -72,37 +62,21 @@ export default function App() {
     loadVillageDetails(villageObj.id);
   };
 
-  // Handle clicking "Get Full Advisory Guide" from Profit Cards or Crop Matrix
-  const handleSelectCropForAdvisory = (cropName) => {
-    setSelectedCropForAdvisory(cropName);
-    setViewMode('detailed');
-    setActiveTab('advisory');
-  };
-
-  const handleBackToFarmerHome = () => {
-    setViewMode('farmer');
-    setActiveTab('dashboard');
-  };
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-emerald-500 selection:text-white pb-16 md:pb-0">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-emerald-500 selection:text-white">
       
-      {/* Top Navbar Header */}
+      {/* 1. Minimal Top Header */}
       <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
         currentLang={currentLang}
         setCurrentLang={setCurrentLang}
         onOpenReportModal={() => setIsReportModalOpen(true)}
         activeVillage={selectedVillage}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
       />
 
-      {/* Main Container Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+      {/* 2. Main Minimalist 1-Page Layout */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6">
         
-        {/* Village Location Selector Banner */}
+        {/* Village Selection Menu */}
         <VillageSelector
           villages={allVillages}
           hierarchy={hierarchy}
@@ -112,108 +86,41 @@ export default function App() {
         />
 
         {loading ? (
-          <div className="py-24 text-center">
-            <RefreshCw className="w-10 h-10 text-emerald-600 animate-spin mx-auto mb-4" />
-            <h3 className="text-base font-bold text-slate-800">Loading Indian Agricultural Climate Database...</h3>
-            <p className="text-xs text-slate-500 mt-1">Connecting to risk index calculator & agro-met forecast engine</p>
+          <div className="py-20 text-center">
+            <RefreshCw className="w-9 h-9 text-emerald-600 animate-spin mx-auto mb-3" />
+            <h3 className="text-sm font-bold text-slate-800">Loading Agricultural Database...</h3>
           </div>
         ) : selectedVillage && riskMetrics ? (
-          <div>
+          <div className="space-y-6">
             
-            {/* FARMER SIMPLE MODE (DEFAULT EASY VIEW FOR FARMERS) */}
-            {viewMode === 'farmer' ? (
-              <div className="space-y-6">
-                
-                {/* 1. TOP HERO: EXPECTED OUTCOMES & CORE PLATFORM FEATURES (PRIMARY FOCUS) */}
-                <PlatformImpactFeatures
-                  village={selectedVillage}
-                  riskMetrics={riskMetrics}
-                />
+            {/* A. EXPECTED OUTCOMES & CORE FEATURES HUB */}
+            <PlatformImpactFeatures
+              village={selectedVillage}
+              riskMetrics={riskMetrics}
+            />
 
-                {/* 2. HYPERLOCAL WEATHER STATUS & CROP ACTION PLAN */}
-                <FarmerSimpleView
-                  village={selectedVillage}
-                  riskMetrics={riskMetrics}
-                  onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
-                  currentLang={currentLang}
-                />
-                
-                {/* 3. PROFIT MAXIMIZING CROPS */}
-                <CropProfitRecommendation
-                  village={selectedVillage}
-                  riskMetrics={riskMetrics}
-                  onSelectCrop={handleSelectCropForAdvisory}
-                  currentLang={currentLang}
-                />
+            {/* B. HYPERLOCAL WEATHER & 4-STEP FARMER CROP ACTION PLAN */}
+            <FarmerSimpleView
+              village={selectedVillage}
+              riskMetrics={riskMetrics}
+              onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+              currentLang={currentLang}
+            />
+            
+            {/* C. TOP PROFIT CROPS RECOMMENDATION */}
+            <CropProfitRecommendation
+              village={selectedVillage}
+              riskMetrics={riskMetrics}
+              onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+              currentLang={currentLang}
+            />
 
-              </div>
-            ) : (
-              /* DETAILED AGRONOMIST MODE */
-              <div>
-                
-                {/* Prominent Back Button to Farmer Home on Every Sub-Tab */}
-                <div className="mb-4">
-                  <button
-                    onClick={handleBackToFarmerHome}
-                    className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-emerald-700 hover:bg-slate-100 font-extrabold text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{t('backToFarmerHome', currentLang)}</span>
-                  </button>
-                </div>
-
-                {/* TAB 1: DASHBOARD VIEW */}
-                {activeTab === 'dashboard' && (
-                  <div className="space-y-6">
-                    <PlatformImpactFeatures village={selectedVillage} riskMetrics={riskMetrics} />
-                    <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
-                    <ClimateCharts village={selectedVillage} riskMetrics={riskMetrics} />
-                    <CropVulnerabilityMatrix
-                      village={selectedVillage}
-                      riskMetrics={riskMetrics}
-                      onSelectCropForAdvisory={handleSelectCropForAdvisory}
-                    />
-                  </div>
-                )}
-
-                {/* SEPARATE TAB 2: PROFIT CROPS */}
-                {activeTab === 'profit' && (
-                  <CropProfitRecommendation
-                    village={selectedVillage}
-                    riskMetrics={riskMetrics}
-                    onSelectCrop={handleSelectCropForAdvisory}
-                    currentLang={currentLang}
-                  />
-                )}
-
-                {/* TAB 3: AI ADVISORY VIEW */}
-                {activeTab === 'advisory' && (
-                  <AIAdvisorySection
-                    village={selectedVillage}
-                    riskMetrics={riskMetrics}
-                    selectedCrop={selectedCropForAdvisory}
-                    onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
-                  />
-                )}
-
-                {/* TAB 4: GEO MAP VIEW */}
-                {activeTab === 'map' && (
-                  <div>
-                    <InteractiveMap village={selectedVillage} riskMetrics={riskMetrics} />
-                    <RiskSummaryCards village={selectedVillage} riskMetrics={riskMetrics} />
-                  </div>
-                )}
-
-                {/* TAB 5: KRISHI MITR AI CHATBOT */}
-                {activeTab === 'chat' && (
-                  <KrishiMitrChat
-                    village={selectedVillage}
-                    riskMetrics={riskMetrics}
-                    currentLang={currentLang}
-                  />
-                )}
-              </div>
-            )}
+            {/* D. KRISHI MITR AI CHAT ASSISTANT */}
+            <KrishiMitrChat
+              village={selectedVillage}
+              riskMetrics={riskMetrics}
+              currentLang={currentLang}
+            />
 
           </div>
         ) : (
@@ -224,7 +131,7 @@ export default function App() {
 
       </main>
 
-      {/* Floating AI Assistant Button & Chat Popup (Bottom Right Front Page) */}
+      {/* Floating AI Assistant Button */}
       {selectedVillage && riskMetrics && (
         <FloatingAIAssistant
           village={selectedVillage}
@@ -233,25 +140,16 @@ export default function App() {
         />
       )}
 
-      {/* YouTube-style Mobile Bottom Navigation Bar */}
-      <BottomNavBar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        currentLang={currentLang}
-      />
-
-      {/* Footer Banner */}
-      <footer className="bg-white border-t border-slate-200 py-6 px-4 text-center text-xs text-slate-500 mb-12 md:mb-0">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      {/* Simple Footer */}
+      <footer className="bg-white border-t border-slate-200 py-5 px-4 text-center text-xs text-slate-500 mt-6">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
             <Sprout className="w-4 h-4 text-emerald-600" />
-            <span className="font-bold text-slate-800">KrishiDrishti AI</span>
-            <span>— AI Agricultural Climate Vulnerability & Resilience Platform</span>
+            <span className="font-extrabold text-slate-800">KrishiDrishti AI</span>
+            <span>— Simple AI Agriculture Climate Advisory</span>
           </div>
           <div>
-            Data Sources: ICAR Agro-Climatic Zones • IMD Weather Baseline • Central Ground Water Board (CGWB)
+            ICAR • IMD Baseline • CGWB Groundwater Data
           </div>
         </div>
       </footer>

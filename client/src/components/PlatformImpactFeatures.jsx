@@ -167,10 +167,10 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
         </div>
       </div>
 
-      {/* DYNAMIC FEATURE & OUTCOME MODALS */}
+      {/* DYNAMIC FEATURE & OUTCOME MODALS (CLEAN UNBLURRED BACKDROP) */}
       {activeModal === 'weather' && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="glass-panel bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md">
@@ -183,7 +183,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                   <p className="text-xs text-slate-500 font-medium">IMD Micro-Climate Station Baseline • Primary Crops: {primaryCropsStr}</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all">
+              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -223,7 +223,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
-              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all">
+              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
                 Close Forecast (बंद करा)
               </button>
             </div>
@@ -233,8 +233,8 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
       {/* FEATURE 2: DYNAMIC AI RISK PREDICTION MODAL */}
       {activeModal === 'risk' && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="glass-panel bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-md">
@@ -247,7 +247,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                   <p className="text-xs text-slate-500 font-medium">Agro-Climate Risk Calculator Baseline</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all">
+              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -303,7 +303,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
-              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all">
+              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
                 Close Analytics (बंद करा)
               </button>
             </div>
@@ -313,8 +313,8 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
       {/* FEATURE 3: CROP ADVISORY MODAL */}
       {activeModal === 'advisory' && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="glass-panel bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md">
@@ -327,7 +327,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                   <p className="text-xs text-slate-500 font-medium">Crops in village: {primaryCropsStr}</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all">
+              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -350,7 +350,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
-              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all">
+              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
                 Close Advisory (बंद करा)
               </button>
             </div>
@@ -360,8 +360,8 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
       {/* FEATURE 4: HARVEST PLANNING MODAL */}
       {activeModal === 'harvest' && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="glass-panel bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md">
@@ -374,7 +374,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                   <p className="text-xs text-slate-500 font-medium">District APMC Market Hub: {dName} Mandi</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all">
+              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -392,7 +392,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
-              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all">
+              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
                 Close Guide (बंद करा)
               </button>
             </div>
@@ -402,8 +402,8 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
       {/* FEATURE 5: EMERGENCY ALERTS MODAL */}
       {activeModal === 'alert' && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="glass-panel bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold shadow-md animate-bounce">
@@ -416,7 +416,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                   <p className="text-xs text-slate-500 font-medium">Active Weather Advisory & PMFBY Helpline</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all">
+              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -440,7 +440,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
-              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all">
+              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
                 Close Alerts (बंद करा)
               </button>
             </div>
@@ -450,8 +450,8 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
       {/* FEATURE 6: HISTORICAL TRENDS MODAL */}
       {activeModal === 'historical' && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="glass-panel bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
+        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center space-x-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-md">
@@ -464,7 +464,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                   <p className="text-xs text-slate-500 font-medium">Decadal Monsoon & Groundwater Analysis for {dName}</p>
                 </div>
               </div>
-              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all">
+              <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -482,7 +482,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
-              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all">
+              <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
                 Close Analysis (बंद करा)
               </button>
             </div>

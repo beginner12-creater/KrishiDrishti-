@@ -4,7 +4,6 @@ import VillageSelector from './components/VillageSelector';
 import PlatformImpactFeatures from './components/PlatformImpactFeatures';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
-import KrishiMitrChat from './components/KrishiMitrChat';
 import FloatingAIAssistant from './components/FloatingAIAssistant';
 import PrintReportModal from './components/PrintReportModal';
 
@@ -93,7 +92,7 @@ export default function App() {
         ) : selectedVillage && riskMetrics ? (
           <div className="space-y-6">
             
-            {/* A. EXPECTED OUTCOMES & CORE FEATURES HUB */}
+            {/* A. FEATURE SLIDE BAR & EXPECTED OUTCOMES */}
             <PlatformImpactFeatures
               village={selectedVillage}
               riskMetrics={riskMetrics}
@@ -115,13 +114,6 @@ export default function App() {
               currentLang={currentLang}
             />
 
-            {/* D. KRISHI MITR AI CHAT ASSISTANT */}
-            <KrishiMitrChat
-              village={selectedVillage}
-              riskMetrics={riskMetrics}
-              currentLang={currentLang}
-            />
-
           </div>
         ) : (
           <div className="text-center py-20 text-slate-500">
@@ -131,7 +123,7 @@ export default function App() {
 
       </main>
 
-      {/* Floating AI Assistant Button */}
+      {/* Floating AI Assistant Button & Chat Popup (Bottom Right) */}
       {selectedVillage && riskMetrics && (
         <FloatingAIAssistant
           village={selectedVillage}

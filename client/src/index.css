@@ -6,9 +6,76 @@
     touch-action: manipulation;
   }
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white min-h-screen overflow-x-hidden;
+    @apply text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white min-h-screen overflow-x-hidden;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 30%, #f8fafc 70%, #f1f5f9 100%);
+    background-attachment: fixed;
   }
+}
+
+/* Custom Keyframe Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
+  50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.35); }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.animate-float {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Premium Glassmorphism & Card Styles */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -4px rgba(16, 185, 129, 0.12);
+  border-color: rgba(52, 211, 153, 0.5);
 }
 
 /* Custom Scrollbars */
@@ -28,20 +95,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #10b981;
-}
-
-/* Light Theme Clean UI Panels */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
-  border: 1px solid #e2e8f0;
-}
-
-.glass-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
 }
 
 /* Leaflet Map styling */

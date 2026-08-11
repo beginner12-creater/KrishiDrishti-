@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Thermometer, Wind } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
@@ -31,6 +31,35 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   };
 
   const conditionType = getWeatherConditionType();
+  const currentTemp = liveWeather?.tempC || 32;
+
+  // Funny Weather Jokes Generator
+  const getWeatherJoke = () => {
+    if (conditionType === 'sunny' || currentTemp > 34) {
+      return {
+        joke: "आज उकाडा इतका जास्त आहे की कोकिळा सुद्धा विहिरीत उडी मारण्याचा विचार करतेय! 🥚☀️ (Today is so hot, even birds want a cold dip!)",
+        mr: "उन्हाचा तडाखा: 'शेतकरी दादा, टोपी घाला आणि थंड ताक प्या!'"
+      };
+    }
+    if (conditionType === 'rainy') {
+      return {
+        joke: "पाऊस पडताच शेतातील बेडूक म्हणतात - 'आम्हीसुद्धा बॉलिवूड गायक आहोत!' 🐸☔ (As soon as it rains, frogs think they are singers!)",
+        mr: "पावसाळी विनोद: 'गरम कांदा भजी आणि चहा रेडी ठेवा!'"
+      };
+    }
+    if (conditionType === 'stormy') {
+      return {
+        joke: "विजांचा कडकडाट पाहून शेतातील बैल म्हणाला - 'दादा, आज रील नंतर बनवूया!' ⚡📱",
+        mr: "वादळी इशारा: 'सुरक्षित ठिकाणी थांबा आणि पीक सांभाळा!'"
+      };
+    }
+    return {
+      joke: "थंडीच्या दिवसात सकाळी अंघोळ करणे म्हणजे एका छोट्या युद्धावर जाण्यासारखे आहे! 🥶🚿 (Bathing in cold weather feels like going to war!)",
+      mr: "हवामान मूड: 'कडक ऊन ना थंड वारा, शेतीत काम करूया मस्त सारा!'"
+    };
+  };
+
+  const weatherJoke = getWeatherJoke();
 
   // Full Expanded Catalog of 8 Crops for 4-per-stage space saving
   const availableCropsCatalog = [
@@ -117,8 +146,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   return (
     <div className="space-y-6">
       
-      {/* 1. PROPER ANIMATED WEATHER CONDITION WIDGET (SUNNY / RAINY / CLOUDY / STORMY) */}
-      <div className={`rounded-3xl border shadow-lg overflow-hidden relative transition-all duration-500 text-white ${
+      {/* 1. DYNAMIC WEATHER WIDGET WITH BACKGROUND RAIN/SUN/COLD ANIMATION & FUNNY WEATHER JOKE */}
+      <div className={`rounded-3xl border shadow-xl overflow-hidden relative transition-all duration-500 text-white ${
         conditionType === 'sunny'
           ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 border-amber-400'
           : conditionType === 'rainy'
@@ -128,9 +157,32 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           : 'bg-gradient-to-r from-slate-700 via-teal-800 to-slate-800 border-slate-400'
       }`}>
 
-        {/* BACKGROUND ANIMATED PARTICLES & GLOWS */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        {/* A. DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
+        {conditionType === 'sunny' && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+            <div className="w-[500px] h-[500px] rounded-full border-[30px] border-amber-200/40 absolute -top-40 -right-40 animate-sunrays" />
+          </div>
+        )}
 
+        {conditionType === 'rainy' && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40 flex justify-around">
+            <span className="w-0.5 h-6 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.1s' }} />
+            <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.4s' }} />
+            <span className="w-0.5 h-6 bg-cyan-300 rounded-full animate-rain" style={{ animationDelay: '0.7s' }} />
+            <span className="w-0.5 h-7 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.2s' }} />
+            <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.9s' }} />
+          </div>
+        )}
+
+        {conditionType === 'cloudy' && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 flex justify-between p-4">
+            <Snowflake className="w-6 h-6 text-white animate-snow" style={{ animationDelay: '0.2s' }} />
+            <Snowflake className="w-8 h-8 text-cyan-200 animate-snow" style={{ animationDelay: '0.8s' }} />
+            <Snowflake className="w-5 h-5 text-white animate-snow" style={{ animationDelay: '1.4s' }} />
+          </div>
+        )}
+
+        {/* B. MAIN WIDGET CONTENT */}
         <div className="p-5 sm:p-7 relative z-10 space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/20 pb-4">
             
@@ -148,11 +200,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 {conditionType === 'rainy' && (
                   <div className="relative flex flex-col items-center justify-center">
                     <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce" />
-                    <div className="flex space-x-1 mt-0.5">
-                      <span className="w-1 h-2 bg-cyan-200 rounded-full animate-pulse" />
-                      <span className="w-1 h-2 bg-cyan-100 rounded-full animate-pulse delay-75" />
-                      <span className="w-1 h-2 bg-cyan-300 rounded-full animate-pulse delay-150" />
-                    </div>
                   </div>
                 )}
 
@@ -193,7 +240,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/20 self-start sm:self-auto">
               <div className="text-right">
                 <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
-                <div className="text-xl font-black text-white">{liveWeather?.tempC || 32}°C</div>
+                <div className="text-xl font-black text-white">{currentTemp}°C</div>
               </div>
               <div className="h-8 w-px bg-white/30" />
               <div>
@@ -202,6 +249,17 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               </div>
             </div>
 
+          </div>
+
+          {/* C. FUNNY WEATHER JOKE BANNER (आनंदी विनोद) */}
+          <div className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-white shadow-2xs">
+            <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
+              <Laugh className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">😂 Weather Fun Fact / हवामान विनोद:</span>
+              <p className="text-xs text-white font-extrabold truncate mt-0.5">{weatherJoke.joke}</p>
+            </div>
           </div>
 
           {/* Quick Weather Metrics Cards */}

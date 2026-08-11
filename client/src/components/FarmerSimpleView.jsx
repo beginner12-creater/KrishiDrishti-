@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, RefreshCw, Umbrella, Shield, Wind, Sparkle } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, RefreshCw } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
@@ -9,7 +9,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
   const [jokeIndex, setJokeIndex] = useState(0);
-  const [activeInteractiveAnimation, setActiveInteractiveAnimation] = useState(null); // 'umbrella' | 'shade' | 'shield' | 'wind'
 
   if (!village || !riskMetrics) return null;
 
@@ -76,18 +75,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   // Filter Jokes Strictly Specific to Active Weather Condition
   const activeWeatherJokes = WEATHER_SPECIFIC_JOKES[conditionType] || WEATHER_SPECIFIC_JOKES.sunny;
   const currentJoke = activeWeatherJokes[jokeIndex % activeWeatherJokes.length];
-
-  // Trigger Interactive Climate Micro-Animation (Umbrella / Shade / Shield / Wind)
-  const triggerClimateAnimation = () => {
-    if (isRainyCondition) setActiveInteractiveAnimation('umbrella');
-    else if (conditionType === 'sunny') setActiveInteractiveAnimation('shade');
-    else if (conditionType === 'stormy') setActiveInteractiveAnimation('shield');
-    else setActiveInteractiveAnimation('wind');
-
-    setTimeout(() => {
-      setActiveInteractiveAnimation(null);
-    }, 4500);
-  };
 
   // Refresh / Next Joke Handler
   const handleNextJoke = () => {
@@ -211,56 +198,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             : 'bg-gradient-to-r from-slate-700 via-teal-800 to-slate-800 border-slate-400'
         }`}>
 
-          {/* A. INTERACTIVE CLIMATE ANIMATION OVERLAY (UMBRELLA DROPS FROM TOP CENTER) */}
-          {activeInteractiveAnimation === 'umbrella' && (
-            <div className="absolute inset-0 bg-blue-950/70 backdrop-blur-xs z-30 flex flex-col items-center justify-center animate-fadeIn text-center p-4">
-              <div className="w-24 h-24 rounded-full bg-cyan-400 text-slate-950 flex items-center justify-center shadow-2xl animate-bounce mb-2 border-4 border-white">
-                <Umbrella className="w-14 h-14 font-black" />
-              </div>
-              <h3 className="text-lg font-black text-white">☂️ Crop Rain Shield Activated! (छत्री संरक्षण)</h3>
-              <p className="text-xs text-cyan-200 font-bold mt-1 max-w-sm">
-                Rainfall protection shield deployed over {village.villageName} fields to prevent waterlogging damage!
-              </p>
-            </div>
-          )}
-
-          {activeInteractiveAnimation === 'shade' && (
-            <div className="absolute inset-0 bg-amber-950/70 backdrop-blur-xs z-30 flex flex-col items-center justify-center animate-fadeIn text-center p-4">
-              <div className="w-24 h-24 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shadow-2xl animate-bounce mb-2 border-4 border-white">
-                <Sun className="w-14 h-14 font-black" />
-              </div>
-              <h3 className="text-lg font-black text-white">🧢 Sun Protection Shade Active! (सावली संरक्षण)</h3>
-              <p className="text-xs text-amber-200 font-bold mt-1 max-w-sm">
-                Cooling mist spray & mulching cover activated for {village.villageName} crops to prevent leaf burning!
-              </p>
-            </div>
-          )}
-
-          {activeInteractiveAnimation === 'shield' && (
-            <div className="absolute inset-0 bg-red-950/70 backdrop-blur-xs z-30 flex flex-col items-center justify-center animate-fadeIn text-center p-4">
-              <div className="w-24 h-24 rounded-full bg-red-500 text-white flex items-center justify-center shadow-2xl animate-pulse mb-2 border-4 border-white">
-                <Shield className="w-14 h-14 font-black" />
-              </div>
-              <h3 className="text-lg font-black text-white">⚡ Thunderstorm Safety Shield Deployed! (सुरक्षा कवच)</h3>
-              <p className="text-xs text-red-200 font-bold mt-1 max-w-sm">
-                Emergency lightning safety protocols & PMFBY insurance claim guide ready for {village.villageName}!
-              </p>
-            </div>
-          )}
-
-          {activeInteractiveAnimation === 'wind' && (
-            <div className="absolute inset-0 bg-teal-950/70 backdrop-blur-xs z-30 flex flex-col items-center justify-center animate-fadeIn text-center p-4">
-              <div className="w-24 h-24 rounded-full bg-teal-400 text-slate-950 flex items-center justify-center shadow-2xl animate-spin mb-2 border-4 border-white" style={{ animationDuration: '6s' }}>
-                <Wind className="w-14 h-14 font-black" />
-              </div>
-              <h3 className="text-lg font-black text-white">🌬️ Cool Wind Breeze Activated! (थंड वारा)</h3>
-              <p className="text-xs text-teal-200 font-bold mt-1 max-w-sm">
-                Blowing away heavy clouds to allow fresh sunlight for crop photosynthesis in {village.villageName}!
-              </p>
-            </div>
-          )}
-
-          {/* B. DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
+          {/* A. DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
           {conditionType === 'sunny' && !isRainyCondition && (
             <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
               <div className="w-[500px] h-[500px] rounded-full border-[30px] border-amber-200/40 absolute -top-40 -right-40 animate-sunrays" />
@@ -285,37 +223,33 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             </div>
           )}
 
-          {/* C. MAIN WIDGET CONTENT */}
+          {/* B. MAIN WIDGET CONTENT */}
           <div className="p-5 sm:p-7 relative z-10 space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/20 pb-4">
               
               <div className="flex items-center space-x-4">
                 
-                {/* DYNAMIC ANIMATED WEATHER ICON WIDGET (CLICKABLE FOR INTERACTIVE ANIMATION) */}
-                <button
-                  onClick={triggerClimateAnimation}
-                  title="Click to activate interactive climate protection animation!"
-                  className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-all group"
-                >
+                {/* DYNAMIC ANIMATED WEATHER ICON WIDGET */}
+                <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
                   {isRainyCondition ? (
                     <div className="relative flex flex-col items-center justify-center">
-                      <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce group-hover:scale-110" />
+                      <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce" />
                     </div>
                   ) : conditionType === 'sunny' ? (
                     <div className="relative flex items-center justify-center">
-                      <Sun className="w-10 h-10 text-amber-200 animate-spin group-hover:scale-110" style={{ animationDuration: '12s' }} />
+                      <Sun className="w-10 h-10 text-amber-200 animate-spin" style={{ animationDuration: '12s' }} />
                       <Sparkles className="w-5 h-5 text-amber-100 absolute animate-pulse" />
                     </div>
                   ) : conditionType === 'stormy' ? (
                     <div className="relative flex items-center justify-center">
-                      <CloudLightning className="w-10 h-10 text-amber-300 animate-pulse group-hover:scale-110" />
+                      <CloudLightning className="w-10 h-10 text-amber-300 animate-pulse" />
                     </div>
                   ) : (
                     <div className="relative flex items-center justify-center">
-                      <Cloud className="w-10 h-10 text-slate-100 animate-float group-hover:scale-110" />
+                      <Cloud className="w-10 h-10 text-slate-100 animate-float" />
                     </div>
                   )}
-                </button>
+                </div>
 
                 <div>
                   <div className="flex items-center space-x-2 mb-1">
@@ -342,51 +276,22 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 </div>
               </div>
 
-              {/* INTERACTIVE CLIMATE SHIELD BUTTON & TEMP */}
-              <div className="flex items-center space-x-3 self-start sm:self-auto">
-                <button
-                  onClick={triggerClimateAnimation}
-                  className="px-3.5 py-2.5 bg-white text-slate-950 hover:bg-emerald-400 font-black text-xs rounded-2xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95 border border-white/40"
-                >
-                  {isRainyCondition ? (
-                    <>
-                      <Umbrella className="w-4 h-4 text-blue-700" />
-                      <span>Drop Rain Umbrella (छत्री उघडा)</span>
-                    </>
-                  ) : conditionType === 'sunny' ? (
-                    <>
-                      <Sun className="w-4 h-4 text-amber-600" />
-                      <span>Deploy Sun Shade (सावली)</span>
-                    </>
-                  ) : conditionType === 'stormy' ? (
-                    <>
-                      <Shield className="w-4 h-4 text-red-600" />
-                      <span>Activate Storm Shield (सुरक्षा)</span>
-                    </>
-                  ) : (
-                    <>
-                      <Wind className="w-4 h-4 text-teal-600" />
-                      <span>Blow Cool Wind (थंड वारा)</span>
-                    </>
-                  )}
-                </button>
-
-                <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20">
-                  <div className="text-right">
-                    <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
-                    <div className="text-lg font-black text-white">{currentTemp}°C</div>
-                  </div>
-                  <div className="h-7 w-px bg-white/30" />
-                  <div>
-                    <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
-                    <div className="text-lg font-black text-cyan-200">{rainProb}%</div>
-                  </div>
+              {/* LIVE TEMP & RAIN PROBABILITY DISPLAY */}
+              <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/20 self-start sm:self-auto">
+                <div className="text-right">
+                  <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
+                  <div className="text-xl font-black text-white">{currentTemp}°C</div>
+                </div>
+                <div className="h-8 w-px bg-white/30" />
+                <div>
+                  <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
+                  <div className="text-xl font-black text-cyan-200">{rainProb}%</div>
                 </div>
               </div>
 
             </div>
 
-            {/* D. SPECIFIC RAINY REGION NAME ALERT BANNER */}
+            {/* C. SPECIFIC RAINY REGION NAME ALERT BANNER */}
             {isRainyCondition && (
               <div className="bg-cyan-900/40 backdrop-blur-md border border-cyan-300/40 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-cyan-100 shadow-sm animate-pulseGlow">
                 <div className="w-8 h-8 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
@@ -403,7 +308,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               </div>
             )}
 
-            {/* E. WEATHER-STRICT JOKE BANNER WITH MANUAL REFRESH BUTTON */}
+            {/* D. WEATHER-STRICT JOKE BANNER WITH MANUAL REFRESH BUTTON */}
             <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
               <div className="flex items-center space-x-3 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">

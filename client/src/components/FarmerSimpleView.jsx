@@ -7,10 +7,64 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
   const [cropStageIndex, setCropStageIndex] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
   const [liveWeather, setLiveWeather] = useState(null);
+  const [jokeIndex, setJokeIndex] = useState(0);
 
   if (!village || !riskMetrics) return null;
 
   const { overallRiskScore, subIndices } = riskMetrics;
+
+  // Expanded Catalog of Funny Weather Jokes for 1-Minute Rotation
+  const JOKES_LIST = [
+    {
+      type: 'sunny',
+      joke: "आज उकाडा इतका जास्त आहे की कोकिळा सुद्धा विहिरीत उडी मारण्याचा विचार करतेय! 🥚☀️",
+      mr: "उन्हाचा तडाखा: 'शेतकरी दादा, टोपी घाला आणि थंड ताक प्या!'"
+    },
+    {
+      type: 'rainy',
+      joke: "पाऊस पडताच शेतातील बेडूक म्हणतात - 'आम्हीसुद्धा बॉलिवूड गायक आहोत!' 🐸☔",
+      mr: "पावसाळी विनोद: 'गरम कांदा भजी आणि चहा रेडी ठेवा!'"
+    },
+    {
+      type: 'sunny',
+      joke: "आजच्या उन्हात कोंबडीने थेट उकडलेले अंडे दिले आहे! 🐔🥚",
+      mr: "उष्णतेचा विनोद: 'उन्हात काम करताना भरपूर पाणी प्या!'"
+    },
+    {
+      type: 'cloudy',
+      joke: "थंडीच्या दिवसात सकाळी अंघोळ करणे म्हणजे एका छोट्या युद्धावर जाण्यासारखे आहे! 🥶🚿",
+      mr: "हवामान मूड: 'कडक ऊन ना थंड वारा, शेतीत काम करूया मस्त सारा!'"
+    },
+    {
+      type: 'stormy',
+      joke: "विजांचा कडकडाट पाहून शेतातील बैल म्हणाला - 'दादा, आज रील नंतर बनवूया!' ⚡📱",
+      mr: "वादळी इशारा: 'सुरक्षित ठिकाणी थांबा आणि पीक सांभाळा!'"
+    },
+    {
+      type: 'rainy',
+      joke: "पावसात छत्री उघडली की वारा ती उलट करतो, जणू हवामान म्हणतेय - 'सरप्राईज!' ☔💨",
+      mr: "पाऊस मूड: 'शेतात पाणी साचू देऊ नका, ड्रेनेज स्वच्छ ठेवा!'"
+    },
+    {
+      type: 'sunny',
+      joke: "आज ऊन पाहून सूर्यदेवाला विचार वाटतोय - 'थोडं एसीचं बटण दाबतो!' ☀️❄️",
+      mr: "उष्णता सल्ला: 'दुपारी १२ ते ३ शेतात विश्रांती घ्या!'"
+    },
+    {
+      type: 'cloudy',
+      joke: "ढग जमा झाले की मोर नाचतात आणि शेतकरी दादा मस्त चहाचा कप शोधतात! ☕🦚",
+      mr: "आनंदी हवामान: 'पिकांची योग्य काळजी घ्या आणि उत्पन्न वाढवा!'"
+    }
+  ];
+
+  // Rotate joke every 1 minute (60,000 ms)
+  useEffect(() => {
+    const jokeInterval = setInterval(() => {
+      setJokeIndex((prevIndex) => (prevIndex + 1) % JOKES_LIST.length);
+    }, 60000); // 1 min
+
+    return () => clearInterval(jokeInterval);
+  }, []);
 
   // Fetch real-time weather integration
   useEffect(() => {
@@ -32,34 +86,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
   const conditionType = getWeatherConditionType();
   const currentTemp = liveWeather?.tempC || 32;
-
-  // Funny Weather Jokes Generator
-  const getWeatherJoke = () => {
-    if (conditionType === 'sunny' || currentTemp > 34) {
-      return {
-        joke: "आज उकाडा इतका जास्त आहे की कोकिळा सुद्धा विहिरीत उडी मारण्याचा विचार करतेय! 🥚☀️ (Today is so hot, even birds want a cold dip!)",
-        mr: "उन्हाचा तडाखा: 'शेतकरी दादा, टोपी घाला आणि थंड ताक प्या!'"
-      };
-    }
-    if (conditionType === 'rainy') {
-      return {
-        joke: "पाऊस पडताच शेतातील बेडूक म्हणतात - 'आम्हीसुद्धा बॉलिवूड गायक आहोत!' 🐸☔ (As soon as it rains, frogs think they are singers!)",
-        mr: "पावसाळी विनोद: 'गरम कांदा भजी आणि चहा रेडी ठेवा!'"
-      };
-    }
-    if (conditionType === 'stormy') {
-      return {
-        joke: "विजांचा कडकडाट पाहून शेतातील बैल म्हणाला - 'दादा, आज रील नंतर बनवूया!' ⚡📱",
-        mr: "वादळी इशारा: 'सुरक्षित ठिकाणी थांबा आणि पीक सांभाळा!'"
-      };
-    }
-    return {
-      joke: "थंडीच्या दिवसात सकाळी अंघोळ करणे म्हणजे एका छोट्या युद्धावर जाण्यासारखे आहे! 🥶🚿 (Bathing in cold weather feels like going to war!)",
-      mr: "हवामान मूड: 'कडक ऊन ना थंड वारा, शेतीत काम करूया मस्त सारा!'"
-    };
-  };
-
-  const weatherJoke = getWeatherJoke();
+  const currentJoke = JOKES_LIST[jokeIndex];
 
   // Full Expanded Catalog of 8 Crops for 4-per-stage space saving
   const availableCropsCatalog = [
@@ -146,7 +173,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   return (
     <div className="space-y-6">
       
-      {/* 1. DYNAMIC WEATHER WIDGET WITH BACKGROUND RAIN/SUN/COLD ANIMATION & FUNNY WEATHER JOKE */}
+      {/* 1. DYNAMIC WEATHER WIDGET WITH BACKGROUND RAIN/SUN/COLD ANIMATION & 1-MIN ROTATING FUNNY JOKE */}
       <div className={`rounded-3xl border shadow-xl overflow-hidden relative transition-all duration-500 text-white ${
         conditionType === 'sunny'
           ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 border-amber-400'
@@ -251,14 +278,17 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
           </div>
 
-          {/* C. FUNNY WEATHER JOKE BANNER (आनंदी विनोद) */}
-          <div className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-white shadow-2xs">
+          {/* C. 1-MINUTE AUTOMATIC ROTATING FUNNY WEATHER JOKE BANNER */}
+          <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
             <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
               <Laugh className="w-5 h-5" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">😂 Weather Fun Fact / हवामान विनोद:</span>
-              <p className="text-xs text-white font-extrabold truncate mt-0.5">{weatherJoke.joke}</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">😂 Weather Fun Joke (1-Min Update):</span>
+                <span className="text-[9px] bg-white/20 px-2 py-0.5 rounded-full text-white/90 font-bold">Auto Rotates ⏱️</span>
+              </div>
+              <p className="text-xs text-white font-extrabold truncate mt-0.5">{currentJoke.joke}</p>
             </div>
           </div>
 

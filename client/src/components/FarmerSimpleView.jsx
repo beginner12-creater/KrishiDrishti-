@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, RefreshCw } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
@@ -14,25 +14,31 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
   const { overallRiskScore, subIndices } = riskMetrics;
 
-  // Weather-Specific Jokes Master Catalog
+  // Expanded Catalog of 15+ Weather-Specific Funny Jokes
   const WEATHER_SPECIFIC_JOKES = {
     sunny: [
       { joke: "आज उकाडा इतका जास्त आहे की कोकिळा सुद्धा विहिरीत उडी मारण्याचा विचार करतेय! 🥚☀️", mr: "उन्हाचा तडाखा: 'शेतकरी दादा, टोपी घाला आणि थंड ताक प्या!'" },
       { joke: "आजच्या उन्हात कोंबडीने थेट उकडलेले अंडे दिले आहे! 🐔🥚", mr: "उष्णतेचा विनोद: 'उन्हात काम करताना भरपूर पाणी प्या!'" },
-      { joke: "आज ऊन पाहून सूर्यदेवाला विचार वाटतोय - 'थोडं एसीचं बटण दाबतो!' ☀️❄️", mr: "उष्णता सल्ला: 'दुपारी १२ ते ३ शेतात विश्रांती घ्या!'" }
+      { joke: "आज ऊन पाहून सूर्यदेवाला विचार वाटतोय - 'थोडं एसीचं बटण दाबतो!' ☀️❄️", mr: "उष्णता सल्ला: 'दुपारी १२ ते ३ शेतात विश्रांती घ्या!'" },
+      { joke: "उन्हात शेतात गेलेला शेतकरी म्हणतो - 'भाऊ, सावली विकत मिळेल का?' ☀️🌳", mr: "उकाडा विनोद: 'ताक, लिंबू पाणी पिऊन ताजेतवाने राहा!'" },
+      { joke: "सूर्यदेव म्हणाले - 'मी आज फुल चार्ज मोडवर आहे!' ☀️⚡", mr: "उन्हाचा कडाका: 'पिकांवर सायंकाळी पाणी द्या!'" }
     ],
     rainy: [
       { joke: "पाऊस पडताच शेतातील बेडूक म्हणतात - 'आम्हीसुद्धा बॉलिवूड गायक आहोत!' 🐸☔", mr: "पावसाळी विनोद: 'गरम कांदा भजी आणि चहा रेडी ठेवा!'" },
       { joke: "पावसात छत्री उघडली की वारा ती उलट करतो, जणू हवामान म्हणतेय - 'सरप्राईज!' ☔💨", mr: "पाऊस मूड: 'शेतात पाणी साचू देऊ नका, ड्रेनेज स्वच्छ ठेवा!'" },
-      { joke: "पाऊस आल्यावर मोर नाचतात आणि शेतकरी दादा गरम चहा शोधतात! ☕🦚", mr: "आनंदी पाऊस: 'कांदा भजी मस्त फस्त करा!'" }
+      { joke: "पाऊस आल्यावर मोर नाचतात आणि शेतकरी दादा गरम चहा शोधतात! ☕🦚", mr: "आनंदी पाऊस: 'कांदा भजी मस्त फस्त करा!'" },
+      { joke: "पावसाचा थेंब पडताच चिखलात पाय घसरला, शेतकरी दादा म्हणाले - 'हा माझा ब्रेकडाऊन्स डान्स आहे!' 💃🌧️", mr: "पाऊस गम्मत: 'काळजीपूर्वक चाला!'" },
+      { joke: "पाऊस आल्यावर चहाचा वाफाळलेला कप म्हणजे स्वर्गाचं सुख! ☕🌧️", mr: "पावसाळी चहा: 'चहा प्रेमी शेतकरी दादांचा विजय असो!'" }
     ],
     stormy: [
       { joke: "विजांचा कडकडाट पाहून शेतातील बैल म्हणाला - 'दादा, आज रील नंतर बनवूया!' ⚡📱", mr: "वादळी इशारा: 'सुरक्षित ठिकाणी थांबा आणि पीक सांभाळा!'" },
-      { joke: "वारा इतका वेगाने वाहतोय की शेतातील झाडे सुद्धा दांडिया खेळतात! 🌪️🌳", mr: "वादळ सुरक्षा: 'झाडांखाली उभे राहू नका!'" }
+      { joke: "वारा इतका वेगाने वाहतोय की शेतातील झाडे सुद्धा दांडिया खेळतात! 🌪️🌳", mr: "वादळ सुरक्षा: 'झाडांखाली उभे राहू नका!'" },
+      { joke: "वादळ पाहून टोपी उडून गेली, शेतकरी दादा म्हणाले - 'माझी टोपी ड्रोन सारखी उडतेय!' 🧢🚁", mr: "वादळ विनोद: 'टोपी घट्ट धरा!'" }
     ],
     cloudy: [
       { joke: "थंडीच्या दिवसात सकाळी अंघोळ करणे म्हणजे एका छोट्या युद्धावर जाण्यासारखे आहे! 🥶🚿", mr: "हवामान मूड: 'कडक ऊन ना थंड वारा, शेतीत काम करूया मस्त सारा!'" },
-      { joke: "ढगाळ हवामानात चहाचा कप हा जगातील सर्वात मौल्यवान दागिना वाटतो! ☕☁️", mr: "ढगाळ हवामान: 'पिकांची नियमित तपासणी करा!'" }
+      { joke: "ढगाळ हवामानात चहाचा कप हा जगातील सर्वात मौल्यवान दागिना वाटतो! ☕☁️", mr: "ढगाळ हवामान: 'पिकांची नियमित तपासणी करा!'" },
+      { joke: "ढग जमले पण पाऊस पडला नाही, शेतकरी दादा म्हणाले - 'हे तर ट्रेलर दाखवून सिनेमा रद्द केला!' ☁️🎬", mr: "ढगाळ नाटक: 'हवामान अंदाजाकडे लक्ष ठेवा!'" }
     ]
   };
 
@@ -70,14 +76,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   const activeWeatherJokes = WEATHER_SPECIFIC_JOKES[conditionType] || WEATHER_SPECIFIC_JOKES.sunny;
   const currentJoke = activeWeatherJokes[jokeIndex % activeWeatherJokes.length];
 
-  // Rotate joke every 1 minute
-  useEffect(() => {
-    const jokeInterval = setInterval(() => {
-      setJokeIndex((prevIndex) => (prevIndex + 1) % activeWeatherJokes.length);
-    }, 60000); // 1 min
-
-    return () => clearInterval(jokeInterval);
-  }, [activeWeatherJokes]);
+  // Refresh / Next Joke Handler (Manual Button Refresh)
+  const handleNextJoke = () => {
+    setJokeIndex((prevIndex) => (prevIndex + 1) % activeWeatherJokes.length);
+  };
 
   // Full Expanded Catalog of 8 Crops for 4-per-stage space saving
   const availableCropsCatalog = [
@@ -306,20 +308,28 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               </div>
             )}
 
-            {/* D. WEATHER-STRICT ROTATING JOKE BANNER */}
-            <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
-              <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
-                <Laugh className="w-5 h-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">
-                    😂 {conditionType.toUpperCase()} Weather Joke (1-Min Update):
-                  </span>
-                  <span className="text-[9px] bg-white/20 px-2 py-0.5 rounded-full text-white/90 font-bold">Auto Rotates ⏱️</span>
+            {/* D. WEATHER-STRICT JOKE BANNER WITH MANUAL REFRESH BUTTON */}
+            <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
+                  <Laugh className="w-5 h-5" />
                 </div>
-                <p className="text-xs text-white font-extrabold truncate mt-0.5">{currentJoke.joke}</p>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">
+                    😂 {conditionType.toUpperCase()} Weather Joke:
+                  </span>
+                  <p className="text-xs text-white font-extrabold truncate mt-0.5">{currentJoke.joke}</p>
+                </div>
               </div>
+
+              {/* MANUAL REFRESH / NEXT JOKE BUTTON */}
+              <button
+                onClick={handleNextJoke}
+                className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-amber-400 hover:text-slate-950 text-white font-black text-xs flex items-center gap-1.5 transition-all shrink-0 cursor-pointer shadow-xs active:scale-95 border border-white/30"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Next Joke (विनोद बदल)</span>
+              </button>
             </div>
 
             {/* Quick Weather Metrics Cards */}

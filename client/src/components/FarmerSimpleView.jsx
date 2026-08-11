@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
 import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, RefreshCw } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
+import { VILLAGES_DATABASE } from '../data/villages';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
   const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
@@ -13,6 +14,13 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   if (!village || !riskMetrics) return null;
 
   const { overallRiskScore, subIndices } = riskMetrics;
+
+  // Find Neighboring Villages & Talukas in the Same District / Zone for Diverse Regional Rain Mapping
+  const regionalRainyVillages = VILLAGES_DATABASE.filter(
+    v => v.districtName === village.districtName || v.stateName === village.stateName
+  ).slice(0, 5);
+
+  const regionalRainyNames = regionalRainyVillages.map(v => `${v.villageName} (${v.blockName})`).join(', ');
 
   // Expanded Catalog of 15+ Weather-Specific Funny Jokes
   const WEATHER_SPECIFIC_JOKES = {
@@ -291,18 +299,18 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
             </div>
 
-            {/* C. SPECIFIC RAINY REGION NAME ALERT BANNER */}
+            {/* C. SPECIFIC RAINY REGIONS & NEIGHBORING TALUKAS ALERT BANNER */}
             {isRainyCondition && (
-              <div className="bg-cyan-900/40 backdrop-blur-md border border-cyan-300/40 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-cyan-100 shadow-sm animate-pulseGlow">
-                <div className="w-8 h-8 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
+              <div className="bg-cyan-900/50 backdrop-blur-md border border-cyan-300/40 p-3.5 rounded-2xl flex items-center space-x-3 text-xs font-bold text-cyan-100 shadow-md animate-pulseGlow">
+                <div className="w-9 h-9 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
                   <MapPin className="w-5 h-5 text-cyan-950" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="text-[10px] text-cyan-200 uppercase font-black tracking-wider block">
-                    🌧️ Specific Rainy Region Alert (अचूक पाऊस क्षेत्र इशारा):
+                    🌧️ Active Rainy Belt & Neighboring Talukas (अचूक पाऊस क्षेत्रे):
                   </span>
                   <p className="text-xs text-white font-black truncate mt-0.5">
-                    Real-time rain forecast active for <strong>{village.villageName}</strong> (Taluka: <strong>{village.blockName}</strong>, District: <strong>{village.districtName}</strong>)
+                    Active Rain Belt: <strong>{regionalRainyNames}</strong> ({village.districtName} District)
                   </p>
                 </div>
               </div>

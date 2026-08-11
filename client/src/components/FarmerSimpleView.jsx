@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, AlertCircle } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
@@ -86,6 +86,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
   const conditionType = getWeatherConditionType();
   const currentTemp = liveWeather?.tempC || 32;
+  const rainProb = liveWeather?.rainProbability || 20;
+  const isRainyCondition = conditionType === 'rainy' || rainProb > 50;
   const currentJoke = JOKES_LIST[jokeIndex];
 
   // Full Expanded Catalog of 8 Crops for 4-per-stage space saving
@@ -173,25 +175,25 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   return (
     <div className="space-y-6">
       
-      {/* 1. DYNAMIC WEATHER WIDGET WITH BACKGROUND RAIN/SUN/COLD ANIMATION & 1-MIN ROTATING FUNNY JOKE */}
+      {/* 1. DYNAMIC WEATHER WIDGET WITH RAIN ALERT & SPECIFIC REGION NAME */}
       <div className={`rounded-3xl border shadow-xl overflow-hidden relative transition-all duration-500 text-white ${
-        conditionType === 'sunny'
-          ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 border-amber-400'
-          : conditionType === 'rainy'
+        isRainyCondition
           ? 'bg-gradient-to-r from-blue-700 via-teal-700 to-indigo-800 border-blue-400'
+          : conditionType === 'sunny'
+          ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 border-amber-400'
           : conditionType === 'stormy'
           ? 'bg-gradient-to-r from-purple-800 via-slate-800 to-red-900 border-red-500'
           : 'bg-gradient-to-r from-slate-700 via-teal-800 to-slate-800 border-slate-400'
       }`}>
 
         {/* A. DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
-        {conditionType === 'sunny' && (
+        {conditionType === 'sunny' && !isRainyCondition && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
             <div className="w-[500px] h-[500px] rounded-full border-[30px] border-amber-200/40 absolute -top-40 -right-40 animate-sunrays" />
           </div>
         )}
 
-        {conditionType === 'rainy' && (
+        {isRainyCondition && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40 flex justify-around">
             <span className="w-0.5 h-6 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.1s' }} />
             <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.4s' }} />
@@ -201,7 +203,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           </div>
         )}
 
-        {conditionType === 'cloudy' && (
+        {conditionType === 'cloudy' && !isRainyCondition && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 flex justify-between p-4">
             <Snowflake className="w-6 h-6 text-white animate-snow" style={{ animationDelay: '0.2s' }} />
             <Snowflake className="w-8 h-8 text-cyan-200 animate-snow" style={{ animationDelay: '0.8s' }} />
@@ -217,26 +219,20 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               
               {/* DYNAMIC ANIMATED WEATHER ICON WIDGET */}
               <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
-                {conditionType === 'sunny' && (
+                {isRainyCondition ? (
+                  <div className="relative flex flex-col items-center justify-center">
+                    <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce" />
+                  </div>
+                ) : conditionType === 'sunny' ? (
                   <div className="relative flex items-center justify-center">
                     <Sun className="w-10 h-10 text-amber-200 animate-spin" style={{ animationDuration: '12s' }} />
                     <Sparkles className="w-5 h-5 text-amber-100 absolute animate-pulse" />
                   </div>
-                )}
-
-                {conditionType === 'rainy' && (
-                  <div className="relative flex flex-col items-center justify-center">
-                    <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce" />
-                  </div>
-                )}
-
-                {conditionType === 'stormy' && (
+                ) : conditionType === 'stormy' ? (
                   <div className="relative flex items-center justify-center">
                     <CloudLightning className="w-10 h-10 text-amber-300 animate-pulse" />
                   </div>
-                )}
-
-                {conditionType === 'cloudy' && (
+                ) : (
                   <div className="relative flex items-center justify-center">
                     <Cloud className="w-10 h-10 text-slate-100 animate-float" />
                   </div>
@@ -252,13 +248,18 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 </div>
 
                 <h2 className="text-xl sm:text-2xl font-black tracking-wide flex items-center gap-2">
-                  {conditionType === 'sunny' && '☀️ Sunny & Hot (सूर्यप्रकाश)'}
-                  {conditionType === 'rainy' && '🌧️ Active Monsoon Rain (पाऊस जारी)'}
-                  {conditionType === 'stormy' && '⚡ Storm & Lightning Alert (वादळी इशारा)'}
-                  {conditionType === 'cloudy' && '☁️ Partly Cloudy (ढगाळ हवामान)'}
+                  {isRainyCondition
+                    ? '🌧️ It May Be a Rainy Day Today! (आज पाऊस पडण्याची शक्यता आहे!)'
+                    : conditionType === 'sunny'
+                    ? '☀️ Sunny & Clear Sky (निरभ्र आकाश)'
+                    : conditionType === 'stormy'
+                    ? '⚡ Storm & Lightning Alert (वादळी इशारा)'
+                    : '☁️ Partly Cloudy (ढगाळ हवामान)'}
                 </h2>
                 <p className="text-xs sm:text-sm text-white/90 font-semibold mt-0.5">
-                  {liveWeather?.conditionDesc || 'Live Micro-Climate Station Active'}
+                  {isRainyCondition
+                    ? `Monsoon cloud cover active over ${village.villageName} (${village.blockName}, ${village.districtName})`
+                    : liveWeather?.conditionDesc || 'Live Micro-Climate Station Active'}
                 </p>
               </div>
             </div>
@@ -272,13 +273,30 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               <div className="h-8 w-px bg-white/30" />
               <div>
                 <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
-                <div className="text-xl font-black text-cyan-200">{liveWeather?.rainProbability || 20}%</div>
+                <div className="text-xl font-black text-cyan-200">{rainProb}%</div>
               </div>
             </div>
 
           </div>
 
-          {/* C. 1-MINUTE AUTOMATIC ROTATING FUNNY WEATHER JOKE BANNER */}
+          {/* C. SPECIFIC RAINY REGION NAME ALERT BANNER */}
+          {isRainyCondition && (
+            <div className="bg-cyan-900/40 backdrop-blur-md border border-cyan-300/40 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-cyan-100 shadow-sm animate-pulseGlow">
+              <div className="w-8 h-8 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
+                <MapPin className="w-5 h-5 text-cyan-950" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] text-cyan-200 uppercase font-black tracking-wider block">
+                  🌧️ Specific Rainy Region Alert (अचूक पाऊस क्षेत्र इशारा):
+                </span>
+                <p className="text-xs text-white font-black truncate mt-0.5">
+                  Real-time rain forecast active for <strong>{village.villageName}</strong> (Taluka: <strong>{village.blockName}</strong>, District: <strong>{village.districtName}</strong>)
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* D. 1-MINUTE AUTOMATIC ROTATING FUNNY WEATHER JOKE BANNER */}
           <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center space-x-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
             <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
               <Laugh className="w-5 h-5" />

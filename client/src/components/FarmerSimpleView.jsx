@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, RefreshCw } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, RefreshCw, X } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 import { VILLAGES_DATABASE } from '../data/villages';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
-  const [selectedCrop, setSelectedCrop] = useState(village?.primaryCrops[0] || 'Cotton');
+  const [selectedCrop, setSelectedCrop] = useState(null); // INITIALLY UNSELECTED
   const [cropStageIndex, setCropStageIndex] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
@@ -105,6 +105,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
   // Dynamic Crop-Specific 4-Step Actions Engine
   const getCropSpecificActions = (cropName) => {
+    if (!cropName) return null;
     const name = cropName.toLowerCase();
 
     if (name.includes('cotton') || name.includes('कापूस')) {
@@ -164,11 +165,17 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
     };
   };
 
-  const currentActions = getCropSpecificActions(selectedCrop);
+  const currentActions = selectedCrop ? getCropSpecificActions(selectedCrop) : null;
 
+  // Toggle Crop Selection / Unselect Handler
   const handleCropButtonClick = (crop) => {
-    setSelectedCrop(crop);
-    if (onSelectCrop) onSelectCrop(crop);
+    if (selectedCrop === crop) {
+      setSelectedCrop(null); // UNSELECT CROP
+      if (onSelectCrop) onSelectCrop(null);
+    } else {
+      setSelectedCrop(crop); // SELECT CROP
+      if (onSelectCrop) onSelectCrop(crop);
+    }
   };
 
   return (
@@ -376,13 +383,18 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         </div>
       )}
 
-      {/* 2. CROP SELECTION WITH MOBILE-STYLE PAGINATED TRANSITION LINE SLIDER */}
+      {/* 2. CROP SELECTION WITH TOGGLE UNSELECT FEATURE */}
       <div className="glass-card border border-slate-200/80 p-5 sm:p-6 rounded-3xl shadow-sm space-y-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-slate-100">
-          <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-            <Sprout className="w-5 h-5 text-emerald-600" />
-            {t('selectCropTitle', currentLang)} <span className="text-xs font-bold text-emerald-700">(पिक निवडा)</span>
-          </h3>
+          <div>
+            <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+              <Sprout className="w-5 h-5 text-emerald-600" />
+              {t('selectCropTitle', currentLang)} <span className="text-xs font-bold text-emerald-700">(पिक निवडा)</span>
+            </h3>
+            <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              Click a crop to view detailed 4-step action plan. Click again to unselect & hide.
+            </p>
+          </div>
 
           {/* MOBILE-STYLE STAGE TRANSITION LINE & PREV/NEXT ARROWS */}
           <div className="flex items-center space-x-3 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-2xl text-xs font-bold">
@@ -427,7 +439,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           </div>
         </div>
 
-        {/* 4 CROPS PER STAGE BUTTONS */}
+        {/* 4 CROPS PER STAGE BUTTONS (TOGGLES SELECTION) */}
         <div key={cropStageIndex} className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 animate-slideUp">
           {currentCropStageItems.map(crop => {
             const isSelected = selectedCrop === crop;
@@ -441,7 +453,12 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                     : 'bg-slate-50 hover:bg-emerald-50 text-slate-800 border-slate-200'
                 }`}
               >
-                <div className="text-[10px] font-bold opacity-80 uppercase tracking-wider">Crop Selection</div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold opacity-80 uppercase tracking-wider">
+                    {isSelected ? '✓ Selected' : 'Click to Select'}
+                  </span>
+                  {isSelected && <X className="w-3.5 h-3.5 text-white/90" />}
+                </div>
                 <div className="text-sm font-black truncate">{crop}</div>
               </button>
             );
@@ -449,74 +466,85 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         </div>
       </div>
 
-      {/* 3. DYNAMIC 4-STEP ACTION PLAN FOR SELECTED CROP */}
-      <div className="glass-card border border-slate-200/80 p-5 sm:p-6 rounded-3xl shadow-sm space-y-4 transition-all">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-500" />
-            {t('keyActionsTitle', currentLang)} <span className="text-emerald-700 underline decoration-emerald-500/50">{selectedCrop}</span>:
-          </h3>
-          <span className="text-xs bg-emerald-100 text-emerald-800 px-3 py-0.5 rounded-full border border-emerald-300 font-extrabold hidden sm:inline">
-            {t('adviceFor', currentLang)} {selectedCrop}
-          </span>
+      {/* 3. DYNAMIC 4-STEP ACTION PLAN (ONLY APPEARS WHEN A CROP IS SELECTED!) */}
+      {selectedCrop && currentActions ? (
+        <div className="glass-card border border-slate-200/80 p-5 sm:p-6 rounded-3xl shadow-sm space-y-4 transition-all animate-slideUp">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              {t('keyActionsTitle', currentLang)} <span className="text-emerald-700 underline decoration-emerald-500/50">{selectedCrop}</span>:
+            </h3>
+            
+            <button
+              onClick={() => setSelectedCrop(null)}
+              className="px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Close Plan (बंद करा)</span>
+            </button>
+          </div>
+
+          <div key={selectedCrop} className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            
+            {/* Step 1: Watering */}
+            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-sm">
+                  1
+                </div>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900">💧 {t('watering', currentLang)} ({selectedCrop})</h4>
+              </div>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+                {currentActions.water}
+              </p>
+            </div>
+
+            {/* Step 2: Soil & Fertilizer */}
+            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-sm">
+                  2
+                </div>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900">🌱 {t('soilSpray', currentLang)} ({selectedCrop})</h4>
+              </div>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+                {currentActions.fertilizer}
+              </p>
+            </div>
+
+            {/* Step 3: Pest Control */}
+            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-sm">
+                  3
+                </div>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900">🐛 {t('insectSpray', currentLang)} ({selectedCrop})</h4>
+              </div>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+                {currentActions.pest}
+              </p>
+            </div>
+
+            {/* Step 4: Crop Insurance */}
+            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-sm">
+                  4
+                </div>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900">🛡️ {t('cropInsurance', currentLang)} ({selectedCrop})</h4>
+              </div>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+                {currentActions.insurance}
+              </p>
+            </div>
+
+          </div>
         </div>
-
-        <div key={selectedCrop} className="grid grid-cols-1 md:grid-cols-2 gap-3.5 animate-slideUp">
-          
-          {/* Step 1: Watering */}
-          <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-sm">
-                1
-              </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">💧 {t('watering', currentLang)} ({selectedCrop})</h4>
-            </div>
-            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-              {currentActions.water}
-            </p>
-          </div>
-
-          {/* Step 2: Soil & Fertilizer */}
-          <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-sm">
-                2
-              </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">🌱 {t('soilSpray', currentLang)} ({selectedCrop})</h4>
-            </div>
-            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-              {currentActions.fertilizer}
-            </p>
-          </div>
-
-          {/* Step 3: Pest Control */}
-          <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-sm">
-                3
-              </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">🐛 {t('insectSpray', currentLang)} ({selectedCrop})</h4>
-            </div>
-            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-              {currentActions.pest}
-            </p>
-          </div>
-
-          {/* Step 4: Crop Insurance */}
-          <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-sm">
-                4
-              </div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900">🛡️ {t('cropInsurance', currentLang)} ({selectedCrop})</h4>
-            </div>
-            <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-              {currentActions.insurance}
-            </p>
-          </div>
-
+      ) : (
+        <div className="p-4 bg-slate-100 border border-dashed border-slate-300 rounded-3xl text-center text-xs font-bold text-slate-500">
+          💡 Select any crop above to reveal its customized 4-step action plan (महत्त्वाचे उपाय).
         </div>
-      </div>
+      )}
 
       {/* 4. HELPLINE CARD */}
       <div className="bg-gradient-to-r from-emerald-700 to-teal-800 p-5 rounded-3xl text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">

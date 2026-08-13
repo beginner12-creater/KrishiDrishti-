@@ -230,7 +230,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-sm whitespace-nowrap">
+                    <span className="px-2.5 py-0.5 rounded-full text-[9px] sm:text-[11px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-sm break-words leading-tight">
                       {liveWeather?.source || 'IMD + OpenWeatherMap Live Feed'}
                     </span>
                     <span className="text-xs font-bold text-white/90 break-words">📍 {village.villageName} ({village.districtName})</span>

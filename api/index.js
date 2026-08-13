@@ -113,13 +113,13 @@ app.post('/api/ai-advisory', (req, res) => {
 });
 
 // 6. Krishi Mitr AI Chatbot Query
-app.post('/api/krishi-mitr/chat', (req, res) => {
+app.post('/api/krishi-mitr/chat', async (req, res) => {
   try {
     const { message, villageId } = req.body;
     const village = VILLAGES_DATABASE.find(v => v.id === villageId) || VILLAGES_DATABASE[0];
 
     const riskMetrics = calculateVillageClimateRisk(village);
-    const reply = answerKrishiMitrQuery(message || '', village, riskMetrics);
+    const reply = await answerKrishiMitrQuery(message || '', village, riskMetrics);
 
     res.json({
       reply,

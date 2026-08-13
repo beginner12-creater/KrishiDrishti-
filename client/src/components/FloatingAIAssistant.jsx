@@ -17,7 +17,11 @@ export default function FloatingAIAssistant({ village, riskMetrics, currentLang 
     `🌱 How to grow Tomato?`,
     `🌾 Best seed for Cotton?`,
     `💰 How to earn ₹3 Lakh/acre?`,
-    `🌱 Zero-cost Jeevamrut recipe?`
+    `🌱 Zero-cost Jeevamrut recipe?`,
+    `🐛 Pest spray for Onion Thrips?`,
+    `🛡️ PMFBY Insurance Claim process?`,
+    `💧 Drip Irrigation 55% Subsidy?`,
+    `🧮 Land Area: 1 Acre = Gunthas?`
   ];
 
   const handleSendMessage = async (textToSend) => {

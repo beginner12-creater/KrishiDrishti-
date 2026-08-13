@@ -238,7 +238,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
                   <h2 className="text-lg sm:text-2xl font-black tracking-tight leading-snug break-words">
                     {isRainyCondition
-                      ? '🌧️ It May Be a Rainy Day Today! (आज पाऊस पडण्याची शक्यता आहे!)'
+                      ? '🌧️ Rain Alert Today (आज पाऊस पडण्याची शक्यता आहे!)'
                       : conditionType === 'sunny'
                       ? '☀️ Sunny & Clear Sky (निरभ्र आकाश)'
                       : conditionType === 'stormy'
@@ -256,12 +256,12 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               {/* LIVE TEMP & RAIN PROBABILITY DISPLAY */}
               <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 self-start sm:self-auto shrink-0">
                 <div className="text-right">
-                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
+                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp (तापमान)</div>
                   <div className="text-base sm:text-xl font-black text-white">{currentTemp}°C</div>
                 </div>
                 <div className="h-7 w-px bg-white/30" />
                 <div>
-                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
+                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob (पाऊस शक्यता)</div>
                   <div className="text-base sm:text-xl font-black text-cyan-200">{rainProb}%</div>
                 </div>
               </div>
@@ -290,28 +290,28 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('drought', currentLang)} (दुष्काळ)</div>
-                  <div className="text-xs sm:text-sm font-black">{subIndices.droughtIndex > 60 ? t('high', currentLang) : t('low', currentLang)}</div>
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Drought Risk (दुष्काळ)</div>
+                  <div className="text-xs sm:text-sm font-black">{subIndices.droughtIndex > 60 ? 'HIGH (जास्त)' : 'LOW (कमी)'}</div>
                 </div>
               </div>
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('water', currentLang)} (पाणी)</div>
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Water Supply (पाणी)</div>
                   <div className="text-xs sm:text-sm font-black truncate">{village.groundwaterStatus.split(' ')[0]}</div>
                 </div>
               </div>
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Bug className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('pestRisk', currentLang)} (कीड)</div>
-                  <div className="text-xs sm:text-sm font-black">{subIndices.pestIndex > 60 ? t('high', currentLang) : t('safe', currentLang)}</div>
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Pest Risk (कीड)</div>
+                  <div className="text-xs sm:text-sm font-black">{subIndices.pestIndex > 60 ? 'HIGH (जास्त)' : 'SAFE (सुरक्षित)'}</div>
                 </div>
               </div>
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('rainfall', currentLang)} (पाऊस)</div>
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Rainfall (पाऊस)</div>
                   <div className="text-xs sm:text-sm font-black">{village.annualRainfallNormal} mm</div>
                 </div>
               </div>
@@ -327,8 +327,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           <div>
             <h3 className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-2">
               <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
-              <span>{t('selectCropTitle', currentLang)}</span>
-              <span className="text-xs font-bold text-emerald-700">(पिक निवडा)</span>
+              <span>Select Your Crop (आपले पीक निवडा)</span>
             </h3>
             <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-snug break-words">
               Click a crop to view detailed 4-step action plan. Click again to unselect & hide.
@@ -411,7 +410,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           <div className="flex items-center justify-between border-b border-slate-100 pb-3 gap-2">
             <h3 className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-1.5 leading-snug break-words">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
-              <span>{t('keyActionsTitle', currentLang)}</span>
+              <span>Key Actions (महत्त्वाचे उपाय) — </span>
               <span className="text-emerald-700 underline decoration-emerald-500/50 break-words">{selectedCrop}</span>:
             </h3>
             
@@ -432,7 +431,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 <div className="w-7 h-7 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-xs shrink-0">
                   1
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">💧 {t('watering', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">💧 Watering Management (पाणी नियोजन) ({selectedCrop})</h4>
               </div>
               <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.water}
@@ -445,7 +444,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 <div className="w-7 h-7 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-xs shrink-0">
                   2
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🌱 {t('soilSpray', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🌱 Soil & Fertilizer Spray (खत फवारणी) ({selectedCrop})</h4>
               </div>
               <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.fertilizer}
@@ -458,7 +457,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 <div className="w-7 h-7 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-xs shrink-0">
                   3
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🐛 {t('insectSpray', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🐛 Insect & Pest Spray (कीड नियंत्रण) ({selectedCrop})</h4>
               </div>
               <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.pest}
@@ -471,7 +470,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 <div className="w-7 h-7 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-xs shrink-0">
                   4
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🛡️ {t('cropInsurance', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🛡️ Crop Insurance Claim (पिक विमा) ({selectedCrop})</h4>
               </div>
               <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.insurance}
@@ -493,8 +492,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             <PhoneCall className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h4 className="text-xs sm:text-base font-black leading-tight">{t('helplineTitle', currentLang)}</h4>
-            <p className="text-[11px] sm:text-xs font-semibold text-emerald-100 leading-tight mt-0.5">{t('helplineSub', currentLang)}</p>
+            <h4 className="text-xs sm:text-base font-black leading-tight">Kisan Call Centre Helpline (किसान कॉल सेंटर हेल्पलाइन)</h4>
+            <p className="text-[11px] sm:text-xs font-semibold text-emerald-100 leading-tight mt-0.5">Free Government Helpline for Farmers (मोफत शासकीय हेल्पलाइन)</p>
           </div>
         </div>
 
@@ -502,7 +501,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           href="tel:18001801551"
           className="px-4 py-2 sm:px-5 sm:py-2.5 bg-white text-emerald-800 font-black text-xs rounded-xl shadow-sm hover:bg-emerald-50 transition-all shrink-0 flex items-center space-x-2"
         >
-          <span>{t('callNow', currentLang)}</span>
+          <span>Call 1800-180-1551 (कॉल करा)</span>
           <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </a>
       </div>

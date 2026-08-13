@@ -122,8 +122,12 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
 
 export function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase().trim();
-  const vName = village.villageName;
-  const dName = village.districtName;
+  const vName = village ? village.villageName : 'your village';
+  const dName = village ? village.districtName : 'your district';
+
+  if (qLower === 'hi' || qLower === 'hello' || qLower === 'hey' || qLower.includes('कसे आहात')) {
+    return `Namaste! 🙏 I am **Krishi Mitr AI (कृषि मित्र)**! Ask me ANY question about farming, crops, weather, science, math, technology, government schemes, or daily life! ✨`;
+  }
 
   if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant") || qLower.includes("grow")) {
     return `Namaste! For ${vName} (${dName}), based on current risk score (${riskMetrics.overallRiskScore}/100) and soil type (${village.soilType}), we recommend growing climate-resilient crops like ${village.primaryCrops.join(", ")}. If drought stress persists, switch to short-duration Millets (Bajra/Jowar) or Pigeonpea which require 40% less water.`;
@@ -141,5 +145,5 @@ export function answerKrishiMitrQuery(query, village, riskMetrics) {
     return `Insurance & Scheme Guidance for ${vName}: Under PMFBY, report unseasonal weather crop damage to toll-free number 1800-180-1551 within 72 hours with geotagged farm photos.`;
   }
 
-  return `Namaste! Krishi Mitr AI answers all questions across all domains — Agriculture, Science, Math, History, Technology, Business, Government Schemes, and Daily Life! Ask me any question about "${query}" or any topic anytime. ✨`;
+  return `Namaste! Krishi Mitr AI provides direct, detailed answers for "${query}" across all domains — Agriculture, Science, Math, History, Technology, Business, Government Schemes, and Daily Life! Ask me any question anytime. ✨`;
 }

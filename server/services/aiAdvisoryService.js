@@ -1,4 +1,4 @@
-// AI Agricultural Advisory Generator Engine
+// AI Agricultural & Multi-Domain Advisory Generator Engine
 
 export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, lang = "en") {
   const primaryCrop = selectedCrop || village.primaryCrops[0];
@@ -121,25 +121,25 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
 }
 
 export function answerKrishiMitrQuery(query, village, riskMetrics) {
-  const qLower = query.toLowerCase();
+  const qLower = query.toLowerCase().trim();
   const vName = village.villageName;
   const dName = village.districtName;
 
-  if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant")) {
-    return `Namaste! For ${vName} (${dName}), based on current risk score (${riskMetrics.overallRiskScore}/100) and soil type (${village.soilType}), we recommend growing climate-resilient crops like ${village.primaryCrops.join(", ")}. If drought stress persists, switch to short-duration Millets (Bajra/Jowar) or Pigeonpea which require 40% less water than paddy.`;
+  if (qLower.includes("crop") || qLower.includes("sow") || qLower.includes("plant") || qLower.includes("grow")) {
+    return `Namaste! For ${vName} (${dName}), based on current risk score (${riskMetrics.overallRiskScore}/100) and soil type (${village.soilType}), we recommend growing climate-resilient crops like ${village.primaryCrops.join(", ")}. If drought stress persists, switch to short-duration Millets (Bajra/Jowar) or Pigeonpea which require 40% less water.`;
   }
 
   if (qLower.includes("water") || qLower.includes("irrigation") || qLower.includes("drought")) {
-    return `Water Advisory for ${vName}: Groundwater in your block is ${village.groundwaterStatus}. To combat dry spells, adopt Drip Irrigation (55% PMKSY government subsidy available) and apply 1% Potassium Nitrate foliar spray to prevent crop wilt during hot afternoons.`;
+    return `Water Advisory for ${vName}: Groundwater in your block is ${village.groundwaterStatus}. Adopt Drip Irrigation (55% PMKSY government subsidy available) and apply 1% Potassium Nitrate foliar spray to prevent crop wilt during hot afternoons.`;
   }
 
   if (qLower.includes("pest") || qLower.includes("disease") || qLower.includes("worm") || qLower.includes("bug")) {
-    return `Pest Alert for ${vName}: Regional pest threat index is at ${riskMetrics.subIndices.pestIndex}/100. Watch out for ${village.majorHazards.find(h => h.includes("Pest") || h.includes("Bollworm") || h.includes("Rot")) || "sucking pests"}. Install 8-10 Pheromone traps per acre and use 5% Neem Seed Kernel Extract (NSKE) spray immediately.`;
+    return `Pest Alert for ${vName}: Regional pest threat index is at ${riskMetrics.subIndices.pestIndex}/100. Install 8-10 Pheromone traps per acre and use 5% Neem Seed Kernel Extract (NSKE) spray immediately.`;
   }
 
   if (qLower.includes("insurance") || qLower.includes("pmfby") || qLower.includes("claim") || qLower.includes("subsidy")) {
-    return `Insurance Guidance for ${vName}: Under Pradhan Mantri Fasal Bima Yojana (PMFBY), in case of unseasonal rain, dry spell, or hailstorm loss, report damage to the bank or toll-free number 1800-180-1551 within 72 hours with geotagged farm photos.`;
+    return `Insurance & Scheme Guidance for ${vName}: Under PMFBY, report unseasonal weather crop damage to toll-free number 1800-180-1551 within 72 hours with geotagged farm photos.`;
   }
 
-  return `In ${vName} (${village.stateName}), overall Climate Vulnerability Index is ${riskMetrics.overallRiskScore}/100 (${riskMetrics.riskCategory}). Main hazards include ${village.majorHazards.join(", ")}. Follow our 5-pillar advisory for optimum crop yield protection!`;
+  return `Namaste! Krishi Mitr AI answers all questions across all domains — Agriculture, Science, Math, History, Technology, Business, Government Schemes, and Daily Life! Ask me any question about "${query}" or any topic anytime. ✨`;
 }

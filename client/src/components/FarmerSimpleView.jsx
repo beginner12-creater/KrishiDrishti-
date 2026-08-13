@@ -4,7 +4,7 @@ import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall
 import { fetchLiveWeather } from '../services/realtimeApiService';
 import { VILLAGES_DATABASE } from '../data/villages';
 
-export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr' }) {
+export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr', isDarkMode = false }) {
   const [selectedCrop, setSelectedCrop] = useState(null); // INITIALLY UNSELECTED
   const [cropStageIndex, setCropStageIndex] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
   const [liveWeather, setLiveWeather] = useState(null);
@@ -326,34 +326,42 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
       )}
 
       {/* 2. CROP SELECTION WITH TOGGLE UNSELECT FEATURE */}
-      <div className="glass-card border border-slate-200/80 p-4 sm:p-6 rounded-3xl shadow-sm space-y-3.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-slate-100">
+      <div className={`p-4 sm:p-6 rounded-3xl shadow-sm space-y-3.5 border transition-colors duration-500 ${
+        isDarkMode
+          ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
+          : 'glass-card border-slate-200/80 text-slate-900'
+      }`}>
+        <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b ${
+          isDarkMode ? 'border-slate-800' : 'border-slate-100'
+        }`}>
           <div>
-            <h3 className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
+            <h3 className={`text-sm sm:text-lg font-black flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+              <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 shrink-0" />
               <span>Select Your Crop (आपले पीक निवडा)</span>
             </h3>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-snug break-words">
+            <p className={`text-[11px] font-medium mt-0.5 leading-snug break-words ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
               Click a crop to view detailed 4-step action plan. Click again to unselect & hide.
             </p>
           </div>
 
           {/* MOBILE-STYLE STAGE TRANSITION LINE & PREV/NEXT ARROWS */}
-          <div className="flex items-center space-x-2.5 bg-slate-50 border border-slate-200/80 px-2.5 py-1.5 rounded-2xl text-xs font-bold self-start sm:self-auto">
+          <div className={`flex items-center space-x-2.5 px-2.5 py-1.5 rounded-2xl text-xs font-bold self-start sm:self-auto border ${
+            isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200/80 text-slate-800'
+          }`}>
             <div className="flex items-center space-x-1">
-              <Layers className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span className="text-[11px] font-black text-slate-800 whitespace-nowrap">
+              <Layers className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <span className={`text-[11px] font-black whitespace-nowrap ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
                 Stage {cropStageIndex + 1}/{totalCropStages}
               </span>
             </div>
 
             {/* Indicator Line Bar */}
-            <div className="w-20 sm:w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
+            <div className={`w-20 sm:w-32 h-1.5 rounded-full overflow-hidden flex ${isDarkMode ? 'bg-slate-800' : 'bg-slate-200'}`}>
               {Array.from({ length: totalCropStages }).map((_, idx) => (
                 <div
                   key={idx}
                   className={`h-full flex-1 transition-all duration-500 ${
-                    idx === cropStageIndex ? 'bg-emerald-600 font-bold' : 'bg-slate-300'
+                    idx === cropStageIndex ? 'bg-emerald-500 font-bold' : isDarkMode ? 'bg-slate-700' : 'bg-slate-300'
                   }`}
                 />
               ))}
@@ -364,7 +372,9 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               <button
                 onClick={() => setCropStageIndex(prev => Math.max(0, prev - 1))}
                 disabled={cropStageIndex === 0}
-                className="p-1 rounded-lg bg-white hover:bg-emerald-600 hover:text-white border border-slate-300 text-slate-700 transition-all disabled:opacity-40 cursor-pointer shadow-2xs"
+                className={`p-1 rounded-lg transition-all disabled:opacity-40 cursor-pointer shadow-2xs ${
+                  isDarkMode ? 'bg-slate-800 hover:bg-emerald-600 border-slate-700 text-white' : 'bg-white hover:bg-emerald-600 border-slate-300 text-slate-700 hover:text-white'
+                }`}
                 aria-label="Previous 4 Crops"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
@@ -391,7 +401,9 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 onClick={() => handleCropButtonClick(crop)}
                 className={`p-3 rounded-2xl text-left border transition-all duration-300 min-h-[68px] flex flex-col justify-between cursor-pointer ${
                   isSelected
-                    ? 'bg-emerald-600 text-white font-black border-emerald-700 shadow-md scale-[1.02]'
+                    ? 'bg-emerald-600 text-white font-black border-emerald-700 shadow-lg scale-[1.02]'
+                    : isDarkMode
+                    ? 'bg-slate-950 hover:bg-slate-800 text-emerald-300 border-slate-800 hover:border-emerald-500 hover:shadow-emerald-950'
                     : 'bg-slate-50 hover:bg-emerald-50 text-slate-800 border-slate-200'
                 }`}
               >
@@ -410,17 +422,27 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
       {/* 3. DYNAMIC 4-STEP ACTION PLAN (ONLY APPEARS WHEN A CROP IS SELECTED! MOBILE OPTIMIZED) */}
       {selectedCrop && currentActions ? (
-        <div className="glass-card border border-slate-200/80 p-4 sm:p-6 rounded-3xl shadow-sm space-y-4 transition-all animate-slideUp">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3 gap-2">
-            <h3 className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-1.5 leading-snug break-words">
+        <div className={`p-4 sm:p-6 rounded-3xl shadow-sm space-y-4 border transition-all animate-slideUp ${
+          isDarkMode
+            ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
+            : 'glass-card border-slate-200/80 text-slate-900'
+        }`}>
+          <div className={`flex items-center justify-between border-b pb-3 gap-2 ${
+            isDarkMode ? 'border-slate-800' : 'border-slate-100'
+          }`}>
+            <h3 className={`text-sm sm:text-lg font-black flex items-center gap-1.5 leading-snug break-words ${
+              isDarkMode ? 'text-white' : 'text-slate-900'
+            }`}>
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
               <span>Key Actions (महत्त्वाचे उपाय) — </span>
-              <span className="text-emerald-700 underline decoration-emerald-500/50 break-words">{selectedCrop}</span>:
+              <span className="text-emerald-400 underline decoration-emerald-500/50 break-words">{selectedCrop}</span>:
             </h3>
             
             <button
               onClick={() => setSelectedCrop(null)}
-              className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer shrink-0"
+              className={`px-2.5 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer shrink-0 ${
+                isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-slate-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+              }`}
             >
               <X className="w-3.5 h-3.5" />
               <span className="whitespace-nowrap">Close Plan (बंद करा)</span>
@@ -430,53 +452,69 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           <div key={selectedCrop} className="grid grid-cols-1 md:grid-cols-2 gap-3">
             
             {/* Step 1: Watering */}
-            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+            <div className={`p-3.5 rounded-2xl space-y-2 border transition-all ${
+              isDarkMode ? 'bg-slate-950 border-slate-800 hover:border-emerald-500' : 'bg-slate-50 border-slate-200/80 hover:border-emerald-400'
+            }`}>
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-xs shrink-0">
                   1
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">💧 Watering Management (पाणी नियोजन) ({selectedCrop})</h4>
+                <h4 className={`text-xs sm:text-sm font-black leading-snug break-words ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>💧 Watering Management (पाणी नियोजन) ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
+              <p className={`text-xs font-medium leading-relaxed p-3 rounded-xl border shadow-2xs break-words ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-700'
+              }`}>
                 {currentActions.water}
               </p>
             </div>
 
             {/* Step 2: Soil & Fertilizer */}
-            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+            <div className={`p-3.5 rounded-2xl space-y-2 border transition-all ${
+              isDarkMode ? 'bg-slate-950 border-slate-800 hover:border-emerald-500' : 'bg-slate-50 border-slate-200/80 hover:border-emerald-400'
+            }`}>
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-xs shrink-0">
                   2
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🌱 Soil & Fertilizer Spray (खत फवारणी) ({selectedCrop})</h4>
+                <h4 className={`text-xs sm:text-sm font-black leading-snug break-words ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>🌱 Soil & Fertilizer Spray (खत फवारणी) ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
+              <p className={`text-xs font-medium leading-relaxed p-3 rounded-xl border shadow-2xs break-words ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-700'
+              }`}>
                 {currentActions.fertilizer}
               </p>
             </div>
 
             {/* Step 3: Pest Control */}
-            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+            <div className={`p-3.5 rounded-2xl space-y-2 border transition-all ${
+              isDarkMode ? 'bg-slate-950 border-slate-800 hover:border-emerald-500' : 'bg-slate-50 border-slate-200/80 hover:border-emerald-400'
+            }`}>
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-xs shrink-0">
                   3
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🐛 Insect & Pest Spray (कीड नियंत्रण) ({selectedCrop})</h4>
+                <h4 className={`text-xs sm:text-sm font-black leading-snug break-words ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>🐛 Insect & Pest Spray (कीड नियंत्रण) ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
+              <p className={`text-xs font-medium leading-relaxed p-3 rounded-xl border shadow-2xs break-words ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-700'
+              }`}>
                 {currentActions.pest}
               </p>
             </div>
 
             {/* Step 4: Crop Insurance */}
-            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+            <div className={`p-3.5 rounded-2xl space-y-2 border transition-all ${
+              isDarkMode ? 'bg-slate-950 border-slate-800 hover:border-emerald-500' : 'bg-slate-50 border-slate-200/80 hover:border-emerald-400'
+            }`}>
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-xs shrink-0">
                   4
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🛡️ Crop Insurance Claim (पिक विमा) ({selectedCrop})</h4>
+                <h4 className={`text-xs sm:text-sm font-black leading-snug break-words ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>🛡️ Crop Insurance Claim (पिक विमा) ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
+              <p className={`text-xs font-medium leading-relaxed p-3 rounded-xl border shadow-2xs break-words ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-700'
+              }`}>
                 {currentActions.insurance}
               </p>
             </div>
@@ -484,7 +522,9 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           </div>
         </div>
       ) : (
-        <div className="p-3.5 bg-slate-100 border border-dashed border-slate-300 rounded-3xl text-center text-xs font-bold text-slate-500 leading-normal">
+        <div className={`p-3.5 rounded-3xl text-center text-xs font-bold leading-normal border border-dashed ${
+          isDarkMode ? 'bg-slate-900/80 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-300 text-slate-500'
+        }`}>
           💡 Select any crop above to reveal its customized 4-step action plan (महत्त्वाचे उपाय).
         </div>
       )}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IndianRupee, TrendingUp, Droplets, ShieldCheck, Star, ArrowUpRight, ChevronLeft, ChevronRight, Layers, Sparkles } from 'lucide-react';
 
-export default function CropProfitRecommendation({ village, riskMetrics, onSelectCrop }) {
+export default function CropProfitRecommendation({ village, riskMetrics, onSelectCrop, isDarkMode = false }) {
   const [currentStage, setCurrentStage] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
 
   if (!village || !riskMetrics) return null;
@@ -48,104 +48,112 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
         displayName: "Pearl Millet (बाजरी / बाजरा)",
         category: "Climate Resilient Grain (धोकामुक्त)",
         estProfitPerAcre: "₹ 45,000 - ₹ 75,000",
-        waterSavings: "65% Less Water (कमी पाणी)",
-        resilienceScore: 94,
+        waterSavings: "65% Less Water (अत्यल्प)",
+        resilienceScore: 95,
         marketDemand: 4,
-        whyBest: "Requires only 2 protective irrigations. High demand for healthy millet flour."
-      },
-      {
-        cropName: "Guava",
-        displayName: "VNR Bihi Guava (पेरू फळबाग)",
-        category: "High-Density Horticulture (सघन फळबाग)",
-        estProfitPerAcre: "₹ 2,00,000 - ₹ 3,50,000",
-        waterSavings: "50% Less Water (कमी पाणी)",
-        resilienceScore: 91,
-        marketDemand: 5,
-        whyBest: "Bears fruit within 1.5 years. High price per kg for Jumbo 500g fruit."
-      },
-      {
-        cropName: "Grapes",
-        displayName: "Export Quality Grapes (द्राक्ष बागा)",
-        category: "Export Cash Crop (निर्यात पीक)",
-        estProfitPerAcre: "₹ 2,50,000 - ₹ 4,50,000",
-        waterSavings: "Precision Drip (ठिबक सिंचन)",
-        resilienceScore: 82,
-        marketDemand: 5,
-        whyBest: `Suited for ${village.districtName}'s climate. High returns from raisin processing.`
+        whyBest: "Zero risk crop during dry spells. Requires minimal fertilizer."
       },
       {
         cropName: "Soybean",
-        displayName: "Soybean + Pigeonpea (सोयाबीन + तूर)",
-        category: "Intercropping (आंतरपीक पद्धत)",
-        estProfitPerAcre: "₹ 70,000 - ₹ 1,20,000",
-        waterSavings: "35% Water Savings (पाणी बचत)",
-        resilienceScore: 89,
-        marketDemand: 4,
-        whyBest: "Double income security. Pigeonpea acts as climate buffer during dry spells."
+        displayName: "Phule Samrudhi Soybean (सोयाबीन)",
+        category: "Certified High Yield Pulse (कडधान्य)",
+        estProfitPerAcre: "₹ 65,000 - ₹ 1,10,000",
+        waterSavings: "35% Water Savings (पाऊस)",
+        resilienceScore: 84,
+        marketDemand: 5,
+        whyBest: "Drought resistant KDS-753 variety. Fixes nitrogen in soil."
       },
       {
-        cropName: "Cashew Nut",
-        displayName: "Cashew Nut (काजू बागायती)",
-        category: "Plantation Crop (फळबाग)",
-        estProfitPerAcre: "₹ 1,50,000 - ₹ 2,40,000",
-        waterSavings: "Rainfed Plantation (पावसावर)",
-        resilienceScore: 90,
+        cropName: "Onion",
+        displayName: "Red Onion / Kanda (लाल कांदा)",
+        category: "High Demand Cash Crop (कांदा)",
+        estProfitPerAcre: "₹ 1,20,000 - ₹ 2,40,000",
+        waterSavings: "30% Water Savings (पाणी)",
+        resilienceScore: 80,
         marketDemand: 5,
-        whyBest: "Low maintenance with high export market demand."
+        whyBest: "High APMC mandi prices. Suitable for storage in Kanda Chawl."
+      },
+      {
+        cropName: "Cotton",
+        displayName: "Bt Cotton BG-II (कापूस)",
+        category: "Commercial Fiber Crop (कापूस)",
+        estProfitPerAcre: "₹ 85,000 - ₹ 1,50,000",
+        waterSavings: "30% Water Savings (कापूस)",
+        resilienceScore: 82,
+        marketDemand: 4,
+        whyBest: "High lint percentage and pink bollworm resistance."
+      },
+      {
+        cropName: "Grapes",
+        displayName: "Thomson Seedless Grapes (द्राक्ष)",
+        category: "Export Quality Horticulture (फळबाग)",
+        estProfitPerAcre: "₹ 4,00,000 - ₹ 7,00,000",
+        waterSavings: "50% Water Savings (ठिबक)",
+        resilienceScore: 85,
+        marketDemand: 5,
+        whyBest: "High export demand for raisins & fresh bunches."
       }
     ];
   };
 
   const allCrops = getAllProfitCrops();
-  const itemsPerPage = 4; // 4 crops per stage for space saving
-  const totalStages = Math.ceil(allCrops.length / itemsPerPage);
+  const itemsPerStage = 4;
+  const totalStages = Math.ceil(allCrops.length / itemsPerStage);
 
   const displayedCrops = allCrops.slice(
-    currentStage * itemsPerPage,
-    (currentStage + 1) * itemsPerPage
+    currentStage * itemsPerStage,
+    (currentStage + 1) * itemsPerStage
   );
 
   return (
-    <div className="glass-card border border-slate-200/80 p-5 sm:p-6 rounded-3xl mb-6 shadow-sm space-y-4 transition-all duration-300">
+    <div className={`p-4 sm:p-6 rounded-3xl shadow-sm border space-y-4 transition-colors duration-500 ${
+      isDarkMode
+        ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
+        : 'glass-card border-slate-200/80 text-slate-900'
+    }`}>
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80">
         <div>
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0 shadow-md">
-              <TrendingUp className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+              <TrendingUp className="w-4 h-4" />
             </div>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              Profit-Maximizing Crops <span className="text-xs font-bold text-amber-700">(अधिक नफा देणारी पिके)</span>
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-black">4-Crop Stages</span>
+            <h3 className={`text-base sm:text-lg font-black flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+              <span>AI Crop Profit Maximizer (उत्पन्न गणित)</span>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-black">4-Crop Stages</span>
             </h3>
           </div>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Suggested climate-resilient profit crops for <strong className="text-slate-900">{village.villageName}</strong> ({village.districtName})
+          <p className={`text-xs font-medium mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            Suggested climate-resilient profit crops for <strong className={isDarkMode ? 'text-white' : 'text-slate-900'}>{village.villageName}</strong> ({village.districtName})
           </p>
         </div>
 
-        <span className="text-xs text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200/80 self-start sm:self-auto font-extrabold">
-          Resilience: <strong className="text-emerald-700">{100 - overallRiskScore}/100</strong>
+        <span className={`text-xs px-3 py-1.5 rounded-xl border self-start sm:self-auto font-extrabold ${
+          isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-slate-100 border-slate-200/80 text-slate-700'
+        }`}>
+          Resilience: <strong className="text-emerald-500">{100 - overallRiskScore}/100</strong>
         </span>
       </div>
 
       {/* MOBILE-STYLE STAGE TRANSITION LINE & PAGINATION CONTROL */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 bg-slate-50/80 border border-slate-200/80 p-3 rounded-2xl">
+      <div className={`flex flex-col sm:flex-row items-center justify-between gap-2.5 p-3 rounded-2xl border ${
+        isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50/80 border-slate-200/80'
+      }`}>
         <div className="flex items-center space-x-2">
-          <Layers className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span className="text-xs font-black text-slate-800">
-            Stage {currentStage + 1} of {totalStages} <span className="text-[11px] text-slate-500 font-bold">(पिके {currentStage * 4 + 1} ते {Math.min((currentStage + 1) * 4, allCrops.length)})</span>
+          <Layers className="w-4 h-4 text-emerald-500 shrink-0" />
+          <span className={`text-xs font-black ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+            Stage {currentStage + 1} of {totalStages} <span className={`text-[11px] font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>(पिके {currentStage * 4 + 1} ते {Math.min((currentStage + 1) * 4, allCrops.length)})</span>
           </span>
         </div>
 
         {/* Transition Line / Indicator Bar */}
-        <div className="w-full sm:w-48 h-2 bg-slate-200 rounded-full overflow-hidden flex">
+        <div className={`w-full sm:w-48 h-2 rounded-full overflow-hidden flex ${isDarkMode ? 'bg-slate-800' : 'bg-slate-200'}`}>
           {Array.from({ length: totalStages }).map((_, idx) => (
             <div
               key={idx}
               className={`h-full flex-1 transition-all duration-500 ${
-                idx === currentStage ? 'bg-emerald-600 font-bold' : 'bg-slate-300'
+                idx === currentStage ? 'bg-emerald-500 font-bold' : isDarkMode ? 'bg-slate-700' : 'bg-slate-300'
               }`}
             />
           ))}
@@ -156,7 +164,9 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
           <button
             onClick={() => setCurrentStage(prev => Math.max(0, prev - 1))}
             disabled={currentStage === 0}
-            className="px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-600 hover:text-white border border-slate-300 text-slate-800 text-xs font-extrabold flex items-center gap-1 transition-all disabled:opacity-40 cursor-pointer shadow-2xs"
+            className={`px-3 py-1.5 rounded-xl border text-xs font-extrabold flex items-center gap-1 transition-all disabled:opacity-40 cursor-pointer shadow-2xs ${
+              isDarkMode ? 'bg-slate-900 hover:bg-emerald-600 border-slate-700 text-white' : 'bg-white hover:bg-emerald-600 border-slate-300 text-slate-800 hover:text-white'
+            }`}
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Prev 4</span>
@@ -177,44 +187,52 @@ export default function CropProfitRecommendation({ village, riskMetrics, onSelec
         {displayedCrops.map((crop, idx) => (
           <div
             key={idx}
-            className="glass-panel border border-slate-200/80 p-4 rounded-2xl flex flex-col justify-between hover:border-emerald-500 transition-all duration-300 space-y-3 shadow-2xs hover:shadow-lg"
+            className={`border p-4 rounded-2xl flex flex-col justify-between transition-all duration-300 space-y-3 shadow-2xs hover:shadow-xl hover:-translate-y-1 ${
+              isDarkMode
+                ? 'bg-slate-950/80 border-slate-800 hover:border-emerald-500 hover:shadow-emerald-950/50'
+                : 'glass-panel border-slate-200/80 hover:border-emerald-500'
+            }`}
           >
             <div>
               <div className="flex items-center justify-between gap-1.5">
-                <span className="text-[10px] font-black text-emerald-900 uppercase tracking-wider bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-300 truncate">
+                <span className="text-[10px] font-black text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-2 py-0.5 rounded-md border border-emerald-500/30 truncate">
                   {crop.category}
                 </span>
                 <div className="flex items-center text-amber-500 text-xs shrink-0">
                   {Array.from({ length: crop.marketDemand }).map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-amber-500" />
+                    <Star key={i} className="w-3 h-3 fill-amber-500 text-amber-500" />
                   ))}
                 </div>
               </div>
 
-              <h4 className="text-sm font-black text-slate-900 my-2 leading-tight">{crop.displayName}</h4>
+              <h4 className={`text-sm font-black my-2 leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{crop.displayName}</h4>
 
               {/* Profit Metric Pill */}
-              <div className="bg-emerald-50 border border-emerald-300 p-2.5 rounded-xl mb-2.5">
-                <div className="text-[10px] text-emerald-900 font-black uppercase tracking-wider flex items-center gap-1">
+              <div className={`border p-2.5 rounded-xl mb-2.5 ${
+                isDarkMode ? 'bg-emerald-950/60 border-emerald-500/30' : 'bg-emerald-50 border-emerald-300'
+              }`}>
+                <div className="text-[10px] text-emerald-400 font-black uppercase tracking-wider flex items-center gap-1">
                   <IndianRupee className="w-3 h-3" /> Net Profit / Acre:
                 </div>
-                <div className="text-base font-black text-emerald-800 mt-0.5">
+                <div className={`text-base font-black mt-0.5 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-800'}`}>
                   {crop.estProfitPerAcre}
                 </div>
               </div>
 
-              <div className="space-y-1 text-[11px] font-bold text-slate-700">
+              <div className={`space-y-1 text-[11px] font-bold ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 flex items-center gap-1"><Droplets className="w-3 h-3 text-cyan-600" /> Water:</span>
-                  <span className="font-extrabold text-cyan-700 truncate">{crop.waterSavings}</span>
+                  <span className="text-slate-400 flex items-center gap-1"><Droplets className="w-3 h-3 text-cyan-400" /> Water:</span>
+                  <span className="font-extrabold text-cyan-400 truncate">{crop.waterSavings}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500 flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-600" /> Resilience:</span>
-                  <span className="font-extrabold text-emerald-700">{crop.resilienceScore}/100</span>
+                  <span className="text-slate-400 flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-emerald-400" /> Resilience:</span>
+                  <span className="font-extrabold text-emerald-400">{crop.resilienceScore}/100</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-700 font-medium mt-2 bg-white p-2 rounded-xl border border-slate-200 leading-relaxed">
+              <p className={`text-[11px] font-medium mt-2 p-2 rounded-xl border leading-relaxed ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
+              }`}>
                 💡 {crop.whyBest}
               </p>
             </div>

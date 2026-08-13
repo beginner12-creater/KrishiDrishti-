@@ -28,18 +28,12 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   const villageRadarBackscatter = (-11.4 - (seed % 9) * 0.4).toFixed(1);
   const villageLstTemp = (31.5 + (subIdx.heatwaveIndex / 10) - (seed % 5) * 0.4).toFixed(1);
 
-  const isroLandData = riskMetrics?.isroLandData || {
-    ndviIndex: villageNdvi,
-    soilMoisturePercent: villageSoilMoisture,
-    satelliteSource: 'ISRO Bhuvan Geo-Portal LULC 2026'
-  };
-
   const outcomes = [
-    { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", icon: Bell, color: "text-amber-600 bg-amber-50/90 border-amber-200" },
-    { id: 'advisory', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", icon: ShieldCheck, color: "text-emerald-600 bg-emerald-50/90 border-emerald-200" },
-    { id: 'risk', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", icon: Sprout, color: "text-teal-600 bg-teal-50/90 border-teal-200" },
-    { id: 'harvest', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", icon: Calendar, color: "text-blue-600 bg-blue-50/90 border-blue-200" },
-    { id: 'historical', text: "Better disaster preparedness", textMr: "आपत्ती पूर्वतयारी", icon: LineChart, color: "text-purple-600 bg-purple-50/90 border-purple-200" }
+    { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", badge: "+35% Crop Saved", icon: Bell, bgGradient: "from-amber-500/10 to-orange-500/10" },
+    { id: 'advisory', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", badge: "Zero Disaster Loss", icon: ShieldCheck, bgGradient: "from-emerald-500/10 to-teal-500/10" },
+    { id: 'risk', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", badge: "AI Soil Protection", icon: Sprout, bgGradient: "from-teal-500/10 to-cyan-500/10" },
+    { id: 'harvest', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", badge: "Mandi Price Profit", icon: Calendar, bgGradient: "from-blue-500/10 to-indigo-500/10" },
+    { id: 'historical', text: "Better preparedness", textMr: "आपत्ती पूर्वतयारी", badge: "10-Yr Trend Alert", icon: LineChart, bgGradient: "from-purple-500/10 to-indigo-500/10" }
   ];
 
   const features = [
@@ -169,47 +163,53 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
         </div>
       </div>
 
-      {/* 2. EXPECTED OUTCOMES SLIDE BAR */}
+      {/* 2. EXPECTED OUTCOMES SLIDE BAR (FORMATTED AS SLEEK FEATURE BOXES) */}
       <div className={`rounded-3xl p-4 sm:p-5 shadow-sm border relative overflow-hidden transition-all duration-500 ${
         isDarkMode
           ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
           : 'glass-card border-slate-200/80 text-slate-900'
       }`}>
-        <div className="flex items-center justify-between mb-3 relative z-10">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
-              <Sparkles className="w-4 h-4 text-emerald-400 font-bold" />
+        <div className="flex items-center justify-between mb-3.5 relative z-10 gap-2">
+          <div className="flex items-center space-x-2.5 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-emerald-500/20 flex items-center justify-center font-bold shrink-0">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
             </div>
-            <div>
-              <h2 className={`text-xs sm:text-sm font-black leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                Expected Outcomes <span className="text-[10px] sm:text-[11px] font-bold text-emerald-500">(अपेक्षित फायदे)</span>
+            <div className="min-w-0">
+              <h2 className={`text-xs sm:text-base font-black leading-tight break-words ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                Expected Outcomes <span className="text-[11px] sm:text-xs font-bold text-emerald-500 block sm:inline">(अपेक्षित फायदे)</span>
               </h2>
+              <p className={`text-[10px] sm:text-[11px] font-medium truncate mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                Proven benefits & yield protections for <strong>{vName}</strong>
+              </p>
             </div>
           </div>
 
           <div className="flex items-center space-x-1 shrink-0">
             <button
               onClick={() => scrollSlider('left', outcomeSliderRef)}
-              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                isDarkMode ? 'bg-slate-800 hover:bg-emerald-600 text-white' : 'bg-slate-100 hover:bg-emerald-600 text-slate-700 hover:text-white'
+              className={`p-1.5 sm:p-2 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95 ${
+                isDarkMode ? 'bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white' : 'bg-slate-100 hover:bg-emerald-600 text-slate-700 hover:text-white'
               }`}
+              aria-label="Previous Outcome Slide"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => scrollSlider('right', outcomeSliderRef)}
-              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                isDarkMode ? 'bg-slate-800 hover:bg-emerald-600 text-white' : 'bg-slate-100 hover:bg-emerald-600 text-slate-700 hover:text-white'
+              className={`p-1.5 sm:p-2 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95 ${
+                isDarkMode ? 'bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white' : 'bg-slate-100 hover:bg-emerald-600 text-slate-700 hover:text-white'
               }`}
+              aria-label="Next Outcome Slide"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
+        {/* OUTCOME BOXES HORIZONTAL SLIDER */}
         <div
           ref={outcomeSliderRef}
-          className="flex space-x-2.5 overflow-x-auto scrollbar-none snap-x py-1 scroll-smooth"
+          className="flex space-x-3.5 overflow-x-auto scrollbar-none snap-x snap-mandatory py-1 px-0.5 relative z-10 scroll-smooth"
         >
           {outcomes.map((item) => {
             const Icon = item.icon;
@@ -217,15 +217,29 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
               <button
                 key={item.id}
                 onClick={() => setActiveModal(item.id)}
-                className={`snap-start shrink-0 px-3 py-2 rounded-2xl border text-xs font-bold flex items-center space-x-2 transition-all transform hover:scale-105 cursor-pointer whitespace-nowrap shadow-2xs ${
+                className={`snap-start shrink-0 w-60 sm:w-72 border p-3 sm:p-3.5 rounded-2xl flex items-center justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl cursor-pointer text-left group bg-gradient-to-r ${item.bgGradient} ${
                   isDarkMode
-                    ? 'bg-slate-950/80 border-slate-800 text-emerald-300 hover:border-emerald-500'
-                    : item.color
+                    ? 'bg-slate-950/80 border-slate-800 hover:border-emerald-400 hover:shadow-emerald-950/50'
+                    : 'glass-panel border-slate-200/80 hover:border-emerald-500'
                 }`}
               >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span>{item.text}</span>
-                <span className="opacity-80 text-[11px]">({item.textMr})</span>
+                <div className="flex items-center space-x-2.5 min-w-0">
+                  <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border flex items-center justify-center shrink-0 transition-all duration-300 ${
+                    isDarkMode
+                      ? 'bg-slate-900 border-slate-700 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white'
+                      : 'bg-white border-slate-200 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white'
+                  }`}>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className={`text-xs sm:text-sm font-black leading-tight truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{item.text}</h3>
+                    <p className={`text-[10px] font-bold truncate mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{item.textMr}</p>
+                    <span className="inline-block mt-1 text-[9px] bg-emerald-500/20 text-emerald-400 font-black px-2 py-0.5 rounded-md border border-emerald-500/30">
+                      {item.badge}
+                    </span>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all shrink-0 ml-1" />
               </button>
             );
           })}

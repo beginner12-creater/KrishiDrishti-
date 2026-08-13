@@ -13,31 +13,36 @@
   }
 }
 
-/* Custom Keyframe Animations */
+/* Custom Keyframe Animations & Transitions */
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(18px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes floatSlow {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-7px) rotate(1deg); }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
-  50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.35); }
+  0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.45); border-color: rgba(52, 211, 153, 0.8); }
+}
+
+@keyframes shimmerSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 /* WEATHER BACKGROUND ANIMATIONS */
@@ -48,8 +53,8 @@
 }
 
 @keyframes sunRays {
-  0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.2; }
-  50% { transform: rotate(180deg) scale(1.15); opacity: 0.5; }
+  0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.25; }
+  50% { transform: rotate(180deg) scale(1.15); opacity: 0.55; }
 }
 
 @keyframes coldSnow {
@@ -59,11 +64,11 @@
 }
 
 .animate-slideUp {
-  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.3s ease-in-out forwards;
+  animation: fadeIn 0.35s ease-out forwards;
 }
 
 .animate-float {
@@ -92,6 +97,7 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card {
@@ -99,13 +105,13 @@
   backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px -4px rgba(16, 185, 129, 0.12);
-  border-color: rgba(52, 211, 153, 0.5);
+  transform: translateY(-4px) scale(1.005);
+  box-shadow: 0 16px 36px -4px rgba(16, 185, 129, 0.15);
+  border-color: rgba(52, 211, 153, 0.6);
 }
 
 /* Custom Scrollbars */

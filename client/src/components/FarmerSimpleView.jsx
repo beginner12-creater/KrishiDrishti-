@@ -200,7 +200,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             </div>
           )}
 
-          {/* B. MAIN WIDGET CONTENT (MOBILE OPTIMIZED - NO TEXT CUT OFF) */}
+          {/* B. MAIN WIDGET CONTENT (MOBILE OPTIMIZED & CLEAR TEXT) */}
           <div className="p-4 sm:p-7 relative z-10 space-y-3.5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/20 pb-3.5">
               
@@ -238,17 +238,21 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
                   <h2 className="text-lg sm:text-2xl font-black tracking-tight leading-snug break-words">
                     {isRainyCondition
-                      ? '🌧️ Rain Alert Today (आज पाऊस पडण्याची शक्यता आहे!)'
+                      ? '🌧️ Rain Alert Today (आज पावसाची शक्यता आहे)'
                       : conditionType === 'sunny'
-                      ? '☀️ Sunny & Clear Sky (निरभ्र आकाश)'
+                      ? '☀️ Clear Sunny Weather (निरभ्र सूर्यप्रकाश)'
                       : conditionType === 'stormy'
-                      ? '⚡ Storm & Lightning Alert (वादळी इशारा)'
-                      : '☁️ Partly Cloudy (ढगाळ हवामान)'}
+                      ? '⚡ Thunderstorm Warning (वादळी पावसाचा इशारा)'
+                      : '☁️ Partly Cloudy Sky (ढगाळ हवामान)'}
                   </h2>
                   <p className="text-xs sm:text-sm text-white/90 font-semibold mt-0.5 leading-snug break-words">
                     {isRainyCondition
-                      ? `Monsoon cloud cover active over ${village.villageName} (${village.blockName}, ${village.districtName})`
-                      : liveWeather?.conditionDesc || 'Live Micro-Climate Station Active'}
+                      ? `Monsoon rain clouds active over ${village.villageName} (${village.blockName}) — Rain Prob: ${rainProb}%`
+                      : conditionType === 'sunny'
+                      ? `Clear sky with ${currentTemp}°C temp over ${village.villageName} (${village.blockName}) — Good day for farming`
+                      : conditionType === 'stormy'
+                      ? `Thunderstorm activity monitored in ${village.districtName} district — Protect open harvested crops`
+                      : `Partly cloudy micro-climate over ${village.villageName} (${village.blockName}) — Humidity: ${liveWeather?.humidityPercent || 65}%`}
                   </p>
                 </div>
               </div>
@@ -291,28 +295,28 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
                 <div className="min-w-0">
                   <div className="text-[9px] text-slate-500 uppercase font-black truncate">Drought Risk (दुष्काळ)</div>
-                  <div className="text-xs sm:text-sm font-black">{subIndices.droughtIndex > 60 ? 'HIGH (जास्त)' : 'LOW (कमी)'}</div>
+                  <div className="text-xs sm:text-sm font-black">{subIndices.droughtIndex > 60 ? 'HIGH RISK (जास्त)' : 'LOW RISK (कमी)'}</div>
                 </div>
               </div>
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Water Supply (पाणी)</div>
-                  <div className="text-xs sm:text-sm font-black truncate">{village.groundwaterStatus.split(' ')[0]}</div>
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Water Level (पाणी)</div>
+                  <div className="text-xs sm:text-sm font-black truncate">{village.groundwaterStatus}</div>
                 </div>
               </div>
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Bug className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 shrink-0" />
                 <div className="min-w-0">
                   <div className="text-[9px] text-slate-500 uppercase font-black truncate">Pest Risk (कीड)</div>
-                  <div className="text-xs sm:text-sm font-black">{subIndices.pestIndex > 60 ? 'HIGH (जास्त)' : 'SAFE (सुरक्षित)'}</div>
+                  <div className="text-xs sm:text-sm font-black">{subIndices.pestIndex > 60 ? 'HIGH RISK (जास्त)' : 'SAFE (सुरक्षित)'}</div>
                 </div>
               </div>
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Rainfall (पाऊस)</div>
-                  <div className="text-xs sm:text-sm font-black">{village.annualRainfallNormal} mm</div>
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Normal Rain (पाऊस)</div>
+                  <div className="text-xs sm:text-sm font-black">{village.annualRainfallNormal} mm/yr</div>
                 </div>
               </div>
             </div>

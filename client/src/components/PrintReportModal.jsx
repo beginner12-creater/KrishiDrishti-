@@ -10,7 +10,7 @@ export default function PrintReportModal({ village, riskMetrics, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white border border-slate-200 w-full max-w-3xl rounded-3xl p-5 sm:p-7 shadow-2xl relative my-8 text-slate-900 print:bg-white print:text-black print:p-0 print:border-none print:shadow-none">
+      <div className="print-card-document bg-white border border-slate-200 w-full max-w-3xl rounded-3xl p-5 sm:p-7 shadow-2xl relative my-8 text-slate-900 print:bg-white print:text-black print:p-0 print:border-none print:shadow-none">
         
         {/* Action Header (Hidden during print) */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 mb-6 border-b border-slate-200 print:hidden">

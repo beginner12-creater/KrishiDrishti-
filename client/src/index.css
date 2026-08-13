@@ -147,3 +147,59 @@
   border: 1px solid #cbd5e1;
   border-radius: 0.75rem;
 }
+
+/* PRINT PDF EXPORT STYLES (FIXES 4 PAGE DUPLICATION ISSUE) */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 11pt !important;
+  }
+
+  /* Hide background elements completely */
+  nav,
+  main,
+  header,
+  footer,
+  .print-hide,
+  .print\:hidden {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Show modal print container cleanly as a single page */
+  .fixed {
+    position: relative !important;
+    inset: auto !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: block !important;
+    z-index: 9999 !important;
+  }
+
+  .print-card-document {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

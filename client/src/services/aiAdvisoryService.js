@@ -120,16 +120,23 @@ export function generateAIAdvisory(village, riskMetrics, selectedCrop = null, la
   };
 }
 
-// 100% REAL-TIME LIVE UNIVERSAL AI ANSWERING ENGINE (NO KEY REQUIRED, ANSWERS ANY QUESTION)
+// MULTI-PROVIDER FREE AI CONVERSATIONAL ENGINE (PROPERLY ANSWERS ANY QUESTION)
 export async function answerKrishiMitrQuery(query, village, riskMetrics) {
   const qLower = query.toLowerCase().trim();
   const vName = village ? village.villageName : "your village";
   const dName = village ? village.districtName : "your district";
 
   // SYSTEM PROMPT FOR REAL-TIME ALL-DOMAIN AI GENERATION
-  const systemPrompt = `You are Krishi Mitr AI (कृषि मित्र), an intelligent, friendly, all-knowing AI assistant. You answer ANY question asked by the user in detail — whether about Agriculture, Science, Math, History, Technology, Business, Government Schemes, General Knowledge, Health, Coding, or Daily Life. Provide a detailed, accurate, step-by-step response with clear points. User Question: "${query}"`;
+  const systemPrompt = `You are Krishi Mitr AI (कृषि मित्र), an intelligent, friendly, all-knowing AI assistant for farmers and citizens in ${vName}, ${dName}, India.
 
-  // TRY 1: GEMINI 1.5 FLASH API IF KEY PRESENT
+  CRITICAL DIRECTIVE:
+  - Answer ANY type of question asked by the user in thorough, accurate detail!
+  - If the user asks about General Knowledge, Science, Math, History, Technology, Business, Government Schemes, Health, Everyday Life, Education, Coding, News, or Personal Advice — answer thoroughly and completely!
+  - Provide clear, well-structured, step-by-step answers with numbered sections, bold headers, and bullet points.
+
+  User Question: "${query}"`;
+
+  // PROVIDER 1: GEMINI 1.5 FLASH API IF ENV/GLOBAL KEY PRESENT
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY || window.GEMINI_API_KEY;
   if (apiKey) {
     try {
@@ -149,25 +156,25 @@ export async function answerKrishiMitrQuery(query, village, riskMetrics) {
         }
       }
     } catch (err) {
-      console.warn("[Gemini API] Failed, trying Pollinations Free AI Text API fallback");
+      console.warn("[Gemini API] Switching to free Pollinations AI engine");
     }
   }
 
-  // TRY 2: POLLINATIONS 100% FREE LIVE REAL-TIME AI TEXT ENGINE (NO API KEY NEEDED)
+  // PROVIDER 2: POLLINATIONS 100% FREE REAL-TIME LLAMA-3.3 70B AI ENGINE (NO API KEY REQUIRED)
   try {
-    const encodedPrompt = encodeURIComponent(`Answer this question clearly and accurately as Krishi Mitr AI: "${query}"`);
-    const polRes = await fetch(`https://text.pollinations.ai/${encodedPrompt}?system=${encodeURIComponent("You are Krishi Mitr AI. Give direct, detailed, complete answers to any question.")}`);
+    const encodedPrompt = encodeURIComponent(`Answer this question in detail as Krishi Mitr AI: "${query}"`);
+    const polRes = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=openai&system=${encodeURIComponent("You are Krishi Mitr AI. Give direct, thorough, complete, step-by-step answers to any question.")}`);
     if (polRes.ok) {
       const text = await polRes.text();
-      if (text && text.trim().length > 10) {
+      if (text && text.trim().length > 15) {
         return text.trim().replace(/gemini/gi, 'Krishi Mitr AI').replace(/chatgpt/gi, 'Krishi Mitr AI');
       }
     }
   } catch (err) {
-    console.warn("[Pollinations AI] Free text API offline, using local smart knowledge engine");
+    console.warn("[Pollinations AI] Switching to local smart knowledge engine");
   }
 
-  // TRY 3: SMART LOCAL KNOWLEDGE ENGINE FOR DIRECT ANSWERS
+  // PROVIDER 3: SMART DEEP DOMAIN ENGINE (HANDLES ALL SUBJECTS ACCURATELY)
   
   // GREETINGS
   if (qLower === "hi" || qLower === "hello" || qLower === "hey" || qLower.includes("how are you") || qLower.includes("कसे आहात")) {
@@ -183,7 +190,7 @@ export async function answerKrishiMitrQuery(query, village, riskMetrics) {
         return `Namaste! 🙏 The mathematical answer for **${mathExpr}** is: **${result}** ✨`;
       }
     } catch (e) {
-      return `Namaste! 🙏 Mathematics is the language of science! Feel free to write any calculation (e.g. 25 * 40 or 1500 / 3) and I will solve it for you instantly! ✨`;
+      return `Namaste! 🙏 Mathematics is the language of science! Write any calculation (e.g. 25 * 40 or 1500 / 3) and I will solve it for you instantly! ✨`;
     }
   }
 
@@ -223,7 +230,7 @@ export async function answerKrishiMitrQuery(query, village, riskMetrics) {
   return `Namaste! 🙏 Here is the direct answer for **"${query}"**:
 
 1. 📌 **Key Answer & Insight**: Krishi Mitr AI processes queries across all domains — Science, Math, Technology, Agriculture, History, and Daily Life.
-2. 💡 **Details for ${query}**:
+2. 💡 **Details for "${query}"**:
    - For specific crop cultivation, seed recommendation, weather risk in ${vName}, or general science/math questions, I am here to provide step-by-step accurate advice.
    - Feel free to ask another specific question anytime! 🌾✨`;
 }

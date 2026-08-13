@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, Laugh, MapPin, RefreshCw, X } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, MapPin, X } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 import { VILLAGES_DATABASE } from '../data/villages';
 
@@ -9,7 +9,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   const [cropStageIndex, setCropStageIndex] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
-  const [jokeIndex, setJokeIndex] = useState(0);
 
   if (!village || !riskMetrics) return null;
 
@@ -21,34 +20,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   ).slice(0, 5);
 
   const regionalRainyNames = regionalRainyVillages.map(v => `${v.villageName} (${v.blockName})`).join(', ');
-
-  // Expanded Catalog of 15+ Weather-Specific Funny Jokes
-  const WEATHER_SPECIFIC_JOKES = {
-    sunny: [
-      { joke: "आज उकाडा इतका जास्त आहे की कोकिळा सुद्धा विहिरीत उडी मारण्याचा विचार करतेय! 🥚☀️", mr: "उन्हाचा तडाखा: 'शेतकरी दादा, टोपी घाला आणि थंड ताक प्या!'" },
-      { joke: "आजच्या उन्हात कोंबडीने थेट उकडलेले अंडे दिले आहे! 🐔🥚", mr: "उष्णतेचा विनोद: 'उन्हात काम करताना भरपूर पाणी प्या!'" },
-      { joke: "आज ऊन पाहून सूर्यदेवाला विचार वाटतोय - 'थोडं एसीचं बटण दाबतो!' ☀️❄️", mr: "उष्णता सल्ला: 'दुपारी १२ ते ३ शेतात विश्रांती घ्या!'" },
-      { joke: "उन्हात शेतात गेलेला शेतकरी म्हणतो - 'भाऊ, सावली विकत मिळेल का?' ☀️🌳", mr: "उकाडा विनोद: 'ताक, लिंबू पाणी पिऊन ताजेतवाने राहा!'" },
-      { joke: "सूर्यदेव म्हणाले - 'मी आज फुल चार्ज मोडवर आहे!' ☀️⚡", mr: "उन्हाचा कडाका: 'पिकांवर सायंकाळी पाणी द्या!'" }
-    ],
-    rainy: [
-      { joke: "पाऊस पडताच शेतातील बेडूक म्हणतात - 'आम्हीसुद्धा बॉलिवूड गायक आहोत!' 🐸☔", mr: "पावसाळी विनोद: 'गरम कांदा भजी आणि चहा रेडी ठेवा!'" },
-      { joke: "पावसात छत्री उघडली की वारा ती उलट करतो, जणू हवामान म्हणतेय - 'सरप्राईज!' ☔💨", mr: "पाऊस मूड: 'शेतात पाणी साचू देऊ नका, ड्रेनेज स्वच्छ ठेवा!'" },
-      { joke: "पाऊस आल्यावर मोर नाचतात आणि शेतकरी दादा गरम चहा शोधतात! ☕🦚", mr: "आनंदी पाऊस: 'कांदा भजी मस्त फस्त करा!'" },
-      { joke: "पावसाचा थेंब पडताच चिखलात पाय घसरला, शेतकरी दादा म्हणाले - 'हा माझा ब्रेकडाऊन्स डान्स आहे!' 💃🌧️", mr: "पाऊस गम्मत: 'काळजीपूर्वक चाला!'" },
-      { joke: "पाऊस आल्यावर चहाचा वाफाळलेला कप म्हणजे स्वर्गाचं सुख! ☕🌧️", mr: "पावसाळी चहा: 'चहा प्रेमी शेतकरी दादांचा विजय असो!'" }
-    ],
-    stormy: [
-      { joke: "विजांचा कडकडाट पाहून शेतातील बैल म्हणाला - 'दादा, आज रील नंतर बनवूया!' ⚡📱", mr: "वादळी इशारा: 'सुरक्षित ठिकाणी थांबा आणि पीक सांभाळा!'" },
-      { joke: "वारा इतका वेगाने वाहतोय की शेतातील झाडे सुद्धा दांडिया खेळतात! 🌪️🌳", mr: "वादळ सुरक्षा: 'झाडांखाली उभे राहू नका!'" },
-      { joke: "वादळ पाहून टोपी उडून गेली, शेतकरी दादा म्हणाले - 'माझी टोपी ड्रोन सारखी उडतेय!' 🧢🚁", mr: "वादळ विनोद: 'टोपी घट्ट धरा!'" }
-    ],
-    cloudy: [
-      { joke: "थंडीच्या दिवसात सकाळी अंघोळ करणे म्हणजे एका छोट्या युद्धावर जाण्यासारखे आहे! 🥶🚿", mr: "हवामान मूड: 'कडक ऊन ना थंड वारा, शेतीत काम करूया मस्त सारा!'" },
-      { joke: "ढगाळ हवामानात चहाचा कप हा जगातील सर्वात मौल्यवान दागिना वाटतो! ☕☁️", mr: "ढगाळ हवामान: 'पिकांची नियमित तपासणी करा!'" },
-      { joke: "ढग जमले पण पाऊस पडला नाही, शेतकरी दादा म्हणाले - 'हे तर ट्रेलर दाखवून सिनेमा रद्द केला!' ☁️🎬", mr: "ढगाळ नाटक: 'हवामान अंदाजाकडे लक्ष ठेवा!'" }
-    ]
-  };
 
   // Fetch real-time weather integration with loading state
   useEffect(() => {
@@ -79,15 +50,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   const currentTemp = liveWeather?.tempC || 32;
   const rainProb = liveWeather?.rainProbability || 20;
   const isRainyCondition = conditionType === 'rainy' || rainProb > 50;
-
-  // Filter Jokes Strictly Specific to Active Weather Condition
-  const activeWeatherJokes = WEATHER_SPECIFIC_JOKES[conditionType] || WEATHER_SPECIFIC_JOKES.sunny;
-  const currentJoke = activeWeatherJokes[jokeIndex % activeWeatherJokes.length];
-
-  // Refresh / Next Joke Handler
-  const handleNextJoke = () => {
-    setJokeIndex((prevIndex) => (prevIndex + 1) % activeWeatherJokes.length);
-  };
 
   // Full Expanded Catalog of 8 Crops for 4-per-stage space saving
   const availableCropsCatalog = [
@@ -179,23 +141,23 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       
       {/* 1. YOUTUBE-STYLE SKELETON LOADER OR DYNAMIC WEATHER WIDGET */}
       {isWeatherLoading ? (
-        <div className="rounded-3xl bg-slate-200 border border-slate-300 p-6 shadow-md animate-pulse space-y-4">
+        <div className="rounded-3xl bg-slate-200 border border-slate-300 p-5 shadow-md animate-pulse space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 rounded-2xl bg-slate-300 shrink-0" />
+              <div className="w-14 h-14 rounded-2xl bg-slate-300 shrink-0" />
               <div className="space-y-2">
-                <div className="w-32 h-4 bg-slate-300 rounded-md" />
-                <div className="w-48 h-6 bg-slate-300 rounded-md" />
+                <div className="w-28 h-4 bg-slate-300 rounded-md" />
+                <div className="w-40 h-6 bg-slate-300 rounded-md" />
               </div>
             </div>
-            <div className="w-24 h-10 bg-slate-300 rounded-2xl" />
+            <div className="w-20 h-9 bg-slate-300 rounded-2xl" />
           </div>
           <div className="w-full h-10 bg-slate-300 rounded-xl" />
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             <div className="h-12 bg-slate-300 rounded-xl" />
             <div className="h-12 bg-slate-300 rounded-xl" />
             <div className="h-12 bg-slate-300 rounded-xl" />
@@ -238,43 +200,43 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             </div>
           )}
 
-          {/* B. MAIN WIDGET CONTENT */}
-          <div className="p-5 sm:p-7 relative z-10 space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/20 pb-4">
+          {/* B. MAIN WIDGET CONTENT (MOBILE OPTIMIZED - NO TEXT CUT OFF) */}
+          <div className="p-4 sm:p-7 relative z-10 space-y-3.5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/20 pb-3.5">
               
-              <div className="flex items-center space-x-4">
+              <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
                 
                 {/* DYNAMIC ANIMATED WEATHER ICON WIDGET */}
-                <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
                   {isRainyCondition ? (
                     <div className="relative flex flex-col items-center justify-center">
-                      <CloudRain className="w-10 h-10 text-cyan-200 animate-bounce" />
+                      <CloudRain className="w-8 h-8 sm:w-10 sm:h-10 text-cyan-200 animate-bounce" />
                     </div>
                   ) : conditionType === 'sunny' ? (
                     <div className="relative flex items-center justify-center">
-                      <Sun className="w-10 h-10 text-amber-200 animate-spin" style={{ animationDuration: '12s' }} />
-                      <Sparkles className="w-5 h-5 text-amber-100 absolute animate-pulse" />
+                      <Sun className="w-8 h-8 sm:w-10 sm:h-10 text-amber-200 animate-spin" style={{ animationDuration: '12s' }} />
+                      <Sparkles className="w-4 h-4 text-amber-100 absolute animate-pulse" />
                     </div>
                   ) : conditionType === 'stormy' ? (
                     <div className="relative flex items-center justify-center">
-                      <CloudLightning className="w-10 h-10 text-amber-300 animate-pulse" />
+                      <CloudLightning className="w-8 h-8 sm:w-10 sm:h-10 text-amber-300 animate-pulse" />
                     </div>
                   ) : (
                     <div className="relative flex items-center justify-center">
-                      <Cloud className="w-10 h-10 text-slate-100 animate-float" />
+                      <Cloud className="w-8 h-8 sm:w-10 sm:h-10 text-slate-100 animate-float" />
                     </div>
                   )}
                 </div>
 
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span className="px-3 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-sm">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-sm whitespace-nowrap">
                       {liveWeather?.source || 'IMD + OpenWeatherMap Live Feed'}
                     </span>
-                    <span className="text-xs font-bold text-white/90">📍 {village.villageName} ({village.districtName})</span>
+                    <span className="text-xs font-bold text-white/90 break-words">📍 {village.villageName} ({village.districtName})</span>
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black tracking-wide flex items-center gap-2">
+                  <h2 className="text-lg sm:text-2xl font-black tracking-tight leading-snug break-words">
                     {isRainyCondition
                       ? '🌧️ It May Be a Rainy Day Today! (आज पाऊस पडण्याची शक्यता आहे!)'
                       : conditionType === 'sunny'
@@ -283,7 +245,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                       ? '⚡ Storm & Lightning Alert (वादळी इशारा)'
                       : '☁️ Partly Cloudy (ढगाळ हवामान)'}
                   </h2>
-                  <p className="text-xs sm:text-sm text-white/90 font-semibold mt-0.5">
+                  <p className="text-xs sm:text-sm text-white/90 font-semibold mt-0.5 leading-snug break-words">
                     {isRainyCondition
                       ? `Monsoon cloud cover active over ${village.villageName} (${village.blockName}, ${village.districtName})`
                       : liveWeather?.conditionDesc || 'Live Micro-Climate Station Active'}
@@ -292,89 +254,65 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               </div>
 
               {/* LIVE TEMP & RAIN PROBABILITY DISPLAY */}
-              <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/20 self-start sm:self-auto">
+              <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 self-start sm:self-auto shrink-0">
                 <div className="text-right">
-                  <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
-                  <div className="text-xl font-black text-white">{currentTemp}°C</div>
+                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp</div>
+                  <div className="text-base sm:text-xl font-black text-white">{currentTemp}°C</div>
                 </div>
-                <div className="h-8 w-px bg-white/30" />
+                <div className="h-7 w-px bg-white/30" />
                 <div>
-                  <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
-                  <div className="text-xl font-black text-cyan-200">{rainProb}%</div>
+                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob</div>
+                  <div className="text-base sm:text-xl font-black text-cyan-200">{rainProb}%</div>
                 </div>
               </div>
 
             </div>
 
-            {/* C. SPECIFIC RAINY REGIONS & NEIGHBORING TALUKAS ALERT BANNER */}
+            {/* C. SPECIFIC RAINY REGIONS & NEIGHBORING TALUKAS ALERT BANNER (MOBILE FULL TEXT WRAPPING) */}
             {isRainyCondition && (
-              <div className="bg-cyan-900/50 backdrop-blur-md border border-cyan-300/40 p-3.5 rounded-2xl flex items-center space-x-3 text-xs font-bold text-cyan-100 shadow-md animate-pulseGlow">
-                <div className="w-9 h-9 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
-                  <MapPin className="w-5 h-5 text-cyan-950" />
+              <div className="bg-cyan-900/50 backdrop-blur-md border border-cyan-300/40 p-3 sm:p-3.5 rounded-2xl flex items-start space-x-3 text-xs font-bold text-cyan-100 shadow-md animate-pulseGlow">
+                <div className="w-8 h-8 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs mt-0.5">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-950" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="text-[10px] text-cyan-200 uppercase font-black tracking-wider block">
                     🌧️ Active Rainy Belt & Neighboring Talukas (अचूक पाऊस क्षेत्रे):
                   </span>
-                  <p className="text-xs text-white font-black truncate mt-0.5">
+                  <p className="text-xs text-white font-black leading-normal mt-0.5 break-words whitespace-normal">
                     Active Rain Belt: <strong>{regionalRainyNames}</strong> ({village.districtName} District)
                   </p>
                 </div>
               </div>
             )}
 
-            {/* D. WEATHER-STRICT JOKE BANNER WITH MANUAL REFRESH BUTTON */}
-            <div key={jokeIndex} className="bg-white/15 backdrop-blur-md border border-white/25 p-3 rounded-2xl flex items-center justify-between gap-3 text-xs font-bold text-white shadow-2xs animate-fadeIn">
-              <div className="flex items-center space-x-3 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs">
-                  <Laugh className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[10px] text-amber-200 uppercase font-black tracking-wider block">
-                    😂 {conditionType.toUpperCase()} Weather Joke:
-                  </span>
-                  <p className="text-xs text-white font-extrabold truncate mt-0.5">{currentJoke.joke}</p>
-                </div>
-              </div>
-
-              {/* MANUAL REFRESH / NEXT JOKE BUTTON */}
-              <button
-                onClick={handleNextJoke}
-                className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-amber-400 hover:text-slate-950 text-white font-black text-xs flex items-center gap-1.5 transition-all shrink-0 cursor-pointer shadow-xs active:scale-95 border border-white/30"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Next Joke (विनोद बदल)</span>
-              </button>
-            </div>
-
             {/* Quick Weather Metrics Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold text-slate-900 pt-1">
-              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-                <Sun className="w-5 h-5 text-amber-500 shrink-0" />
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('drought', currentLang)} (दुष्काळ)</div>
-                  <div className="text-sm font-black">{subIndices.droughtIndex > 60 ? t('high', currentLang) : t('low', currentLang)}</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold text-slate-900 pt-0.5">
+              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
+                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('drought', currentLang)} (दुष्काळ)</div>
+                  <div className="text-xs sm:text-sm font-black">{subIndices.droughtIndex > 60 ? t('high', currentLang) : t('low', currentLang)}</div>
                 </div>
               </div>
-              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-                <Droplets className="w-5 h-5 text-cyan-600 shrink-0" />
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('water', currentLang)} (पाणी)</div>
-                  <div className="text-sm font-black">{village.groundwaterStatus.split(' ')[0]}</div>
+              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
+                <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('water', currentLang)} (पाणी)</div>
+                  <div className="text-xs sm:text-sm font-black truncate">{village.groundwaterStatus.split(' ')[0]}</div>
                 </div>
               </div>
-              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-                <Bug className="w-5 h-5 text-purple-600 shrink-0" />
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('pestRisk', currentLang)} (कीड)</div>
-                  <div className="text-sm font-black">{subIndices.pestIndex > 60 ? t('high', currentLang) : t('safe', currentLang)}</div>
+              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
+                <Bug className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('pestRisk', currentLang)} (कीड)</div>
+                  <div className="text-xs sm:text-sm font-black">{subIndices.pestIndex > 60 ? t('high', currentLang) : t('safe', currentLang)}</div>
                 </div>
               </div>
-              <div className="bg-white/95 p-3 rounded-2xl border border-white/40 flex items-center space-x-2.5 shadow-2xs">
-                <Sprout className="w-5 h-5 text-emerald-600 shrink-0" />
-                <div>
-                  <div className="text-[10px] text-slate-500 uppercase font-black">{t('rainfall', currentLang)} (पाऊस)</div>
-                  <div className="text-sm font-black">{village.annualRainfallNormal} mm</div>
+              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
+                <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">{t('rainfall', currentLang)} (पाऊस)</div>
+                  <div className="text-xs sm:text-sm font-black">{village.annualRainfallNormal} mm</div>
                 </div>
               </div>
             </div>
@@ -384,29 +322,30 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
       )}
 
       {/* 2. CROP SELECTION WITH TOGGLE UNSELECT FEATURE */}
-      <div className="glass-card border border-slate-200/80 p-5 sm:p-6 rounded-3xl shadow-sm space-y-3.5">
+      <div className="glass-card border border-slate-200/80 p-4 sm:p-6 rounded-3xl shadow-sm space-y-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2 border-b border-slate-100">
           <div>
-            <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <Sprout className="w-5 h-5 text-emerald-600" />
-              {t('selectCropTitle', currentLang)} <span className="text-xs font-bold text-emerald-700">(पिक निवडा)</span>
+            <h3 className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-2">
+              <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
+              <span>{t('selectCropTitle', currentLang)}</span>
+              <span className="text-xs font-bold text-emerald-700">(पिक निवडा)</span>
             </h3>
-            <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+            <p className="text-[11px] text-slate-500 font-medium mt-0.5 leading-snug break-words">
               Click a crop to view detailed 4-step action plan. Click again to unselect & hide.
             </p>
           </div>
 
           {/* MOBILE-STYLE STAGE TRANSITION LINE & PREV/NEXT ARROWS */}
-          <div className="flex items-center space-x-3 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-2xl text-xs font-bold">
-            <div className="flex items-center space-x-1.5">
+          <div className="flex items-center space-x-2.5 bg-slate-50 border border-slate-200/80 px-2.5 py-1.5 rounded-2xl text-xs font-bold self-start sm:self-auto">
+            <div className="flex items-center space-x-1">
               <Layers className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span className="text-[11px] font-black text-slate-800">
+              <span className="text-[11px] font-black text-slate-800 whitespace-nowrap">
                 Stage {cropStageIndex + 1}/{totalCropStages}
               </span>
             </div>
 
             {/* Indicator Line Bar */}
-            <div className="w-24 sm:w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
+            <div className="w-20 sm:w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
               {Array.from({ length: totalCropStages }).map((_, idx) => (
                 <div
                   key={idx}
@@ -447,93 +386,94 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               <button
                 key={crop}
                 onClick={() => handleCropButtonClick(crop)}
-                className={`p-3.5 rounded-2xl text-left border transition-all duration-300 min-h-[72px] flex flex-col justify-between cursor-pointer ${
+                className={`p-3 rounded-2xl text-left border transition-all duration-300 min-h-[68px] flex flex-col justify-between cursor-pointer ${
                   isSelected
                     ? 'bg-emerald-600 text-white font-black border-emerald-700 shadow-md scale-[1.02]'
                     : 'bg-slate-50 hover:bg-emerald-50 text-slate-800 border-slate-200'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold opacity-80 uppercase tracking-wider">
-                    {isSelected ? '✓ Selected' : 'Click to Select'}
+                  <span className="text-[9px] font-bold opacity-80 uppercase tracking-wider">
+                    {isSelected ? '✓ Selected' : 'Tap to Select'}
                   </span>
-                  {isSelected && <X className="w-3.5 h-3.5 text-white/90" />}
+                  {isSelected && <X className="w-3.5 h-3.5 text-white/90 shrink-0" />}
                 </div>
-                <div className="text-sm font-black truncate">{crop}</div>
+                <div className="text-xs sm:text-sm font-black truncate leading-tight mt-1">{crop}</div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 3. DYNAMIC 4-STEP ACTION PLAN (ONLY APPEARS WHEN A CROP IS SELECTED!) */}
+      {/* 3. DYNAMIC 4-STEP ACTION PLAN (ONLY APPEARS WHEN A CROP IS SELECTED! MOBILE OPTIMIZED) */}
       {selectedCrop && currentActions ? (
-        <div className="glass-card border border-slate-200/80 p-5 sm:p-6 rounded-3xl shadow-sm space-y-4 transition-all animate-slideUp">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-              {t('keyActionsTitle', currentLang)} <span className="text-emerald-700 underline decoration-emerald-500/50">{selectedCrop}</span>:
+        <div className="glass-card border border-slate-200/80 p-4 sm:p-6 rounded-3xl shadow-sm space-y-4 transition-all animate-slideUp">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3 gap-2">
+            <h3 className="text-sm sm:text-lg font-black text-slate-900 flex items-center gap-1.5 leading-snug break-words">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
+              <span>{t('keyActionsTitle', currentLang)}</span>
+              <span className="text-emerald-700 underline decoration-emerald-500/50 break-words">{selectedCrop}</span>:
             </h3>
             
             <button
               onClick={() => setSelectedCrop(null)}
-              className="px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer"
+              className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer shrink-0"
             >
               <X className="w-3.5 h-3.5" />
-              <span>Close Plan (बंद करा)</span>
+              <span className="whitespace-nowrap">Close Plan (बंद करा)</span>
             </button>
           </div>
 
-          <div key={selectedCrop} className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <div key={selectedCrop} className="grid grid-cols-1 md:grid-cols-2 gap-3">
             
             {/* Step 1: Watering */}
-            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-sm">
+            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2">
+                <div className="w-7 h-7 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center font-black text-xs shrink-0">
                   1
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900">💧 {t('watering', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">💧 {t('watering', currentLang)} ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.water}
               </p>
             </div>
 
             {/* Step 2: Soil & Fertilizer */}
-            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-sm">
+            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2">
+                <div className="w-7 h-7 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-black text-xs shrink-0">
                   2
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900">🌱 {t('soilSpray', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🌱 {t('soilSpray', currentLang)} ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.fertilizer}
               </p>
             </div>
 
             {/* Step 3: Pest Control */}
-            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-sm">
+            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2">
+                <div className="w-7 h-7 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-black text-xs shrink-0">
                   3
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900">🐛 {t('insectSpray', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🐛 {t('insectSpray', currentLang)} ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.pest}
               </p>
             </div>
 
             {/* Step 4: Crop Insurance */}
-            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-sm">
+            <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl space-y-2 hover:border-emerald-400 transition-all">
+              <div className="flex items-center space-x-2">
+                <div className="w-7 h-7 rounded-xl bg-rose-100 text-rose-800 flex items-center justify-center font-black text-xs shrink-0">
                   4
                 </div>
-                <h4 className="text-xs sm:text-sm font-black text-slate-900">🛡️ {t('cropInsurance', currentLang)} ({selectedCrop})</h4>
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 leading-snug break-words">🛡️ {t('cropInsurance', currentLang)} ({selectedCrop})</h4>
               </div>
-              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+              <p className="text-xs text-slate-700 font-medium leading-relaxed bg-white p-3 rounded-xl border border-slate-200 shadow-2xs break-words">
                 {currentActions.insurance}
               </p>
             </div>
@@ -541,29 +481,29 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           </div>
         </div>
       ) : (
-        <div className="p-4 bg-slate-100 border border-dashed border-slate-300 rounded-3xl text-center text-xs font-bold text-slate-500">
+        <div className="p-3.5 bg-slate-100 border border-dashed border-slate-300 rounded-3xl text-center text-xs font-bold text-slate-500 leading-normal">
           💡 Select any crop above to reveal its customized 4-step action plan (महत्त्वाचे उपाय).
         </div>
       )}
 
       {/* 4. HELPLINE CARD */}
-      <div className="bg-gradient-to-r from-emerald-700 to-teal-800 p-5 rounded-3xl text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+      <div className="bg-gradient-to-r from-emerald-700 to-teal-800 p-4 sm:p-5 rounded-3xl text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-white text-emerald-700 flex items-center justify-center shrink-0 shadow-sm">
-            <PhoneCall className="w-5 h-5" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white text-emerald-700 flex items-center justify-center shrink-0 shadow-sm">
+            <PhoneCall className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h4 className="text-sm sm:text-base font-black">{t('helplineTitle', currentLang)}</h4>
-            <p className="text-xs font-semibold text-emerald-100">{t('helplineSub', currentLang)}</p>
+            <h4 className="text-xs sm:text-base font-black leading-tight">{t('helplineTitle', currentLang)}</h4>
+            <p className="text-[11px] sm:text-xs font-semibold text-emerald-100 leading-tight mt-0.5">{t('helplineSub', currentLang)}</p>
           </div>
         </div>
 
         <a
           href="tel:18001801551"
-          className="px-5 py-2.5 bg-white text-emerald-800 font-black text-xs rounded-xl shadow-sm hover:bg-emerald-50 transition-all shrink-0 flex items-center space-x-2"
+          className="px-4 py-2 sm:px-5 sm:py-2.5 bg-white text-emerald-800 font-black text-xs rounded-xl shadow-sm hover:bg-emerald-50 transition-all shrink-0 flex items-center space-x-2"
         >
           <span>{t('callNow', currentLang)}</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </a>
       </div>
 

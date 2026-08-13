@@ -97,6 +97,7 @@ export default function App() {
             <PlatformImpactFeatures
               village={selectedVillage}
               riskMetrics={riskMetrics}
+              selectedCrop={selectedCropForAdvisory}
             />
 
             {/* B. MAIN PAGE NAVIGATION TAB BAR (ADVISORY VS PROFIT TAB) */}

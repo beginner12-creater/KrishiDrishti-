@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, ChevronLeft, ChevronRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, Satellite, MapPin, Cpu, CheckCircle } from 'lucide-react';
 
-export default function PlatformImpactFeatures({ village, riskMetrics }) {
+export default function PlatformImpactFeatures({ village, riskMetrics, selectedCrop }) {
   const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
   const sliderRef = useRef(null);
   const outcomeSliderRef = useRef(null);
@@ -9,7 +9,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
   const vName = village ? village.villageName : 'Selected Village';
   const dName = village ? village.districtName : 'Selected District';
   const bName = village ? village.blockName : 'Selected Taluka';
-  const cropName = village?.primaryCrops ? village.primaryCrops[0] : 'Crop';
+  const activeCrop = selectedCrop || (village?.primaryCrops ? village.primaryCrops[0] : 'Cotton');
   const primaryCropsStr = village?.primaryCrops ? village.primaryCrops.join(', ') : 'Cotton, Soybean';
 
   // Dynamic Metrics from Selected Village & Risk Engine
@@ -18,7 +18,6 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
   const forecastDays = riskMetrics?.forecastDays || [];
   const todayForecast = forecastDays[0] || { maxTempC: 34, minTempC: 24, humidityPercent: 65, windSpeedKmh: 12, precipitationProbPercent: 20 };
   const isroLandData = riskMetrics?.isroLandData || { ndviIndex: 0.72, soilMoisturePercent: 34, satelliteSource: 'ISRO Bhuvan Geo-Portal' };
-  const fusedPrecisionScore = riskMetrics?.fusedPrecisionScore || '99.1% High-Precision Physics Model';
 
   const outcomes = [
     { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", icon: Bell, color: "text-amber-600 bg-amber-50/90 border-amber-200" },
@@ -193,7 +192,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
         </div>
       </div>
 
-      {/* DYNAMIC FEATURE & OUTCOME MODALS */}
+      {/* DYNAMIC FEATURE MODALS WITH EASY FARMER INFO DYNAMICALLY UPDATING PER CROP & CLIMATE */}
+      
+      {/* 1. HYPERLOCAL WEATHER MODAL */}
       {activeModal === 'weather' && (
         <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
@@ -204,9 +205,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Hyperlocal Weather Forecast for {vName} <span className="text-xs font-bold text-slate-500">({bName}, {dName})</span>
+                    7-Day Weather Guidance for {vName}
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">IMD Micro-Climate Station Baseline • Primary Crops: {primaryCropsStr}</p>
+                  <p className="text-xs text-slate-500 font-medium">Selected Crop: <strong className="text-emerald-700">{activeCrop}</strong> • {bName}, {dName}</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
@@ -218,13 +219,13 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div className="bg-amber-50 border border-amber-200 p-3 rounded-2xl shadow-2xs">
                   <Thermometer className="w-5 h-5 text-amber-600 mx-auto mb-1" />
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Max Temp</span>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Today Temp</span>
                   <span className="text-base font-black text-slate-900">{todayForecast.maxTempC}°C</span>
                 </div>
                 <div className="bg-blue-50 border border-blue-200 p-3 rounded-2xl shadow-2xs">
                   <Droplets className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Humidity</span>
-                  <span className="text-base font-black text-slate-900">{todayForecast.humidityPercent}%</span>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase block">Rain Chance</span>
+                  <span className="text-base font-black text-slate-900">{todayForecast.precipitationProbPercent}%</span>
                 </div>
                 <div className="bg-teal-50 border border-teal-200 p-3 rounded-2xl shadow-2xs">
                   <Wind className="w-5 h-5 text-teal-600 mx-auto mb-1" />
@@ -233,9 +234,16 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                 </div>
               </div>
 
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs font-medium text-emerald-900 space-y-1">
+                <h4 className="font-black text-sm">💡 Farmer Weather Tip for {activeCrop}:</h4>
+                <p>
+                  Today's temperature in {vName} is {todayForecast.maxTempC}°C with {todayForecast.precipitationProbPercent}% rain chance. If spraying pesticides on <strong>{activeCrop}</strong>, finish before 10 AM or after 5 PM.
+                </p>
+              </div>
+
               <div>
                 <h4 className="text-xs font-black text-slate-900 uppercase tracking-wide mb-2">7-Day Agro-Met Forecast Table for {vName}</h4>
-                <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                   {forecastDays.slice(0, 7).map((d, i) => (
                     <div key={i} className="flex items-center justify-between p-2.5 bg-slate-50 hover:bg-emerald-50/50 rounded-xl text-xs font-bold border border-slate-100 transition-all">
                       <span className="w-28 text-slate-900 font-extrabold">{d.dayName} ({d.date})</span>
@@ -250,14 +258,14 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
             <div className="pt-3 border-t border-slate-100 text-right">
               <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
-                Close Forecast (बंद करा)
+                Close (बंद करा)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* FEATURE 2: HIGH-PRECISION DYNAMIC AI RISK PREDICTION MODAL */}
+      {/* 2. DYNAMIC AI RISK PREDICTION MODAL */}
       {activeModal === 'risk' && (
         <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
@@ -268,9 +276,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    High-Precision AI Risk Model: {vName}
+                    AI Climate Risk Status: {vName}
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Fused Precision Engine Rating: <strong className="text-emerald-700">99.1%</strong></p>
+                  <p className="text-xs text-slate-500 font-medium">Selected Crop: <strong className="text-emerald-700">{activeCrop}</strong> • Rating: <strong>99.1%</strong></p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
@@ -280,19 +288,25 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
             <div className="py-4 space-y-4">
               <div className="p-4 bg-amber-50/80 border border-amber-300 rounded-2xl text-center shadow-2xs">
-                <div className="flex items-center justify-center space-x-2 mb-1">
-                  <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="text-xs font-black text-amber-900 uppercase">Physics & ISRO Satellite Fused Risk Score</span>
-                </div>
-                <span className="text-4xl font-black text-amber-700">{overallRisk}/100</span>
-                <p className="text-xs text-amber-800 font-bold mt-1">Groundwater Status: <strong>{village?.groundwaterStatus || 'Critical'}</strong> • Soil Carbon: <strong>{village?.organicCarbon || '0.5%'}</strong></p>
+                <span className="text-xs font-black text-amber-900 uppercase">Overall Climate Risk Level for {vName}</span>
+                <div className="text-3xl font-black text-amber-700 mt-0.5">{overallRisk}/100</div>
+                <p className="text-xs text-amber-800 font-bold mt-1">
+                  Groundwater: <strong>{village?.groundwaterStatus || 'Critical'}</strong> • Rainfall: <strong>{village?.annualRainfallNormal || 650} mm/yr</strong>
+                </p>
               </div>
 
-              <div className="space-y-3 text-xs font-bold">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-2xl text-xs text-blue-900 space-y-1 font-medium">
+                <h4 className="font-black text-sm text-blue-950">🛡️ How this affects your {activeCrop}:</h4>
+                <p>
+                  Drought Risk is <strong>{subIndices.droughtIndex}/100</strong> and Pest Risk is <strong>{subIndices.pestIndex}/100</strong> in {vName}. Use drip irrigation and yellow sticky traps for <strong>{activeCrop}</strong> protection.
+                </p>
+              </div>
+
+              <div className="space-y-2.5 text-xs font-bold">
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className="text-slate-800">Drought Index (दुष्काळ धोका)</span>
-                    <span className="text-amber-700 font-black">{subIdx.droughtIndex}/100</span>
+                    <span className="text-amber-700 font-black">{subIndices.droughtIndex}/100</span>
                   </div>
                   <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-amber-500 rounded-full transition-all duration-1000" style={{ width: `${subIdx.droughtIndex}%` }} />
@@ -308,39 +322,19 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                     <div className="h-full bg-orange-500 rounded-full transition-all duration-1000" style={{ width: `${subIdx.heatwaveIndex}%` }} />
                   </div>
                 </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-slate-800">Pest Threat Index (कीड उपद्रव)</span>
-                    <span className="text-purple-700 font-black">{subIdx.pestIndex}/100</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-purple-500 rounded-full transition-all duration-1000" style={{ width: `${subIdx.pestIndex}%` }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-slate-800">Flood Hazard Index (पूर धोका)</span>
-                    <span className="text-blue-700 font-black">{subIdx.floodIndex}/100</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full transition-all duration-1000" style={{ width: `${subIdx.floodIndex}%` }} />
-                  </div>
-                </div>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
               <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
-                Close Analytics (बंद करा)
+                Close (बंद करा)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* FEATURE 3: CROP ADVISORY MODAL */}
+      {/* 3. DYNAMIC CROP ADVISORY MODAL */}
       {activeModal === 'advisory' && (
         <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
@@ -351,9 +345,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Crop Advisory for {cropName} <span className="text-xs font-bold text-slate-500">({vName})</span>
+                    Agro Advice for {activeCrop} ({vName})
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Crops in village: {primaryCropsStr}</p>
+                  <p className="text-xs text-slate-500 font-medium">Soil: {village?.soilType || 'Black Soil'} • Groundwater: {village?.groundwaterStatus}</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
@@ -361,33 +355,32 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
               </button>
             </div>
 
-            <div className="py-4 space-y-3.5 text-xs font-medium leading-relaxed">
-              <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-2xl shadow-2xs">
-                <h4 className="font-black text-emerald-900 text-sm mb-1">🌱 Seed Variety & Sowing Strategy for {cropName}</h4>
-                <p className="text-slate-800">For {vName}'s soil ({village?.soilType || 'Black Soil'}), sow certified high-yielding hybrid seeds. Treat seeds with *Trichoderma Viride* (10g/kg) 24h prior to sowing.</p>
+            <div className="py-4 space-y-3 text-xs font-medium leading-relaxed">
+              <div className="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-2xl shadow-2xs">
+                <h4 className="font-black text-emerald-900 text-sm mb-1">🌱 Sowing & Seed Treatment for {activeCrop}</h4>
+                <p className="text-slate-800">
+                  Sow certified seeds suitable for {village?.soilType || 'Black Soil'}. Treat seeds with Trichoderma Viride (10g/kg) 24h prior to sowing in {vName}.
+                </p>
               </div>
 
-              <div className="p-3 bg-blue-50/80 border border-blue-200 rounded-2xl shadow-2xs">
-                <h4 className="font-black text-blue-900 text-sm mb-1">💧 Micro-Irrigation Schedule for {vName}</h4>
-                <p className="text-slate-800">Groundwater status is {village?.groundwaterStatus || 'Critical'}. Apply Drip Irrigation strictly between 6 PM to 8 AM. Spread dry mulch (5 tonnes/ha) to conserve soil moisture by 35%.</p>
-              </div>
-
-              <div className="p-3 bg-purple-50/80 border border-purple-200 rounded-2xl shadow-2xs">
-                <h4 className="font-black text-purple-900 text-sm mb-1">🐛 Organic Pest Control Spray</h4>
-                <p className="text-slate-800">Install 10 Yellow Sticky Traps per acre. Spray 5% Organic Neem Seed Kernel Extract (NSKE) at early crop stage.</p>
+              <div className="p-3.5 bg-blue-50/90 border border-blue-200 rounded-2xl shadow-2xs">
+                <h4 className="font-black text-blue-900 text-sm mb-1">💧 Water Conservation Tip for {activeCrop}</h4>
+                <p className="text-slate-800">
+                  Groundwater status in {vName} is {village?.groundwaterStatus || 'Critical'}. Use drip irrigation between 6 PM to 8 AM to save 35% water.
+                </p>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
               <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
-                Close Advisory (बंद करा)
+                Close (बंद करा)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* FEATURE 4: HARVEST PLANNING MODAL */}
+      {/* 4. DYNAMIC HARVEST & MANDI PLANNING MODAL */}
       {activeModal === 'harvest' && (
         <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
@@ -398,9 +391,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Harvest & APMC Mandi Guide for {vName}
+                    Harvest & APMC Mandi Guide: {activeCrop}
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">District APMC Market Hub: {dName} Mandi</p>
+                  <p className="text-xs text-slate-500 font-medium">Nearest Market Hub: {dName} APMC Mandi</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
@@ -410,26 +403,30 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
 
             <div className="py-4 space-y-3 text-xs font-medium leading-relaxed">
               <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl shadow-2xs">
-                <h4 className="font-black text-slate-900 text-sm mb-1">🌾 Optimum Moisture Harvesting Window for {cropName}</h4>
-                <p className="text-slate-700">Harvest crops when grain moisture drops to 12-14% or when fruits reach 80% color maturity to minimize post-harvest loss.</p>
+                <h4 className="font-black text-slate-900 text-sm mb-1">🌾 Ideal Harvest Time for {activeCrop} in {vName}</h4>
+                <p className="text-slate-700">
+                  Harvest <strong>{activeCrop}</strong> when moisture drops to 12-14% to avoid post-harvest rot during transport to {dName} Mandi.
+                </p>
               </div>
 
               <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl shadow-2xs">
-                <h4 className="font-black text-amber-900 text-sm mb-1">📱 APMC {dName} Mandi Realization</h4>
-                <p className="text-amber-800 font-bold">Grade produce into A, B, C quality bins before taking to {dName} APMC Mandi to get 15-20% higher market prices!</p>
+                <h4 className="font-black text-amber-900 text-sm mb-1">💰 APMC {dName} Mandi Price Booster</h4>
+                <p className="text-amber-800 font-bold">
+                  Grade {activeCrop} into A-Grade quality bins before visiting {dName} APMC Mandi to get 15-20% higher market price!
+                </p>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
               <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
-                Close Guide (बंद करा)
+                Close (बंद करा)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* FEATURE 5: EMERGENCY ALERTS MODAL */}
+      {/* 5. DYNAMIC EMERGENCY ALERTS MODAL */}
       {activeModal === 'alert' && (
         <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
@@ -440,9 +437,9 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
-                    Emergency Alerts for {vName} <span className="text-xs font-bold text-slate-500">({bName})</span>
+                    Emergency Alerts for {vName} ({bName})
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Active Weather Advisory & PMFBY Helpline</p>
+                  <p className="text-xs text-slate-500 font-medium">Target Crop: <strong className="text-emerald-700">{activeCrop}</strong></p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
@@ -454,30 +451,34 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
               <div className="p-3.5 bg-red-50/90 border border-red-300 rounded-2xl flex items-start space-x-3 shadow-2xs">
                 <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-black text-red-900 text-sm">⚠️ Heatwave Alert for {vName} (उष्णतेचा इशारा)</h4>
-                  <p className="text-red-800 mt-1">Temperature expected to touch {todayForecast.maxTempC}°C over next 48 hours. Irrigate crops in the evening after 6 PM to prevent flower dropping.</p>
+                  <h4 className="font-black text-red-900 text-sm">⚠️ Climate Alert for {activeCrop} in {vName}</h4>
+                  <p className="text-red-800 mt-1">
+                    Temperature is expected to reach {todayForecast.maxTempC}°C with {todayForecast.precipitationProbPercent}% rain chance. Water <strong>{activeCrop}</strong> after 6 PM to prevent flower shedding.
+                  </p>
                 </div>
               </div>
 
               <div className="p-3.5 bg-amber-50/90 border border-amber-300 rounded-2xl flex items-start space-x-3 shadow-2xs">
                 <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-black text-amber-900 text-sm">🛡️ PMFBY Crop Insurance 72-Hour Claim Helpline</h4>
-                  <p className="text-amber-800 mt-1">If unseasonal rain or hailstorm damages fields in {dName}, call toll-free <strong>1800-180-1551</strong> within 72 hours with mobile photos to claim compensation!</p>
+                  <h4 className="font-black text-amber-900 text-sm">🛡️ PMFBY Crop Insurance 72-Hour Helpline</h4>
+                  <p className="text-amber-800 mt-1">
+                    If unseasonal rain damages <strong>{activeCrop}</strong> fields in {vName}, call toll-free <strong>1800-180-1551</strong> within 72 hours with mobile photo evidence!
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
               <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
-                Close Alerts (बंद करा)
+                Close (बंद करा)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* FEATURE 6: HISTORICAL TRENDS MODAL */}
+      {/* 6. DYNAMIC HISTORICAL WEATHER MODAL */}
       {activeModal === 'historical' && (
         <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl animate-slideUp border border-slate-200">
@@ -490,7 +491,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
                   <h3 className="text-base sm:text-lg font-black text-slate-900">
                     10-Year Historical Trends for {vName}
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">Decadal Monsoon & Groundwater Analysis for {dName}</p>
+                  <p className="text-xs text-slate-500 font-medium">Decadal Analysis for {dName}</p>
                 </div>
               </div>
               <button onClick={() => setActiveModal(null)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer">
@@ -501,18 +502,22 @@ export default function PlatformImpactFeatures({ village, riskMetrics }) {
             <div className="py-4 space-y-3 text-xs font-medium leading-relaxed">
               <div className="p-3 bg-purple-50/80 border border-purple-200 rounded-2xl shadow-2xs">
                 <h4 className="font-black text-purple-900 text-sm mb-1">🌧️ 10-Year Annual Rainfall Normal</h4>
-                <p className="text-purple-800">Normal annual rainfall in {vName} is <strong>{village?.annualRainfallNormal || 650} mm</strong>. Monsoon arrival fluctuates by up to 10-14 days.</p>
+                <p className="text-purple-800">
+                  Normal annual rainfall in {vName} is <strong>{village?.annualRainfallNormal || 650} mm</strong>. Monsoon arrival fluctuates by 10-14 days.
+                </p>
               </div>
 
               <div className="p-3 bg-teal-50/80 border border-teal-200 rounded-2xl shadow-2xs">
                 <h4 className="font-black text-teal-900 text-sm mb-1">💧 Groundwater Depth History (CGWB)</h4>
-                <p className="text-teal-800">Groundwater status in {vName} is currently <strong>{village?.groundwaterStatus || 'Critical'}</strong>. Shifting to drip micro-irrigation is recommended.</p>
+                <p className="text-teal-800">
+                  Groundwater status in {vName} is currently <strong>{village?.groundwaterStatus || 'Critical'}</strong>. Micro-drip irrigation is recommended for <strong>{activeCrop}</strong>.
+                </p>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 text-right">
               <button onClick={() => setActiveModal(null)} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-xs shadow-md transition-all cursor-pointer">
-                Close Analysis (बंद करा)
+                Close (बंद करा)
               </button>
             </div>
           </div>

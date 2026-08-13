@@ -257,7 +257,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 </div>
               </div>
 
-              {/* LIVE TEMP & RAIN PROBABILITY DISPLAY */}
+              {/* LIVE TEMP & RAIN EXPECTATION DISPLAY */}
               <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 self-start sm:self-auto shrink-0">
                 <div className="text-right">
                   <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp (तापमान)</div>
@@ -265,7 +265,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                 </div>
                 <div className="h-7 w-px bg-white/30" />
                 <div>
-                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Prob (पाऊस शक्यता)</div>
+                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Expectation (पाऊस अंदाज)</div>
                   <div className="text-base sm:text-xl font-black text-cyan-200">{rainProb}%</div>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
                 <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Normal Rain (पाऊस)</div>
+                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Annual Rain Level (वार्षिक पाऊस प्रमाण)</div>
                   <div className="text-xs sm:text-sm font-black">{village.annualRainfallNormal} mm/yr</div>
                 </div>
               </div>

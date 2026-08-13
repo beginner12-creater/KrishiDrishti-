@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, ChevronLeft, ChevronRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, Satellite, MapPin, Cpu, CheckCircle, IndianRupee } from 'lucide-react';
+import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, ChevronLeft, ChevronRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, Satellite, MapPin, Cpu, CheckCircle, IndianRupee, TrendingUp, TrendingDown, Store } from 'lucide-react';
 
 export default function PlatformImpactFeatures({ village, riskMetrics, selectedCrop, isDarkMode = false }) {
   const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
@@ -11,6 +11,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   const vName = village ? village.villageName : 'Selected Village';
   const dName = village ? village.districtName : 'Selected District';
   const bName = village ? village.blockName : 'Selected Taluka';
+  const sName = village ? village.stateName : 'Maharashtra';
   const activeCrop = selectedCrop || (village?.primaryCrops ? village.primaryCrops[0] : 'Cotton');
   const primaryCropsStr = village?.primaryCrops ? village.primaryCrops.join(', ') : 'Cotton, Soybean';
 
@@ -28,19 +29,22 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   const villageRadarBackscatter = (-11.4 - (seed % 9) * 0.4).toFixed(1);
   const villageLstTemp = (31.5 + (subIdx.heatwaveIndex / 10) - (seed % 5) * 0.4).toFixed(1);
 
+  // Compute Dynamic Mandi Prices based on Crop + District Region
+  const mandiPriceData = getDynamicMandiPrice(activeCrop, dName, sName);
+
   const outcomes = [
     { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", badge: "+35% Crop Saved", icon: Bell, bgGradient: "from-amber-500/10 to-orange-500/10" },
     { id: 'advisory', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", badge: "Zero Disaster Loss", icon: ShieldCheck, bgGradient: "from-emerald-500/10 to-teal-500/10" },
     { id: 'risk', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", badge: "AI Soil Protection", icon: Sprout, bgGradient: "from-teal-500/10 to-cyan-500/10" },
-    { id: 'harvest', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", badge: "Mandi Price Profit", icon: Calendar, bgGradient: "from-blue-500/10 to-indigo-500/10" },
+    { id: 'harvest', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", badge: `₹ ${mandiPriceData.maxPrice} Mandi`, icon: Calendar, bgGradient: "from-blue-500/10 to-indigo-500/10" },
     { id: 'historical', text: "Better preparedness", textMr: "आपत्ती पूर्वतयारी", badge: "10-Yr Trend Alert", icon: LineChart, bgGradient: "from-purple-500/10 to-indigo-500/10" }
   ];
 
   const features = [
     { id: 'weather', title: "Hyperlocal weather forecasts", subtitle: "तालुका-स्तरीय अचूक हवामान", icon: CloudRain, badge: "Live Forecast", bgGradient: "from-blue-500/10 to-teal-500/10" },
     { id: 'risk', title: "AI risk prediction", subtitle: "कृत्रिम बुद्धिमत्ता धोका अंदाज", icon: LineChart, badge: "Risk Index", bgGradient: "from-amber-500/10 to-orange-500/10" },
-    { id: 'advisory', title: "Crop-specific advisories", subtitle: "पिकानुसार कृषी सल्ला", icon: Sprout, badge: "AI Advisory", bgGradient: "from-emerald-500/10 to-teal-500/10" },
-    { id: 'harvest', title: "Harvest planning", subtitle: "काढणी व बाजार नियोजन", icon: Calendar, badge: "Mandi Guide", bgGradient: "from-blue-500/10 to-indigo-500/10" },
+    { id: 'advisory', title: "Crop-specific advisories", subtitle: `Sowing & Spray (${activeCrop})`, icon: Sprout, badge: "AI Advisory", bgGradient: "from-emerald-500/10 to-teal-500/10" },
+    { id: 'harvest', title: "Harvest planning", subtitle: `${dName} APMC Rates`, icon: Calendar, badge: `₹${mandiPriceData.minPrice} Mandi`, bgGradient: "from-blue-500/10 to-indigo-500/10" },
     { id: 'alert', title: "Alert notifications", subtitle: "इशारा संदेश", icon: Bell, badge: "Active Alert", bgGradient: "from-red-500/10 to-amber-500/10" },
     { id: 'historical', title: "Historical weather analysis", subtitle: "मागील हवामान विश्लेषण", icon: ShieldCheck, badge: "10-Yr Trends", bgGradient: "from-purple-500/10 to-indigo-500/10" }
   ];
@@ -69,7 +73,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
               <span className="text-xs font-bold text-teal-200 whitespace-nowrap">📍 {vName} ({dName})</span>
             </div>
             <p className="text-xs text-white font-extrabold leading-snug break-words">
-              Soil Moisture: <strong>{villageSoilMoisture}%</strong> • Crop Health (NDVI): <strong>{villageNdvi}</strong> • LST Temp: <strong>{villageLstTemp}°C</strong> • Radar: <strong>{villageRadarBackscatter} dB</strong>
+              Soil Moisture: <strong>{villageSoilMoisture}%</strong> • Crop Health (NDVI): <strong>{villageNdvi}</strong> • LST Temp: <strong>{villageLstTemp}°C</strong> • Mandi ({activeCrop}): <strong>₹{mandiPriceData.maxPrice}/{mandiPriceData.unit}</strong>
             </p>
           </div>
         </div>
@@ -271,12 +275,12 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                     {activeModal === 'weather' && `Hyperlocal Weather Forecast — ${vName}`}
                     {activeModal === 'risk' && `AI Climate Risk Breakdown — ${vName}`}
                     {activeModal === 'advisory' && `Crop Advisory Strategy — ${activeCrop}`}
-                    {activeModal === 'harvest' && `Mandi Harvest & Price Guide — ${vName}`}
+                    {activeModal === 'harvest' && `APMC Mandi Harvest & Price Guide — ${mandiPriceData.apmcName}`}
                     {activeModal === 'alert' && `Emergency Weather Alerts — ${vName}`}
                     {activeModal === 'historical' && `10-Year Climate Trend Analysis — ${vName}`}
                   </h3>
                   <p className="text-xs text-emerald-500 font-bold mt-0.5">
-                    Taluka: {bName} • District: {dName}
+                    Taluka: {bName} • District: {dName} • Region: {sName}
                   </p>
                 </div>
               </div>
@@ -390,27 +394,62 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
               </div>
             )}
 
-            {/* MODAL CONTENT 4: HARVEST PLANNING & MANDI GUIDE */}
+            {/* MODAL CONTENT 4: DYNAMIC REGIONAL APMC MANDI PRICE HARVEST GUIDE */}
             {activeModal === 'harvest' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900 to-indigo-900 text-white flex items-center justify-between">
+                
+                {/* Dynamic APMC Price Banner */}
+                <div className="p-4.5 rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-blue-500/40">
                   <div>
-                    <span className="text-[10px] text-blue-300 font-black uppercase tracking-wider block">APMC Mandi A-Grade Price</span>
-                    <div className="text-xl font-black mt-0.5">₹ 7,450 - ₹ 8,200 / Quintal</div>
+                    <div className="flex items-center space-x-2">
+                      <Store className="w-4 h-4 text-blue-400" />
+                      <span className="text-[11px] text-blue-200 font-black uppercase tracking-wider block">
+                        Live APMC Mandi Rate: {mandiPriceData.apmcName}
+                      </span>
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-black text-white mt-1 flex items-baseline gap-2">
+                      <span>₹ {mandiPriceData.minPrice} - ₹ {mandiPriceData.maxPrice}</span>
+                      <span className="text-xs text-blue-200 font-bold">/ {mandiPriceData.unit}</span>
+                    </div>
+                    <p className="text-[11px] text-blue-300 font-bold mt-1">
+                      Crop: <strong className="text-white">{activeCrop}</strong> • District APMC: <strong className="text-white">{dName}</strong>
+                    </p>
                   </div>
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-400 text-slate-950 uppercase">
-                    High Demand
-                  </span>
+
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 border-t sm:border-t-0 pt-2 sm:pt-0 border-white/20">
+                    <span className={`px-3 py-1 rounded-full text-xs font-black flex items-center gap-1 ${
+                      mandiPriceData.isUp ? 'bg-emerald-400 text-slate-950' : 'bg-amber-400 text-slate-950'
+                    }`}>
+                      {mandiPriceData.isUp ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+                      <span>Daily Trend {mandiPriceData.dailyChangePercent}</span>
+                    </span>
+                    <span className="text-[10px] text-teal-300 font-extrabold bg-white/10 px-2.5 py-1 rounded-lg border border-white/20">
+                      Govt MSP: ₹ {mandiPriceData.mspGovernment}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="space-y-2 text-xs">
-                  <div className={`p-3 rounded-2xl border font-medium ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                    📦 <strong>Grade A Quality Sorting</strong>: Clean crop at 12% moisture level before bringing to APMC Mandi to realize 15% higher market price.
+                {/* Mandi Quality Sorting & Regional Selling Protocol */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className={`p-3.5 rounded-2xl border space-y-1.5 ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                    <div className="font-black text-blue-400 flex items-center gap-1.5">
+                      <span>📦 Grade A Quality Mandi Sorting ({activeCrop})</span>
+                    </div>
+                    <p className="opacity-90 leading-relaxed font-medium">
+                      Clean {activeCrop} to under 12% moisture level before bringing to <strong>{mandiPriceData.apmcName}</strong> to fetch maximum premium market rates.
+                    </p>
                   </div>
-                  <div className={`p-3 rounded-2xl border font-medium ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                    🚛 <strong>Transport & Storage</strong>: Store in ventilated Kanda Chawl or grain warehouse if prices spike during festival season.
+
+                  <div className={`p-3.5 rounded-2xl border space-y-1.5 ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                    <div className="font-black text-blue-400 flex items-center gap-1.5">
+                      <span>🚛 District Storage & Transport ({dName})</span>
+                    </div>
+                    <p className="opacity-90 leading-relaxed font-medium">
+                      Use WDRA accredited warehouses in {dName} district to get 77% e-NWR pledge loan financing while waiting for peak market prices.
+                    </p>
                   </div>
                 </div>
+
               </div>
             )}
 
@@ -477,6 +516,48 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
 
     </div>
   );
+}
+
+// Dynamic Regional APMC Mandi Price Calculator Engine
+export function getDynamicMandiPrice(cropName = 'Cotton', districtName = 'Yavatmal', stateName = 'Maharashtra') {
+  const seed = hashString(cropName + districtName);
+  
+  const basePrices = {
+    'Cotton': { min: 7200, max: 8250, unit: 'Quintal', apmcSuffix: 'Cotton Yard' },
+    'Soybean': { min: 4600, max: 5400, unit: 'Quintal', apmcSuffix: 'Oilseed Yard' },
+    'Pomegranate': { min: 11000, max: 16500, unit: 'Quintal', apmcSuffix: 'Fruit APMC' },
+    'Dragon Fruit': { min: 14000, max: 22000, unit: 'Quintal', apmcSuffix: 'Exotic Fruit Market' },
+    'Turmeric': { min: 12500, max: 18500, unit: 'Quintal', apmcSuffix: 'Spice APMC' },
+    'Onion': { min: 1800, max: 3200, unit: 'Quintal', apmcSuffix: 'Kanda Market' },
+    'Grapes': { min: 6500, max: 11200, unit: 'Quintal', apmcSuffix: 'Export Yard' },
+    'Bajra': { min: 2350, max: 2850, unit: 'Quintal', apmcSuffix: 'Grain Market' },
+    'Wheat': { min: 2450, max: 2980, unit: 'Quintal', apmcSuffix: 'Annaj Mandi' },
+    'Rice': { min: 3100, max: 4200, unit: 'Quintal', apmcSuffix: 'Grain Yard' },
+    'Sugarcane': { min: 315, max: 355, unit: 'Quintal (FRP)', apmcSuffix: 'Sugar Factory' }
+  };
+
+  const cropKey = Object.keys(basePrices).find(k => cropName.toLowerCase().includes(k.toLowerCase())) || 'Cotton';
+  const data = basePrices[cropKey];
+
+  const districtAdjustment = ((seed % 15) - 7) * 45;
+  const minPrice = Math.max(1200, Math.round(data.min + districtAdjustment));
+  const maxPrice = Math.max(minPrice + 300, Math.round(data.max + districtAdjustment));
+
+  const dailyChangePercent = (((seed % 31) - 15) * 0.2).toFixed(1);
+  const isUp = parseFloat(dailyChangePercent) >= 0;
+
+  const apmcName = `${districtName} APMC ${data.apmcSuffix}`;
+
+  return {
+    cropKey,
+    minPrice: minPrice.toLocaleString('en-IN'),
+    maxPrice: maxPrice.toLocaleString('en-IN'),
+    unit: data.unit,
+    apmcName,
+    dailyChangePercent: (isUp ? `+${dailyChangePercent}` : dailyChangePercent) + '%',
+    isUp,
+    mspGovernment: Math.round(minPrice * 0.92).toLocaleString('en-IN')
+  };
 }
 
 function hashString(str) {

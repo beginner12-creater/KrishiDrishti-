@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, ChevronLeft, ChevronRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, Satellite, MapPin, Cpu, CheckCircle, IndianRupee, TrendingUp, TrendingDown, Store } from 'lucide-react';
+import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, ChevronLeft, ChevronRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, Satellite, MapPin, Cpu, CheckCircle, IndianRupee, TrendingUp, TrendingDown, Store, Radio, Send, Smartphone } from 'lucide-react';
+import CellTowerSMSBroadcastModal from './CellTowerSMSBroadcastModal';
 
 export default function PlatformImpactFeatures({ village, riskMetrics, selectedCrop, isDarkMode = false }) {
   const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
+  const [isTowerModalOpen, setIsTowerModalOpen] = useState(false);
   const sliderRef = useRef(null);
   const outcomeSliderRef = useRef(null);
 
@@ -28,6 +30,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   const villageSoilMoisture = Math.min(68, Math.max(16, Math.round(28 + (village.annualRainfallNormal / 90) - (seed % 11))));
   const villageRadarBackscatter = (-11.4 - (seed % 9) * 0.4).toFixed(1);
   const villageLstTemp = (31.5 + (subIdx.heatwaveIndex / 10) - (seed % 5) * 0.4).toFixed(1);
+  const farmerCount = Math.round(850 + (seed % 450));
 
   // Compute Dynamic Mandi Prices based on Crop + District Region
   const mandiPriceData = getDynamicMandiPrice(activeCrop, dName, sName);
@@ -78,9 +81,14 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
           </div>
         </div>
 
-        <span className="text-[10px] sm:text-[11px] bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/20 font-bold self-start sm:self-auto text-teal-200 whitespace-nowrap">
-          🛰️ Geo-Sensor Active for {vName}
-        </span>
+        <button
+          onClick={() => setIsTowerModalOpen(true)}
+          className="flex items-center space-x-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-xl font-black text-xs transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap self-start sm:self-auto"
+          title="Connect to nearest cell tower and send SMS alerts to local farmers"
+        >
+          <Radio className="w-4 h-4 text-slate-950 animate-pulse" />
+          <span>📡 Cell Tower SMS Alert ({farmerCount} Farmers)</span>
+        </button>
       </div>
 
       {/* 1. CORE PLATFORM FEATURE SLIDE BAR (HORIZONTAL CAROUSEL) */}
@@ -512,6 +520,17 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
 
           </div>
         </div>
+      )}
+
+      {/* 4. CELL TOWER EMERGENCY SMS BROADCAST MODAL POPUP */}
+      {isTowerModalOpen && (
+        <CellTowerSMSBroadcastModal
+          village={village}
+          riskMetrics={riskMetrics}
+          selectedCrop={activeCrop}
+          onClose={() => setIsTowerModalOpen(false)}
+          isDarkMode={isDarkMode}
+        />
       )}
 
     </div>

@@ -201,6 +201,7 @@ export default function App() {
               <FarmerSimpleView
                 village={selectedVillage}
                 riskMetrics={riskMetrics}
+                selectedCrop={selectedCropForAdvisory}
                 onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
                 currentLang={currentLang}
                 isDarkMode={isDarkMode}

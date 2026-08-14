@@ -4,11 +4,18 @@ import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall
 import { fetchLiveWeather } from '../services/realtimeApiService';
 import { VILLAGES_DATABASE } from '../data/villages';
 
-export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr', isDarkMode = false }) {
-  const [selectedCrop, setSelectedCrop] = useState(null); // INITIALLY UNSELECTED
+export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr', isDarkMode = false, selectedCrop: selectedCropProp = null }) {
+  const [selectedCrop, setSelectedCrop] = useState(selectedCropProp); // Sync with initial prop
   const [cropStageIndex, setCropStageIndex] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
+
+  // Sync internal selectedCrop state when selectedCropProp from parent/CropProfitRecommendation changes
+  useEffect(() => {
+    if (selectedCropProp) {
+      setSelectedCrop(selectedCropProp);
+    }
+  }, [selectedCropProp]);
 
   if (!village || !riskMetrics) return null;
 
@@ -19,43 +26,39 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
     v => v.districtName === village.districtName || v.stateName === village.stateName
   ).slice(0, 5);
 
-  const regionalRainyNames = regionalRainyVillages.map(v => `${v.villageName} (${v.blockName})`).join(', ');
+  const lat = village?.coordinates?.latitude || 20.3888;
+  const lng = village?.coordinates?.longitude || 78.1204;
 
-  // Fetch real-time weather integration with loading state
+  // Initial Load of Real-Time Live Weather API from Open-Meteo
   useEffect(() => {
-    if (village) {
+    let isMounted = true;
+    async function loadWeatherData() {
       setIsWeatherLoading(true);
-      fetchLiveWeather(village.coordinates?.lat || 19.5, village.coordinates?.lng || 74.2, village.villageName)
-        .then(data => {
+      try {
+        const data = await fetchLiveWeather(lat, lng, village.villageName);
+        if (isMounted && data) {
           setLiveWeather(data);
-          setIsWeatherLoading(false);
-        })
-        .catch(err => {
-          console.error('Failed to fetch live weather:', err);
-          setIsWeatherLoading(false);
-        });
+        }
+      } catch (err) {
+        console.error('Failed to load live weather:', err);
+      } finally {
+        if (isMounted) setIsWeatherLoading(false);
+      }
     }
-  }, [village]);
+    loadWeatherData();
+    return () => { isMounted = false; };
+  }, [lat, lng, village.villageName]);
 
-  // Determine Animated Weather Condition Visual State
-  const getWeatherConditionType = () => {
-    if (liveWeather?.conditionType) return liveWeather.conditionType;
-    if (overallRiskScore >= 70) return 'stormy';
-    if (subIndices.droughtIndex > 55) return 'sunny';
-    if (subIndices.floodIndex > 50) return 'rainy';
-    return 'cloudy';
-  };
-
-  const conditionType = getWeatherConditionType();
+  const conditionType = liveWeather?.conditionType || 'sunny';
   const currentTemp = liveWeather?.tempC || 32;
   const rainProb = liveWeather?.rainProbability || 20;
   const isRainyCondition = conditionType === 'rainy' || rainProb > 50;
 
   // Full Expanded Catalog of 8 Crops for 4-per-stage space saving
-  const availableCropsCatalog = [
+  const availableCropsCatalog = Array.from(new Set([
     ...(village.primaryCrops || ['Cotton', 'Soybean', 'Sugarcane', 'Onion']),
-    'Pomegranate', 'Grapes', 'Turmeric', 'Bajra'
-  ].slice(0, 8);
+    'Pomegranate', 'Dragon Fruit', 'Turmeric', 'Grapes', 'Bajra', 'Wheat', 'Rice'
+  ])).slice(0, 8);
 
   const itemsPerPage = 4; // 4 crops per stage
   const totalCropStages = Math.ceil(availableCropsCatalog.length / itemsPerPage);
@@ -65,7 +68,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
     (cropStageIndex + 1) * itemsPerPage
   );
 
-  // Dynamic Crop-Specific 4-Step Actions Engine
+  // Dynamic Crop-Specific 4-Step Actions Engine (100% CUSTOM FOR EVERY CROP)
   const getCropSpecificActions = (cropName) => {
     if (!cropName) return null;
     const name = cropName.toLowerCase();
@@ -86,12 +89,12 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         insurance: "Inform bank within 72 hours if drought causes pod shedding."
       };
     }
-    if (name.includes('sugarcane') || name.includes('ऊस')) {
+    if (name.includes('dragon') || name.includes('कमलम') || name.includes('ड्रॅगन')) {
       return {
-        water: "Drip irrigate every 4-6 days. Cover soil with dry trash to save water.",
-        fertilizer: "Apply Zinc Sulphate + Ferrous Sulphate to prevent yellow leaves.",
-        pest: "Release Trichogramma parasite cards against Early Shoot Borer.",
-        insurance: "Report flood waterlogging (>48 hours) to bank for insurance."
+        water: "Requires minimal drip watering (2-4 liters/pole/day). Avoid waterlogging around trellis.",
+        fertilizer: "Apply 10kg Vermicompost + SSP + Micronutrient spray every 3 months for heavy fruiting.",
+        pest: "Spray Copper Fungicide (2g/L) for Stem Rot & Anthracnose during humid monsoon.",
+        insurance: "Enroll under PMFBY horticulture scheme for trellis storm damage protection."
       };
     }
     if (name.includes('pomegranate') || name.includes('डाळिंब') || name.includes('अनार')) {
@@ -100,6 +103,14 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         fertilizer: "Spray Calcium Nitrate (3g/L) + Boron (1g/L) to prevent fruit cracking.",
         pest: "Spray Copper Oxychloride (2.5g/L) for Bacterial Oily Spot (Telya).",
         insurance: "Report hailstorms within 72 hours if fruit skins are damaged."
+      };
+    }
+    if (name.includes('turmeric') || name.includes('हळद')) {
+      return {
+        water: "Maintain moist soil during rhizome development stage. Drip irrigation every 3 days.",
+        fertilizer: "Apply Potash (60kg/acre) + Azospirillum bio-fertilizer for high curcumin content.",
+        pest: "Spray Mancozeb (2.5g/L) against Leaf Blotch and Rhizome Rot fungal infection.",
+        insurance: "Report field flooding (>48h) to PMFBY for rhizome decay compensation."
       };
     }
     if (name.includes('onion') || name.includes('कांदा')) {
@@ -118,12 +129,44 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         insurance: "Claim insurance if Oct-Nov unseasonal rains damage grape bunches."
       };
     }
+    if (name.includes('bajra') || name.includes('बाजरी') || name.includes('बाजरा')) {
+      return {
+        water: "Requires only 1-2 protective irrigations. Highly drought tolerant.",
+        fertilizer: "Apply 40kg Nitrogen/acre split into sowing and tillering stage.",
+        pest: "Spray Metalaxyl (2g/L) against Downy Mildew & Ergot earhead disease.",
+        insurance: "Claim PMFBY insurance if severe dry spell causes grain filling failure."
+      };
+    }
+    if (name.includes('wheat') || name.includes('गहू')) {
+      return {
+        water: "Ensure critical irrigations at Crown Root Initiation (21 days) and Grain Filling stage.",
+        fertilizer: "Top dress Urea + Zinc Sulphate before second irrigation.",
+        pest: "Spray Propiconazole 25% EC (1ml/L) against Yellow Rust fungal disease.",
+        insurance: "Report March heatwaves causing early grain shrinking to crop insurance."
+      };
+    }
+    if (name.includes('rice') || name.includes('भात') || name.includes('तांदूळ')) {
+      return {
+        water: "Maintain 2-3 cm standing water during tillering and panicle initiation.",
+        fertilizer: "Apply Neem Coated Urea in 3 split doses for high grain yield.",
+        pest: "Install Pheromone Traps for Stem Borer; spray Cartap Hydrochloride.",
+        insurance: "Report monsoon dry spell or flash floods damaging paddy nurseries."
+      };
+    }
+    if (name.includes('sugarcane') || name.includes('ऊस')) {
+      return {
+        water: "Drip irrigate every 4-6 days. Cover soil with dry trash to save water.",
+        fertilizer: "Apply Zinc Sulphate + Ferrous Sulphate to prevent yellow leaves.",
+        pest: "Release Trichogramma parasite cards against Early Shoot Borer.",
+        insurance: "Report flood waterlogging (>48 hours) to bank for insurance."
+      };
+    }
 
     return {
-      water: `Provide protective irrigation during flowering & fruiting of ${cropName}.`,
-      fertilizer: `Spray 1% Potassium Nitrate (KNO3) during hot dry spells to protect leaves.`,
-      pest: `Install 8 Sticky Traps per acre and spray 5% organic Neem seed extract.`,
-      insurance: `Inform bank or call toll-free 1800-180-1551 within 72 hours if weather damages crop.`
+      water: `Provide protective drip irrigation during flowering & fruiting of ${cropName}.`,
+      fertilizer: `Spray 1% Potassium Nitrate (KNO3) + 19:19:19 during dry spells to boost crop yield.`,
+      pest: `Install 10 Yellow Sticky Traps per acre and spray 5% organic Neem seed extract.`,
+      insurance: `Inform bank or call toll-free 1800-180-1551 within 72 hours if weather damages ${cropName}.`
     };
   };
 
@@ -132,10 +175,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   // Toggle Crop Selection / Unselect Handler
   const handleCropButtonClick = (crop) => {
     if (selectedCrop === crop) {
-      setSelectedCrop(null); // UNSELECT CROP
+      setSelectedCrop(null);
       if (onSelectCrop) onSelectCrop(null);
     } else {
-      setSelectedCrop(crop); // SELECT CROP
+      setSelectedCrop(crop);
       if (onSelectCrop) onSelectCrop(crop);
     }
   };
@@ -178,116 +221,60 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           {/* A. DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
           {conditionType === 'sunny' && !isRainyCondition && (
             <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-              <div className="w-[500px] h-[500px] rounded-full border-[30px] border-amber-200/40 absolute -top-40 -right-40 animate-sunrays" />
+              <div className="w-96 h-96 rounded-full bg-amber-300/40 blur-3xl absolute -top-20 -right-20 animate-pulse" />
             </div>
           )}
 
           {isRainyCondition && (
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40 flex justify-around">
-              <span className="w-0.5 h-6 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.1s' }} />
-              <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.4s' }} />
-              <span className="w-0.5 h-6 bg-cyan-300 rounded-full animate-rain" style={{ animationDelay: '0.7s' }} />
-              <span className="w-0.5 h-7 bg-cyan-200 rounded-full animate-rain" style={{ animationDelay: '0.2s' }} />
-              <span className="w-0.5 h-8 bg-cyan-100 rounded-full animate-rain" style={{ animationDelay: '0.9s' }} />
-            </div>
+            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px] animate-pulse" />
           )}
 
-          {conditionType === 'cloudy' && !isRainyCondition && (
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 flex justify-between p-4">
-              <Snowflake className="w-6 h-6 text-white animate-snow" style={{ animationDelay: '0.2s' }} />
-              <Snowflake className="w-8 h-8 text-cyan-200 animate-snow" style={{ animationDelay: '0.8s' }} />
-              <Snowflake className="w-5 h-5 text-white animate-snow" style={{ animationDelay: '1.4s' }} />
-            </div>
-          )}
-
-          {/* B. MAIN WIDGET CONTENT (MOBILE OPTIMIZED & CLEAR TEXT) */}
-          <div className="p-4 sm:p-7 relative z-10 space-y-3.5">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/20 pb-3.5">
+          {/* B. MAIN WEATHER HEADER BAR */}
+          <div className="p-4 sm:p-6 space-y-4 relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               
-              <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
-                
-                {/* DYNAMIC ANIMATED WEATHER ICON WIDGET */}
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+              <div className="flex items-center space-x-3.5">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-md">
                   {isRainyCondition ? (
-                    <div className="relative flex flex-col items-center justify-center">
-                      <CloudRain className="w-8 h-8 sm:w-10 sm:h-10 text-cyan-200 animate-bounce" />
-                    </div>
+                    <CloudRain className="w-7 h-7 text-cyan-200 animate-bounce" />
                   ) : conditionType === 'sunny' ? (
-                    <div className="relative flex items-center justify-center">
-                      <Sun className="w-8 h-8 sm:w-10 sm:h-10 text-amber-200 animate-spin" style={{ animationDuration: '12s' }} />
-                      <Sparkles className="w-4 h-4 text-amber-100 absolute animate-pulse" />
-                    </div>
+                    <Sun className="w-7 h-7 text-amber-200 animate-spin" style={{ animationDuration: '25s' }} />
                   ) : conditionType === 'stormy' ? (
-                    <div className="relative flex items-center justify-center">
-                      <CloudLightning className="w-8 h-8 sm:w-10 sm:h-10 text-amber-300 animate-pulse" />
-                    </div>
+                    <CloudLightning className="w-7 h-7 text-yellow-300 animate-pulse" />
                   ) : (
-                    <div className="relative flex items-center justify-center">
-                      <Cloud className="w-8 h-8 sm:w-10 sm:h-10 text-slate-100 animate-float" />
-                    </div>
+                    <Cloud className="w-7 h-7 text-teal-200" />
                   )}
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] sm:text-[11px] font-black uppercase tracking-wider bg-white/20 text-white border border-white/30 backdrop-blur-sm break-words leading-tight">
-                      {liveWeather?.source || 'IMD + OpenWeatherMap Live Feed'}
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/30">
+                      📍 {village.villageName} ({village.blockName})
                     </span>
-                    <span className="text-xs font-bold text-white/90 break-words">📍 {village.villageName} ({village.districtName})</span>
+                    <span className="text-[10px] font-bold text-white/80 hidden sm:inline-block">
+                      {liveWeather?.source || 'Realtime Open-Meteo Feed'}
+                    </span>
                   </div>
 
-                  <h2 className="text-lg sm:text-2xl font-black tracking-tight leading-snug break-words">
-                    {isRainyCondition
-                      ? '🌧️ Rain Alert Today (आज पावसाची शक्यता आहे)'
-                      : conditionType === 'sunny'
-                      ? '☀️ Clear Sunny Weather (निरभ्र सूर्यप्रकाश)'
-                      : conditionType === 'stormy'
-                      ? '⚡ Thunderstorm Warning (वादळी पावसाचा इशारा)'
-                      : '☁️ Partly Cloudy Sky (ढगाळ हवामान)'}
+                  <h2 className="text-xl sm:text-3xl font-black mt-1 leading-tight flex items-baseline space-x-2">
+                    <span>{currentTemp}°C</span>
+                    <span className="text-xs sm:text-sm font-bold opacity-90 truncate font-sans">
+                      • {liveWeather?.conditionDesc || 'Clear Sunshine'}
+                    </span>
                   </h2>
-                  <p className="text-xs sm:text-sm text-white/90 font-semibold mt-0.5 leading-snug break-words">
-                    {isRainyCondition
-                      ? `Monsoon rain clouds active over ${village.villageName} (${village.blockName}) — Rain Prob: ${rainProb}%`
-                      : conditionType === 'sunny'
-                      ? `Clear sky with ${currentTemp}°C temp over ${village.villageName} (${village.blockName}) — Good day for farming`
-                      : conditionType === 'stormy'
-                      ? `Thunderstorm activity monitored in ${village.districtName} district — Protect open harvested crops`
-                      : `Partly cloudy micro-climate over ${village.villageName} (${village.blockName}) — Humidity: ${liveWeather?.humidityPercent || 65}%`}
-                  </p>
                 </div>
               </div>
 
-              {/* LIVE TEMP & RAIN EXPECTATION DISPLAY */}
-              <div className="flex items-center space-x-3 bg-black/20 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 self-start sm:self-auto shrink-0">
-                <div className="text-right">
-                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Live Temp (तापमान)</div>
-                  <div className="text-base sm:text-xl font-black text-white">{currentTemp}°C</div>
-                </div>
-                <div className="h-7 w-px bg-white/30" />
+              {/* Rain Risk Badge */}
+              <div className="bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-2 rounded-2xl flex items-center space-x-2 self-start sm:self-auto shadow-xs">
+                <CloudRain className="w-4 h-4 text-cyan-200 shrink-0" />
                 <div>
-                  <div className="text-[9px] sm:text-[10px] text-white/80 font-bold uppercase tracking-wider">Rain Expectation (पाऊस अंदाज)</div>
-                  <div className="text-base sm:text-xl font-black text-cyan-200">{rainProb}%</div>
+                  <div className="text-[9px] uppercase font-black opacity-80 leading-none">Rain Expectation (पाऊस अंदाज)</div>
+                  <div className="text-xs sm:text-sm font-black mt-0.5">{rainProb}% Chance</div>
                 </div>
               </div>
 
             </div>
-
-            {/* C. SPECIFIC RAINY REGIONS & NEIGHBORING TALUKAS ALERT BANNER (MOBILE FULL TEXT WRAPPING) */}
-            {isRainyCondition && (
-              <div className="bg-cyan-900/50 backdrop-blur-md border border-cyan-300/40 p-3 sm:p-3.5 rounded-2xl flex items-start space-x-3 text-xs font-bold text-cyan-100 shadow-md animate-pulseGlow">
-                <div className="w-8 h-8 rounded-xl bg-cyan-400 text-slate-900 flex items-center justify-center font-black shrink-0 shadow-xs mt-0.5">
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-950" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <span className="text-[10px] text-cyan-200 uppercase font-black tracking-wider block">
-                    🌧️ Active Rainy Belt & Neighboring Talukas (अचूक पाऊस क्षेत्रे):
-                  </span>
-                  <p className="text-xs text-white font-black leading-normal mt-0.5 break-words whitespace-normal">
-                    Active Rain Belt: <strong>{regionalRainyNames}</strong> ({village.districtName} District)
-                  </p>
-                </div>
-              </div>
-            )}
 
             {/* Quick Weather Metrics Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold text-slate-900 pt-0.5">
@@ -420,7 +407,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         </div>
       </div>
 
-      {/* 3. DYNAMIC 4-STEP ACTION PLAN (ONLY APPEARS WHEN A CROP IS SELECTED! MOBILE OPTIMIZED) */}
+      {/* 3. DYNAMIC 4-STEP ACTION PLAN (100% DYNAMIC & CUSTOM FOR EVERY CROP!) */}
       {selectedCrop && currentActions ? (
         <div className={`p-4 sm:p-6 rounded-3xl shadow-sm space-y-4 border transition-all animate-slideUp ${
           isDarkMode
@@ -439,7 +426,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             </h3>
             
             <button
-              onClick={() => setSelectedCrop(null)}
+              onClick={() => {
+                setSelectedCrop(null);
+                if (onSelectCrop) onSelectCrop(null);
+              }}
               className={`px-2.5 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer shrink-0 ${
                 isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-slate-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
               }`}
@@ -528,27 +518,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           💡 Select any crop above to reveal its customized 4-step action plan (महत्त्वाचे उपाय).
         </div>
       )}
-
-      {/* 4. HELPLINE CARD */}
-      <div className="bg-gradient-to-r from-emerald-700 to-teal-800 p-4 sm:p-5 rounded-3xl text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
-        <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white text-emerald-700 flex items-center justify-center shrink-0 shadow-sm">
-            <PhoneCall className="w-4 h-4 sm:w-5 sm:h-5" />
-          </div>
-          <div>
-            <h4 className="text-xs sm:text-base font-black leading-tight">Kisan Call Centre Helpline (किसान कॉल सेंटर हेल्पलाइन)</h4>
-            <p className="text-[11px] sm:text-xs font-semibold text-emerald-100 leading-tight mt-0.5">Free Government Helpline for Farmers (मोफत शासकीय हेल्पलाइन)</p>
-          </div>
-        </div>
-
-        <a
-          href="tel:18001801551"
-          className="px-4 py-2 sm:px-5 sm:py-2.5 bg-white text-emerald-800 font-black text-xs rounded-xl shadow-sm hover:bg-emerald-50 transition-all shrink-0 flex items-center space-x-2"
-        >
-          <span>Call 1800-180-1551 (कॉल करा)</span>
-          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        </a>
-      </div>
 
     </div>
   );

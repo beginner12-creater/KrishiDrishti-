@@ -221,7 +221,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   return (
     <div className="space-y-5">
       
-      {/* 1. WEATHER WIDGET */}
+      {/* 1. WEATHER WIDGET WITH FULL DYNAMIC BACKGROUND ANIMATIONS */}
       {isWeatherLoading ? (
         <div className="rounded-3xl bg-slate-200 border border-slate-300 p-5 shadow-md animate-pulse space-y-4">
           <div className="flex items-center justify-between">
@@ -247,6 +247,22 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             : 'bg-gradient-to-r from-slate-700 via-teal-800 to-slate-800 border-slate-400'
         }`}>
 
+          {/* DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
+          {conditionType === 'sunny' && !isRainyCondition && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+              <div className="w-96 h-96 rounded-full bg-amber-300/40 blur-3xl absolute -top-20 -right-20 animate-pulse" />
+              <div className="w-64 h-64 rounded-full bg-orange-400/30 blur-2xl absolute -bottom-10 -left-10 animate-spin" style={{ animationDuration: '30s' }} />
+            </div>
+          )}
+
+          {isRainyCondition && (
+            <div className="absolute inset-0 pointer-events-none opacity-30 bg-[radial-gradient(#38bdf8_1.5px,transparent_1.5px)] [background-size:14px_14px] animate-pulse" />
+          )}
+
+          {conditionType === 'stormy' && (
+            <div className="absolute inset-0 pointer-events-none opacity-25 bg-yellow-400/20 animate-ping" />
+          )}
+
           <div className="p-4 sm:p-6 space-y-4 relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center space-x-3.5">
@@ -258,7 +274,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                   ) : conditionType === 'stormy' ? (
                     <CloudLightning className="w-7 h-7 text-yellow-300 animate-pulse" />
                   ) : (
-                    <Cloud className="w-7 h-7 text-teal-200" />
+                    <Cloud className="w-7 h-7 text-teal-200 animate-pulse" />
                   )}
                 </div>
 
@@ -282,7 +298,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               </div>
 
               <div className="bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-2 rounded-2xl flex items-center space-x-2 self-start sm:self-auto shadow-xs">
-                <CloudRain className="w-4 h-4 text-cyan-200 shrink-0" />
+                <CloudRain className="w-4 h-4 text-cyan-200 shrink-0 animate-bounce" />
                 <div>
                   <div className="text-[9px] uppercase font-black opacity-80 leading-none">Rain Expectation (पाऊस अंदाज)</div>
                   <div className="text-xs sm:text-sm font-black mt-0.5">{rainProb}% Chance</div>
@@ -292,14 +308,14 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold text-slate-900 pt-0.5">
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
-                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
+                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0 animate-spin" style={{ animationDuration: '15s' }} />
                 <div className="min-w-0">
                   <div className="text-[9px] text-slate-500 uppercase font-black truncate">Drought Risk</div>
                   <div className="text-xs sm:text-sm font-black">{subIndices.droughtIndex > 60 ? 'HIGH RISK' : 'LOW RISK'}</div>
                 </div>
               </div>
               <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
-                <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 shrink-0" />
+                <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 shrink-0 animate-pulse" />
                 <div className="min-w-0">
                   <div className="text-[9px] text-slate-500 uppercase font-black truncate">Water Level</div>
                   <div className="text-xs sm:text-sm font-black truncate">{village.groundwaterStatus}</div>
@@ -448,7 +464,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
             </button>
           </div>
 
-          {/* 4-STEP RECOMMENDED ACTIONS GRID */}
           <div key={selectedCrop} className="grid grid-cols-1 md:grid-cols-2 gap-3">
             
             <div className={`p-3.5 rounded-2xl space-y-2 border transition-all ${
@@ -517,7 +532,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
 
           </div>
 
-          {/* DEDICATED WHAT NOT TO DO / PRACTICES TO AVOID CARD BOX */}
           {currentActions.notToDo && (
             <div className="p-4 rounded-2xl bg-rose-950/60 border border-rose-500/50 text-white space-y-2.5 animate-slideUp shadow-lg">
               <div className="flex items-center space-x-2 text-rose-300 font-black text-xs sm:text-sm">

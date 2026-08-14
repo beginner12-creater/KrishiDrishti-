@@ -3,7 +3,8 @@ import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkl
 import CellTowerSMSBroadcastModal from './CellTowerSMSBroadcastModal';
 
 export default function PlatformImpactFeatures({ village, riskMetrics, selectedCrop, isDarkMode = false }) {
-  const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical' | 'outcome-*'
+  const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
+  const [selectedOutcomeTab, setSelectedOutcomeTab] = useState('outcome-alert'); // 'outcome-alert' | 'outcome-loss' | 'outcome-resilience' | 'outcome-planning' | 'outcome-preparedness'
   const [isTowerModalOpen, setIsTowerModalOpen] = useState(false);
   const sliderRef = useRef(null);
   const outcomeSliderRef = useRef(null);
@@ -15,7 +16,6 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   const bName = village ? village.blockName : 'Selected Taluka';
   const sName = village ? village.stateName : 'Maharashtra';
   const activeCrop = selectedCrop || (village?.primaryCrops ? village.primaryCrops[0] : 'Cotton');
-  const primaryCropsStr = village?.primaryCrops ? village.primaryCrops.join(', ') : 'Cotton, Soybean';
 
   // Dynamic Village-Specific Physics & ISRO Satellite AI Metrics
   const overallRisk = riskMetrics?.overallRiskScore || 62;
@@ -28,7 +28,6 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   const seed = hashString(village.id || 'v1');
   const villageNdvi = (0.52 + (village.irrigationCoveragePercent / 250) + (seed % 15) * 0.015).toFixed(2);
   const villageSoilMoisture = Math.min(68, Math.max(16, Math.round(28 + (village.annualRainfallNormal / 90) - (seed % 11))));
-  const villageRadarBackscatter = (-11.4 - (seed % 9) * 0.4).toFixed(1);
   const villageLstTemp = (31.5 + (subIdx.heatwaveIndex / 10) - (seed % 5) * 0.4).toFixed(1);
   const farmerCount = Math.round(850 + (seed % 450));
 
@@ -154,6 +153,8 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
     };
   };
 
+  const currentOutcomeData = getCropOutcomeAnalytics(selectedOutcomeTab, activeCrop, vName, dName);
+
   return (
     <div className="space-y-5 mb-6 animate-slideUp">
 
@@ -270,7 +271,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
         </div>
       </div>
 
-      {/* 2. EXPECTED OUTCOMES SLIDE BAR (FORMATTED AS SLEEK FEATURE BOXES WITH CROP-SPECIFIC ADVISORY) */}
+      {/* 2. EXPECTED OUTCOMES (CLEAN INLINE REPORT DISPLAY - NO POPUPS/MODALS!) */}
       <div className={`rounded-3xl p-4 sm:p-5 shadow-sm border relative overflow-hidden transition-all duration-500 ${
         isDarkMode
           ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
@@ -286,7 +287,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                 Expected Outcomes <span className="text-[11px] sm:text-xs font-bold text-emerald-500 block sm:inline">(अपेक्षित फायदे — {activeCrop})</span>
               </h2>
               <p className={`text-[10px] sm:text-[11px] font-medium truncate mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                Crop-specific yield benefits for <strong>{activeCrop}</strong> in <strong>{vName}</strong>
+                Click any outcome below to view inline yield report for <strong>{activeCrop}</strong> in <strong>{vName}</strong>
               </p>
             </div>
           </div>
@@ -313,48 +314,92 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
           </div>
         </div>
 
-        {/* OUTCOME BOXES HORIZONTAL SLIDER */}
+        {/* OUTCOME BUTTON CAROUSEL */}
         <div
           ref={outcomeSliderRef}
-          className="flex space-x-3.5 overflow-x-auto scrollbar-none snap-x snap-mandatory py-1 px-0.5 relative z-10 scroll-smooth"
+          className="flex space-x-3.5 overflow-x-auto scrollbar-none snap-x snap-mandatory py-1 px-0.5 relative z-10 scroll-smooth mb-4"
         >
           {outcomes.map((item) => {
             const Icon = item.icon;
+            const isSelected = selectedOutcomeTab === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveModal(item.id)}
-                className={`snap-start shrink-0 w-60 sm:w-72 border p-3 sm:p-3.5 rounded-2xl flex items-center justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl cursor-pointer text-left group bg-gradient-to-r ${item.bgGradient} ${
-                  isDarkMode
-                    ? 'bg-slate-950/80 border-slate-800 hover:border-emerald-400 hover:shadow-emerald-950/50'
+                onClick={() => setSelectedOutcomeTab(item.id)}
+                className={`snap-start shrink-0 w-60 sm:w-72 border p-3 sm:p-3.5 rounded-2xl flex items-center justify-between transition-all duration-300 transform cursor-pointer text-left group bg-gradient-to-r ${item.bgGradient} ${
+                  isSelected
+                    ? 'bg-emerald-600 text-white font-black border-emerald-700 shadow-lg scale-[1.02]'
+                    : isDarkMode
+                    ? 'bg-slate-950/80 border-slate-800 hover:border-emerald-400'
                     : 'glass-panel border-slate-200/80 hover:border-emerald-500'
                 }`}
               >
                 <div className="flex items-center space-x-2.5 min-w-0">
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border flex items-center justify-center shrink-0 transition-all duration-300 ${
-                    isDarkMode
-                      ? 'bg-slate-900 border-slate-700 text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white'
-                      : 'bg-white border-slate-200 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white'
+                    isSelected
+                      ? 'bg-white text-emerald-800 border-white/40'
+                      : isDarkMode
+                      ? 'bg-slate-900 border-slate-700 text-emerald-400'
+                      : 'bg-white border-slate-200 text-emerald-700'
                   }`}>
                     <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className={`text-xs sm:text-sm font-black leading-tight truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{item.text}</h3>
-                    <p className={`text-[10px] font-bold truncate mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{item.textMr}</p>
-                    <span className="inline-block mt-1 text-[9px] bg-emerald-500/20 text-emerald-400 font-black px-2 py-0.5 rounded-md border border-emerald-500/30">
+                    <h3 className={`text-xs sm:text-sm font-black leading-tight truncate ${isSelected ? 'text-white' : isDarkMode ? 'text-white' : 'text-slate-900'}`}>{item.text}</h3>
+                    <p className={`text-[10px] font-bold truncate mt-0.5 ${isSelected ? 'text-emerald-100' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{item.textMr}</p>
+                    <span className={`inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-md border ${
+                      isSelected ? 'bg-white/20 text-white border-white/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    }`}>
                       {item.badge}
                     </span>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all shrink-0 ml-1" />
+                <ArrowRight className={`w-4 h-4 transition-all shrink-0 ml-1 ${isSelected ? 'text-white translate-x-1' : 'text-slate-400 group-hover:text-emerald-400'}`} />
               </button>
             );
           })}
         </div>
+
+        {/* INLINE EXPANDED EXPECTED OUTCOME BENEFIT REPORT BOX (NO MODAL/ALERT POPUPS!) */}
+        {currentOutcomeData && (
+          <div className={`p-4 sm:p-5 rounded-2xl border transition-all animate-slideUp ${
+            isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/50 mb-3">
+              <div>
+                <span className="text-[10px] text-emerald-400 font-black uppercase tracking-wider block">📍 Verified Outcome Report for {activeCrop} ({vName})</span>
+                <h3 className="text-base sm:text-lg font-black mt-0.5">{currentOutcomeData.title}</h3>
+                <p className="text-xs font-medium text-slate-400 mt-0.5">{currentOutcomeData.impactText}</p>
+              </div>
+              <span className="px-3 py-1 rounded-xl text-xs font-black bg-amber-400 text-slate-950 uppercase shrink-0 whitespace-nowrap shadow-2xs">
+                {currentOutcomeData.badge}
+              </span>
+            </div>
+
+            {/* 3 Metric Badges */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-bold mb-3">
+              {currentOutcomeData.metrics.map((m, i) => (
+                <div key={i} className={`p-3 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-2xs'}`}>
+                  <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block">{m.label}</span>
+                  <div className="text-sm font-black text-emerald-400 mt-0.5">{m.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Specific Farmer Protocol */}
+            <div className={`p-3.5 rounded-xl border text-xs font-medium ${
+              isDarkMode ? 'bg-slate-900/80 border-slate-800 text-slate-200' : 'bg-emerald-50/50 border-emerald-200 text-slate-800'
+            }`}>
+              <span className="font-black text-emerald-400 block mb-1">💡 Actionable Protocol for {activeCrop} Farmers:</span>
+              <p className="text-xs leading-relaxed font-bold">{currentOutcomeData.keyTip}</p>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. DYNAMIC MODAL DRAWER OVERLAYS FOR ALL CLIMATE TOOLS & CROP OUTCOMES */}
+      {/* 3. DYNAMIC MODAL DRAWER OVERLAYS FOR CLIMATE TOOLS ONLY */}
       {/* ========================================================================= */}
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
@@ -372,7 +417,6 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                   {activeModal === 'harvest' && <Calendar className="w-5 h-5" />}
                   {activeModal === 'alert' && <Bell className="w-5 h-5" />}
                   {activeModal === 'historical' && <ShieldCheck className="w-5 h-5" />}
-                  {activeModal.startsWith('outcome-') && <Sparkles className="w-5 h-5 text-amber-300" />}
                 </div>
                 <div>
                   <h3 className="text-base sm:text-xl font-black flex items-center gap-2">
@@ -382,7 +426,6 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                     {activeModal === 'harvest' && `APMC Mandi Harvest & Price Guide — ${mandiPriceData.apmcName}`}
                     {activeModal === 'alert' && `Emergency Weather Alerts — ${vName}`}
                     {activeModal === 'historical' && `10-Year Climate Trend Analysis — ${vName}`}
-                    {activeModal.startsWith('outcome-') && getCropOutcomeAnalytics(activeModal, activeCrop, vName, dName).title}
                   </h3>
                   <p className="text-xs text-emerald-500 font-bold mt-0.5">
                     Selected Crop: <strong className="text-amber-400">{activeCrop}</strong> • Village: {vName} ({bName})
@@ -399,57 +442,6 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                 <X className="w-5 h-5" />
               </button>
             </div>
-
-            {/* DYNAMIC CROP-SPECIFIC EXPECTED OUTCOME BENEFIT MODAL RENDERER */}
-            {activeModal.startsWith('outcome-') && (() => {
-              const outcomeData = getCropOutcomeAnalytics(activeModal, activeCrop, vName, dName);
-              return (
-                <div className="space-y-4">
-                  {/* Outcome Banner */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-emerald-500/40">
-                    <div>
-                      <span className="text-[10px] text-emerald-300 font-black uppercase tracking-wider block">Verified Outcome Benefit</span>
-                      <div className="text-xl sm:text-2xl font-black mt-0.5">{outcomeData.title}</div>
-                      <p className="text-xs text-emerald-100 font-medium mt-1 leading-snug">{outcomeData.impactText}</p>
-                    </div>
-                    <span className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-amber-400 text-slate-950 uppercase shadow-xs shrink-0 whitespace-nowrap">
-                      {outcomeData.badge}
-                    </span>
-                  </div>
-
-                  {/* Quantified Outcome Metrics */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-bold">
-                    {outcomeData.metrics.map((m, i) => (
-                      <div key={i} className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                        <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block">{m.label}</span>
-                        <div className="text-sm font-black text-emerald-400 mt-0.5">{m.value}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Key Action Protocol */}
-                  <div className={`p-4 rounded-2xl border text-xs font-medium space-y-2 ${
-                    isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
-                  }`}>
-                    <div className="font-black text-emerald-400 flex items-center gap-1.5 text-sm">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
-                      <span>Specific Protocol for {activeCrop} Farmers ({vName}):</span>
-                    </div>
-                    <p className="text-xs leading-relaxed font-bold">{outcomeData.keyTip}</p>
-                  </div>
-
-                  <div className="flex items-center justify-end space-x-2 border-t border-slate-800 pt-3">
-                    <button
-                      onClick={() => setIsTowerModalOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black flex items-center gap-1 transition-all shadow-md cursor-pointer"
-                    >
-                      <Radio className="w-3.5 h-3.5" />
-                      <span>Broadcast Alert to {activeCrop} Farmers ({farmerCount})</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
 
             {/* MODAL CONTENT 1: HYPERLOCAL WEATHER FORECAST */}
             {activeModal === 'weather' && (

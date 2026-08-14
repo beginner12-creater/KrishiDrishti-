@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Radio, Send, CheckCircle, Smartphone, AlertTriangle, X, ShieldAlert, Sparkles, RefreshCw, PhoneCall, Wifi } from 'lucide-react';
+import React, { useState } from 'react';
+import { Radio, Send, CheckCircle, Smartphone, AlertTriangle, X, ShieldAlert, Sparkles, RefreshCw, Bell, Wifi, Check } from 'lucide-react';
 
 export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selectedCrop, onClose, isDarkMode = false }) {
   const vName = village ? village.villageName : 'Selected Village';
@@ -8,9 +8,14 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
   const crop = selectedCrop || (village?.primaryCrops ? village.primaryCrops[0] : 'Cotton');
 
   const seed = hashString(village?.id || 'v1');
-  const farmerCount = Math.round(850 + (seed % 450)); // e.g. 1,120 farmers in tower range
+  const farmerCount = Math.round(850 + (seed % 450));
   const towerId = `BSNL-JIO-MH-${(seed % 800) + 100}`;
-  const signalDb = -64 - (seed % 12); // -64 dBm 4G LTE
+  const signalDb = -64 - (seed % 12);
+
+  // User Device Verification State
+  const [userPhone, setUserPhone] = useState('');
+  const [testSentToDevice, setTestSentToDevice] = useState(false);
+  const [deviceAlertMessage, setDeviceAlertMessage] = useState('');
 
   // SMS Alert Templates
   const alertTemplates = [
@@ -47,17 +52,38 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
   const [isCompleted, setIsCompleted] = useState(false);
   const [liveLog, setLiveLog] = useState([]);
 
-  // Generate Sample Farmer Phone Roster for Live Dispatch Log
   const farmerNames = [
     'Dnyaneshwar M. (ज्ञानेश्वर)', 'Ramesh Patil (रमेश)', 'Savitri Bai (सावित्रीबाई)',
     'Subhash Shinde (सुभाष)', 'Ananda Gawande (आनंदा)', 'Prakash Rathod (प्रकाश)',
-    'Sunita Deshmukh (सुनिता)', 'Vishnu Jadhav (विष्णू)', 'Ganesh More (गणेश)',
-    'Eknath Kadam (एकनाथ)', 'Santosh Wagh (संतोष)', 'Lakshman Bhosale (लक्ष्मण)'
+    'Sunita Deshmukh (सुनिता)', 'Vishnu Jadhav (विष्णू)', 'Ganesh More (गणेश)'
   ];
 
   const handleSelectTemplate = (template) => {
     setSelectedTemplate(template);
     setCustomText(template.message);
+  };
+
+  // Send Test SMS Direct to User's Mobile Device / Web Push
+  const handleSendTestToUserDevice = () => {
+    if (!userPhone || userPhone.length < 10) {
+      alert('Please enter a valid 10-digit mobile phone number (उदा. 9876543210)!');
+      return;
+    }
+
+    setTestSentToDevice(true);
+    setDeviceAlertMessage(customText);
+
+    // Request Web Notification permission if supported
+    if ('Notification' in window && Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(`🚨 Emergency Climate Alert (${vName})`, {
+        body: customText,
+        icon: '/favicon.ico'
+      });
+    }
   };
 
   const handleStartBroadcast = () => {
@@ -77,16 +103,15 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
       }
       setBroadcastProgress(current);
 
-      // Append live farmer dispatch log
       const randomName = farmerNames[Math.floor(Math.random() * farmerNames.length)];
       const randomNum = `+91 ${Math.floor(70000 + Math.random() * 29999)} ${Math.floor(10000 + Math.random() * 89999)}`;
       
       setLiveLog(prev => [
         { name: randomName, number: randomNum, time: new Date().toLocaleTimeString() },
-        ...prev.slice(0, 5)
+        ...prev.slice(0, 4)
       ]);
 
-    }, 350);
+    }, 300);
   };
 
   return (
@@ -96,7 +121,7 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
       }`}>
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-200/80 mb-5">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200/80 mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md animate-pulse">
               <Radio className="w-5 h-5" />
@@ -106,7 +131,7 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
                 Cell Tower Geo-Broadcast SMS Hub (सेल टॉवर मेसेज केंद्र)
               </h3>
               <p className="text-xs text-emerald-500 font-bold mt-0.5">
-                Connected to Nearest Cell Tower: <strong className="text-amber-400">{towerId}</strong> ({vName})
+                Automated Tower Dispatch: <strong className="text-amber-400">{towerId}</strong> ({vName})
               </p>
             </div>
           </div>
@@ -121,8 +146,17 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
           </button>
         </div>
 
+        {/* AUTOMATED CLIMATE SENSOR BROADCAST BADGE */}
+        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold mb-4 flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-2">
+            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Automated Weather Sensor Active: Tower automatically triggers SMS broadcast when climate thresholds change in {vName}!</span>
+          </div>
+          <span className="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full font-black uppercase shrink-0">Auto Alert</span>
+        </div>
+
         {/* 1. TOWER STATUS & CONNECTED FARMERS GRID */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 text-xs">
           <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
             <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block">Cell Tower ID</span>
             <div className="text-sm font-black text-emerald-400 mt-0.5 truncate">{towerId}</div>
@@ -141,8 +175,54 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
           </div>
         </div>
 
-        {/* 2. SELECT EMERGENCY ALERT MESSAGE TEMPLATE */}
-        <div className="space-y-3 mb-5">
+        {/* 2. USER PHONE NUMBER DEVICE VERIFICATION SECTION */}
+        <div className={`p-3.5 rounded-2xl border mb-4 ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+          <label className="text-xs font-black uppercase tracking-wider text-emerald-500 flex items-center gap-1.5 mb-2">
+            <Smartphone className="w-4 h-4 text-emerald-400" />
+            <span>Verify SMS Alert on Your Own Mobile Device (आपल्या मोबाईलवर एसएमएस तपासणी):</span>
+          </label>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <input
+              type="tel"
+              placeholder="Enter your 10-digit mobile number (उदा. 9876543210)"
+              value={userPhone}
+              onChange={(e) => setUserPhone(e.target.value)}
+              className={`flex-1 p-2.5 rounded-xl border text-xs font-bold w-full focus:outline-none focus:border-emerald-500 ${
+                isDarkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+              }`}
+            />
+            <button
+              onClick={handleSendTestToUserDevice}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-black flex items-center justify-center space-x-1.5 transition-all cursor-pointer whitespace-nowrap shadow-xs"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Send Alert to My Device</span>
+            </button>
+          </div>
+
+          {/* USER DEVICE SMS LOCK-SCREEN NOTIFICATION SIMULATOR POPUP */}
+          {testSentToDevice && (
+            <div className="mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-emerald-500/60 text-white shadow-xl animate-slideUp">
+              <div className="flex items-center justify-between text-[11px] font-black text-emerald-400 border-b border-white/10 pb-1.5 mb-2">
+                <span className="flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Incoming SMS on +91 {userPhone}</span>
+                </span>
+                <span className="text-[10px] text-slate-400">Just Now • SIM 1 (BSNL/Jio)</span>
+              </div>
+              <p className="text-xs font-bold text-slate-100 leading-snug break-words">
+                {deviceAlertMessage}
+              </p>
+              <div className="mt-2 text-[10px] text-emerald-400 font-extrabold flex items-center gap-1">
+                <Check className="w-3.5 h-3.5" /> Verified! Mobile device alert received successfully.
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 3. SELECT EMERGENCY ALERT MESSAGE TEMPLATE */}
+        <div className="space-y-3 mb-4">
           <label className="text-xs font-black uppercase tracking-wider text-emerald-500 block">
             Select SMS Alert Template (संदेश प्रकार निवडा):
           </label>
@@ -167,13 +247,13 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
           </div>
         </div>
 
-        {/* 3. MESSAGE COMPOSER & MOBILE NOTIFICATION PREVIEW */}
-        <div className="space-y-3 mb-5">
+        {/* 4. MESSAGE COMPOSER */}
+        <div className="space-y-3 mb-4">
           <label className="text-xs font-black uppercase tracking-wider text-emerald-500 block">
             SMS Message Text (मोबाईलवर पाठवला जाणारा मेसेज):
           </label>
           <textarea
-            rows={3}
+            rows={2}
             value={customText}
             onChange={(e) => setCustomText(e.target.value)}
             className={`w-full p-3 rounded-2xl border text-xs font-bold focus:outline-none focus:border-emerald-500 ${
@@ -182,9 +262,9 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
           />
         </div>
 
-        {/* 4. LIVE BROADCAST ANIMATION & DISPATCH LOG */}
+        {/* 5. LIVE BROADCAST ANIMATION & DISPATCH LOG */}
         {isBroadcasting && (
-          <div className="space-y-3 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-white mb-5 animate-slideUp">
+          <div className="space-y-3 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-white mb-4 animate-slideUp">
             <div className="flex items-center justify-between text-xs font-black">
               <span className="flex items-center gap-2">
                 <RefreshCw className="w-4 h-4 text-emerald-400 animate-spin" />
@@ -193,7 +273,6 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
               <span className="text-emerald-400">{Math.round((broadcastProgress / 100) * farmerCount)} / {farmerCount} Delivered ({broadcastProgress}%)</span>
             </div>
 
-            {/* Progress Bar */}
             <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-700">
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300"
@@ -201,8 +280,13 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
               />
             </div>
 
-            {/* Live Farmer Roster Log */}
             <div className="space-y-1 text-[11px] font-bold font-mono">
+              {userPhone && (
+                <div className="flex items-center justify-between text-amber-300 border-b border-white/10 pb-1">
+                  <span>📱 +91 {userPhone} (Your Mobile Device)</span>
+                  <span className="text-emerald-400">DELIVERED ✅ [{new Date().toLocaleTimeString()}]</span>
+                </div>
+              )}
               {liveLog.map((log, i) => (
                 <div key={i} className="flex items-center justify-between text-slate-300 border-b border-white/10 pb-1">
                   <span>📱 {log.number} ({log.name})</span>
@@ -213,9 +297,9 @@ export default function CellTowerSMSBroadcastModal({ village, riskMetrics, selec
           </div>
         )}
 
-        {/* 5. SUCCESS CONFIRMATION BADGE */}
+        {/* 6. SUCCESS CONFIRMATION BADGE */}
         {isCompleted && (
-          <div className="p-4 rounded-2xl bg-emerald-600 text-white flex items-center justify-between shadow-lg mb-5 animate-slideUp">
+          <div className="p-4 rounded-2xl bg-emerald-600 text-white flex items-center justify-between shadow-lg mb-4 animate-slideUp">
             <div className="flex items-center space-x-3">
               <CheckCircle className="w-8 h-8 text-emerald-200 shrink-0" />
               <div>

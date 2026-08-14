@@ -1,16 +1,7 @@
 import React from 'react';
-import { Sprout, Globe, FileText, Sun, Moon, Sunrise, Sunset } from 'lucide-react';
+import { Sprout, FileText, Sun, Moon } from 'lucide-react';
 
-export default function Navbar({ currentLang, setCurrentLang, onOpenReportModal, activeVillage, isDarkMode, onToggleTheme, currentHour = 12 }) {
-  const languages = [
-    { code: 'mr', label: 'मराठी' },
-    { code: 'hi', label: 'हिन्दी' },
-    { code: 'en', label: 'EN' },
-    { code: 'pa', label: 'ਪੰਜਾਬੀ' },
-    { code: 'ta', label: 'தமிழ்' },
-    { code: 'te', label: 'తెలుగు' },
-    { code: 'gu', label: 'ગુજરાતી' }
-  ];
+export default function Navbar({ onOpenReportModal, activeVillage, isDarkMode, onToggleTheme, currentHour = 12 }) {
 
   // Determine Hourly Climate Label
   const getHourlyTimeBadge = () => {
@@ -56,7 +47,7 @@ export default function Navbar({ currentLang, setCurrentLang, onOpenReportModal,
           </div>
         </div>
 
-        {/* Right Tools: Dark/Light Toggle + Language Dropdown + Export Button */}
+        {/* Right Tools: Dark/Light Toggle + Export Button */}
         <div className="flex items-center space-x-2 shrink-0">
           
           {/* Dark / Light Mode Toggle Button */}
@@ -79,28 +70,6 @@ export default function Navbar({ currentLang, setCurrentLang, onOpenReportModal,
               {isDarkMode ? 'Light' : 'Dark'}
             </span>
           </button>
-
-          {/* Language Selector Dropdown */}
-          <div className={`flex items-center border rounded-xl px-2 py-1.5 text-xs font-bold ${
-            isDarkMode
-              ? 'bg-slate-800 border-slate-700 text-white'
-              : 'bg-slate-100 border-slate-200/80 text-slate-800'
-          }`}>
-            <Globe className="w-3.5 h-3.5 mr-1.5 text-emerald-500 shrink-0" />
-            <select
-              value={currentLang}
-              onChange={(e) => setCurrentLang(e.target.value)}
-              className={`bg-transparent border-none text-xs font-black focus:outline-none cursor-pointer pr-1 ${
-                isDarkMode ? 'text-white' : 'text-slate-900'
-              }`}
-            >
-              {languages.map(l => (
-                <option key={l.code} value={l.code} className={isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-900 font-bold'}>
-                  {l.label}
-                </option>
-              ))}
-            </select>
-          </div>
 
           {/* Export Report Button */}
           {activeVillage && (

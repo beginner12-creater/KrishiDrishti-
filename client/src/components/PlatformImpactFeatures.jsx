@@ -3,7 +3,7 @@ import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkl
 import CellTowerSMSBroadcastModal from './CellTowerSMSBroadcastModal';
 
 export default function PlatformImpactFeatures({ village, riskMetrics, selectedCrop, isDarkMode = false }) {
-  const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
+  const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical' | 'outcome-*'
   const [isTowerModalOpen, setIsTowerModalOpen] = useState(false);
   const sliderRef = useRef(null);
   const outcomeSliderRef = useRef(null);
@@ -35,12 +35,13 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   // Compute Dynamic Mandi Prices based on Crop + District Region
   const mandiPriceData = getDynamicMandiPrice(activeCrop, dName, sName);
 
+  // Dedicated Unique IDs for Expected Outcomes to show Crop-Specific Benefit Reports!
   const outcomes = [
-    { id: 'alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", badge: "+35% Crop Saved", icon: Bell, bgGradient: "from-amber-500/10 to-orange-500/10" },
-    { id: 'advisory', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", badge: "Zero Disaster Loss", icon: ShieldCheck, bgGradient: "from-emerald-500/10 to-teal-500/10" },
-    { id: 'risk', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", badge: "AI Soil Protection", icon: Sprout, bgGradient: "from-teal-500/10 to-cyan-500/10" },
-    { id: 'harvest', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", badge: `₹ ${mandiPriceData.maxPrice} Mandi`, icon: Calendar, bgGradient: "from-blue-500/10 to-indigo-500/10" },
-    { id: 'historical', text: "Better preparedness", textMr: "आपत्ती पूर्वतयारी", badge: "10-Yr Trend Alert", icon: LineChart, bgGradient: "from-purple-500/10 to-indigo-500/10" }
+    { id: 'outcome-alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", badge: `+35% ${activeCrop} Saved`, icon: Bell, bgGradient: "from-amber-500/10 to-orange-500/10" },
+    { id: 'outcome-loss', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", badge: `Zero ${activeCrop} Loss`, icon: ShieldCheck, bgGradient: "from-emerald-500/10 to-teal-500/10" },
+    { id: 'outcome-resilience', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", badge: `AI Soil Protection`, icon: Sprout, bgGradient: "from-teal-500/10 to-cyan-500/10" },
+    { id: 'outcome-planning', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", badge: `₹ ${mandiPriceData.maxPrice} Mandi Rate`, icon: Calendar, bgGradient: "from-blue-500/10 to-indigo-500/10" },
+    { id: 'outcome-preparedness', text: "Better preparedness", textMr: "आपत्ती पूर्वतयारी", badge: `10-Yr PMFBY Safety Net`, icon: LineChart, bgGradient: "from-purple-500/10 to-indigo-500/10" }
   ];
 
   const features = [
@@ -57,6 +58,100 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
       const scrollAmount = direction === 'left' ? -280 : 280;
       ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
+  };
+
+  // Generate 100% Crop-Specific Expected Outcome Benefit Details
+  const getCropOutcomeAnalytics = (outcomeId, cropName, villageName, districtName) => {
+    const crop = cropName || 'Cotton';
+    const cLower = crop.toLowerCase();
+
+    if (outcomeId === 'outcome-alert') {
+      let alertTip = `Sends SMS & cell broadcast 24-48 hours before severe climate changes in ${villageName}.`;
+      if (cLower.includes('cotton') || cLower.includes('कापूस')) {
+        alertTip = `Sends SMS warning before unseasonal rains to cover open cotton bolls & prevent lint discoloration (${villageName}).`;
+      } else if (cLower.includes('dragon') || cLower.includes('कमलम')) {
+        alertTip = `Pushes high windstorm alerts to secure Dragon Fruit trellis poles and protect heavy fruiting branches (${villageName}).`;
+      } else if (cLower.includes('soybean') || cLower.includes('सोयाबीन')) {
+        alertTip = `Warns farmers 48 hours before dry spells to apply Potassium Nitrate 1% foliar spray and prevent pod shedding.`;
+      } else if (cLower.includes('pomegranate') || cLower.includes('डाळिंब')) {
+        alertTip = `Alerts before sudden temperature swings to apply Calcium Nitrate & prevent fruit skin cracking.`;
+      }
+
+      return {
+        title: `Early Weather Alerts — Benefit for ${crop}`,
+        badge: `+35% ${crop} Yield Saved`,
+        impactText: `Cellular SMS alerts arrive 24-48h before weather changes to save your ${crop} crop in ${villageName}.`,
+        keyTip: alertTip,
+        metrics: [
+          { label: 'Warning Lead Time', value: '24 - 48 Hours' },
+          { label: 'Crop Damage Avoided', value: '35% Saved' },
+          { label: 'Cell Tower Coverage', value: '100% Village' }
+        ]
+      };
+    }
+
+    if (outcomeId === 'outcome-loss') {
+      let lossTip = `Prevents disaster losses by suggesting soil moisture conservation & IPM sprays.`;
+      if (cLower.includes('soybean') || cLower.includes('सोयाबीन')) {
+        lossTip = `Broad Bed Furrow (BBF) planting eliminates waterlogging root rot in monsoon rainfalls for ${crop}.`;
+      } else if (cLower.includes('turmeric') || cLower.includes('हळद')) {
+        lossTip = `Fungal spray prevents rhizome rot decay during 48h field waterlogging in ${districtName}.`;
+      } else if (cLower.includes('onion') || cLower.includes('कांदा')) {
+        lossTip = `Proper 15-day pre-harvest water cutoff prevents 90% bulb rotting during field drying.`;
+      }
+
+      return {
+        title: `Reduced Crop Losses — Benefit for ${crop}`,
+        badge: `Zero Disaster Loss`,
+        impactText: `Customized soil drainage and bio-pesticide protocols minimize climate damage for ${crop}.`,
+        keyTip: lossTip,
+        metrics: [
+          { label: 'Disaster Loss Reduction', value: '90% Avoided' },
+          { label: 'Saved Cost / Acre', value: '₹ 45,000 / Acre' },
+          { label: 'Soil Health Protection', value: '+42% Organic Carbon' }
+        ]
+      };
+    }
+
+    if (outcomeId === 'outcome-resilience') {
+      return {
+        title: `Climate-Resilient Farming — Benefit for ${crop}`,
+        badge: `AI Soil Protection`,
+        impactText: `Builds long-term drought & thermal resilience for ${crop} in ${villageName}.`,
+        keyTip: `Micro-drip fertigation + Azospirillum bio-fertilizers increase soil moisture retention by +40% during dry spells.`,
+        metrics: [
+          { label: 'Resilience Score', value: `${100 - overallRisk}/100` },
+          { label: 'Water Savings', value: '45% Drip Efficiency' },
+          { label: 'Drought Survival', value: 'Up to 25 Days' }
+        ]
+      };
+    }
+
+    if (outcomeId === 'outcome-planning') {
+      return {
+        title: `Improved Crop Planning & Mandi Rates — Benefit for ${crop}`,
+        badge: `₹ ${mandiPriceData.maxPrice} Mandi Rate`,
+        impactText: `APMC Mandi price forecasting helps ${villageName} farmers sell ${crop} at peak market rates.`,
+        keyTip: `WDRA warehouse storage + e-NWR pledge loans allow farmers to hold ${crop} until price spikes (+28% net profit).`,
+        metrics: [
+          { label: 'Peak Mandi Rate', value: `₹ ${mandiPriceData.maxPrice} / ${mandiPriceData.unit}` },
+          { label: 'Govt MSP Guarantee', value: `₹ ${mandiPriceData.mspGovernment}` },
+          { label: 'Market Demand', value: '5/5 Grade A' }
+        ]
+      };
+    }
+
+    return {
+      title: `10-Year Preparedness & PMFBY Safety Net — Benefit for ${crop}`,
+      badge: `100% PMFBY Safety Net`,
+      impactText: `10-year historical climate analytics & fast 72-hour PMFBY insurance claim filing for ${crop}.`,
+      keyTip: `ISRO satellite SAR radar damage mapping automatically validates insurance claims within 14 days.`,
+      metrics: [
+        { label: 'Claim Payout Window', value: '14 Days' },
+        { label: 'Satellite Verification', value: 'ISRO Bhuvan SAR' },
+        { label: 'Farmer Helpline', value: '1800-180-1551' }
+      ]
+    };
   };
 
   return (
@@ -175,7 +270,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
         </div>
       </div>
 
-      {/* 2. EXPECTED OUTCOMES SLIDE BAR (FORMATTED AS SLEEK FEATURE BOXES) */}
+      {/* 2. EXPECTED OUTCOMES SLIDE BAR (FORMATTED AS SLEEK FEATURE BOXES WITH CROP-SPECIFIC ADVISORY) */}
       <div className={`rounded-3xl p-4 sm:p-5 shadow-sm border relative overflow-hidden transition-all duration-500 ${
         isDarkMode
           ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
@@ -188,10 +283,10 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
             </div>
             <div className="min-w-0">
               <h2 className={`text-xs sm:text-base font-black leading-tight break-words ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                Expected Outcomes <span className="text-[11px] sm:text-xs font-bold text-emerald-500 block sm:inline">(अपेक्षित फायदे)</span>
+                Expected Outcomes <span className="text-[11px] sm:text-xs font-bold text-emerald-500 block sm:inline">(अपेक्षित फायदे — {activeCrop})</span>
               </h2>
               <p className={`text-[10px] sm:text-[11px] font-medium truncate mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                Proven benefits & yield protections for <strong>{vName}</strong>
+                Crop-specific yield benefits for <strong>{activeCrop}</strong> in <strong>{vName}</strong>
               </p>
             </div>
           </div>
@@ -259,7 +354,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. DYNAMIC MODAL DRAWER OVERLAYS FOR ALL 6 CLIMATE TOOLS & OUTCOMES */}
+      {/* 3. DYNAMIC MODAL DRAWER OVERLAYS FOR ALL CLIMATE TOOLS & CROP OUTCOMES */}
       {/* ========================================================================= */}
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
@@ -277,6 +372,7 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                   {activeModal === 'harvest' && <Calendar className="w-5 h-5" />}
                   {activeModal === 'alert' && <Bell className="w-5 h-5" />}
                   {activeModal === 'historical' && <ShieldCheck className="w-5 h-5" />}
+                  {activeModal.startsWith('outcome-') && <Sparkles className="w-5 h-5 text-amber-300" />}
                 </div>
                 <div>
                   <h3 className="text-base sm:text-xl font-black flex items-center gap-2">
@@ -286,9 +382,10 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                     {activeModal === 'harvest' && `APMC Mandi Harvest & Price Guide — ${mandiPriceData.apmcName}`}
                     {activeModal === 'alert' && `Emergency Weather Alerts — ${vName}`}
                     {activeModal === 'historical' && `10-Year Climate Trend Analysis — ${vName}`}
+                    {activeModal.startsWith('outcome-') && getCropOutcomeAnalytics(activeModal, activeCrop, vName, dName).title}
                   </h3>
                   <p className="text-xs text-emerald-500 font-bold mt-0.5">
-                    Taluka: {bName} • District: {dName} • Region: {sName}
+                    Selected Crop: <strong className="text-amber-400">{activeCrop}</strong> • Village: {vName} ({bName})
                   </p>
                 </div>
               </div>
@@ -302,6 +399,57 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* DYNAMIC CROP-SPECIFIC EXPECTED OUTCOME BENEFIT MODAL RENDERER */}
+            {activeModal.startsWith('outcome-') && (() => {
+              const outcomeData = getCropOutcomeAnalytics(activeModal, activeCrop, vName, dName);
+              return (
+                <div className="space-y-4">
+                  {/* Outcome Banner */}
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-emerald-500/40">
+                    <div>
+                      <span className="text-[10px] text-emerald-300 font-black uppercase tracking-wider block">Verified Outcome Benefit</span>
+                      <div className="text-xl sm:text-2xl font-black mt-0.5">{outcomeData.title}</div>
+                      <p className="text-xs text-emerald-100 font-medium mt-1 leading-snug">{outcomeData.impactText}</p>
+                    </div>
+                    <span className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-amber-400 text-slate-950 uppercase shadow-xs shrink-0 whitespace-nowrap">
+                      {outcomeData.badge}
+                    </span>
+                  </div>
+
+                  {/* Quantified Outcome Metrics */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-bold">
+                    {outcomeData.metrics.map((m, i) => (
+                      <div key={i} className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                        <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block">{m.label}</span>
+                        <div className="text-sm font-black text-emerald-400 mt-0.5">{m.value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Key Action Protocol */}
+                  <div className={`p-4 rounded-2xl border text-xs font-medium space-y-2 ${
+                    isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                  }`}>
+                    <div className="font-black text-emerald-400 flex items-center gap-1.5 text-sm">
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      <span>Specific Protocol for {activeCrop} Farmers ({vName}):</span>
+                    </div>
+                    <p className="text-xs leading-relaxed font-bold">{outcomeData.keyTip}</p>
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-2 border-t border-slate-800 pt-3">
+                    <button
+                      onClick={() => setIsTowerModalOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black flex items-center gap-1 transition-all shadow-md cursor-pointer"
+                    >
+                      <Radio className="w-3.5 h-3.5" />
+                      <span>Broadcast Alert to {activeCrop} Farmers ({farmerCount})</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* MODAL CONTENT 1: HYPERLOCAL WEATHER FORECAST */}
             {activeModal === 'weather' && (

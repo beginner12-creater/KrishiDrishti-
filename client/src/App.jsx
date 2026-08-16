@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import VillageSelector from './components/VillageSelector';
+import FarmContextIntake from './components/FarmContextIntake';
 import PlatformImpactFeatures from './components/PlatformImpactFeatures';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
@@ -16,10 +17,18 @@ export default function App() {
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
   const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
-  const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState(null);
+  const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState('Cotton');
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('advisory'); // 'advisory' | 'profit'
+
+  // Global Mandatory Farm Context Intake State
+  const [farmContext, setFarmContext] = useState({
+    crop: 'Cotton',
+    phenologyStage: 'Flowering & Pollination (46-75 Days)',
+    soilType: 'Deep Black Clay (Regur)',
+    acreage: 5.0
+  });
 
   // Dark/Light Mode Theme & Hourly Climate Background Engine
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -76,7 +85,9 @@ export default function App() {
       if (data && data.village && data.riskMetrics) {
         setSelectedVillage(data.village);
         setRiskMetrics(data.riskMetrics);
-        setSelectedCropForAdvisory(data.village.primaryCrops[0]);
+        const pCrop = data.village.primaryCrops ? data.village.primaryCrops[0] : 'Cotton';
+        setSelectedCropForAdvisory(pCrop);
+        setFarmContext(prev => ({ ...prev, crop: pCrop }));
       }
     } catch (err) {
       console.error('Failed to load village risk metrics:', err);
@@ -95,26 +106,26 @@ export default function App() {
   const getHourlyBackgroundGradient = () => {
     if (isDarkMode) {
       if (currentHour >= 5 && currentHour < 8) {
-        return 'bg-gradient-to-br from-amber-950 via-slate-950 to-rose-950 text-slate-100'; // Sunrise Dark
+        return 'bg-gradient-to-br from-amber-950 via-slate-950 to-rose-950 text-slate-100';
       }
       if (currentHour >= 8 && currentHour < 17) {
-        return 'bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 text-slate-100'; // Daytime Dark
+        return 'bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 text-slate-100';
       }
       if (currentHour >= 17 && currentHour < 20) {
-        return 'bg-gradient-to-br from-purple-950 via-slate-950 to-amber-950 text-slate-100'; // Sunset Dark
+        return 'bg-gradient-to-br from-purple-950 via-slate-950 to-amber-950 text-slate-100';
       }
-      return 'bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100'; // Night Dark
+      return 'bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100';
     } else {
       if (currentHour >= 5 && currentHour < 8) {
-        return 'bg-gradient-to-br from-amber-100 via-rose-50 to-emerald-50 text-slate-900'; // Sunrise Light
+        return 'bg-gradient-to-br from-amber-100 via-rose-50 to-emerald-50 text-slate-900';
       }
       if (currentHour >= 8 && currentHour < 17) {
-        return 'bg-gradient-to-br from-emerald-50 via-teal-50 to-sky-50 text-slate-900'; // Daytime Light
+        return 'bg-gradient-to-br from-emerald-50 via-teal-50 to-sky-50 text-slate-900';
       }
       if (currentHour >= 17 && currentHour < 20) {
-        return 'bg-gradient-to-br from-orange-100 via-purple-50 to-amber-50 text-slate-900'; // Sunset Light
+        return 'bg-gradient-to-br from-orange-100 via-purple-50 to-amber-50 text-slate-900';
       }
-      return 'bg-gradient-to-br from-slate-200 via-indigo-50 to-slate-100 text-slate-900'; // Night Light
+      return 'bg-gradient-to-br from-slate-200 via-indigo-50 to-slate-100 text-slate-900';
     }
   };
 
@@ -151,6 +162,19 @@ export default function App() {
           isDarkMode={isDarkMode}
         />
 
+        {/* Mandatory Farm Profile Intake Filter Bar */}
+        {selectedVillage && (
+          <FarmContextIntake
+            farmContext={farmContext}
+            onChangeFarmContext={(newCtx) => {
+              setFarmContext(newCtx);
+              setSelectedCropForAdvisory(newCtx.crop);
+            }}
+            isDarkMode={isDarkMode}
+            primaryCrops={selectedVillage.primaryCrops}
+          />
+        )}
+
         {loading ? (
           <div className="py-20 text-center">
             <RefreshCw className="w-9 h-9 text-emerald-500 animate-spin mx-auto mb-3" />
@@ -167,7 +191,7 @@ export default function App() {
               isDarkMode={isDarkMode}
             />
 
-            {/* B. MAIN DUAL VIEW NAVIGATION TABS (SIMPLE FARMER VIEW vs PROFIT ESTIMATOR) */}
+            {/* B. MAIN DUAL VIEW NAVIGATION TABS (AI DECISION ENGINE vs PROFIT ESTIMATOR) */}
             <div className={`p-1.5 rounded-2xl border flex items-center gap-2 shadow-xs transition-colors duration-300 ${
               isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
             }`}>
@@ -180,7 +204,7 @@ export default function App() {
                 }`}
               >
                 <Sprout className="w-4 h-4 text-emerald-300 shrink-0" />
-                <span className="truncate">Farmer Dashboard (शेतकरी माहिती)</span>
+                <span className="truncate">AI Decision Engine (निर्णय प्रणाली)</span>
               </button>
 
               <button
@@ -202,7 +226,12 @@ export default function App() {
                 village={selectedVillage}
                 riskMetrics={riskMetrics}
                 selectedCrop={selectedCropForAdvisory}
-                onSelectCrop={(crop) => setSelectedCropForAdvisory(crop)}
+                onSelectCrop={(crop) => {
+                  setSelectedCropForAdvisory(crop);
+                  setFarmContext(prev => ({ ...prev, crop }));
+                }}
+                farmContext={farmContext}
+                onChangeFarmContext={setFarmContext}
                 currentLang={currentLang}
                 isDarkMode={isDarkMode}
               />
@@ -210,6 +239,11 @@ export default function App() {
               <CropProfitRecommendation
                 village={selectedVillage}
                 riskMetrics={riskMetrics}
+                onSelectCrop={(crop) => {
+                  setSelectedCropForAdvisory(crop);
+                  setFarmContext(prev => ({ ...prev, crop }));
+                  setActiveTab('advisory');
+                }}
                 currentLang={currentLang}
                 isDarkMode={isDarkMode}
               />

@@ -44,12 +44,12 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
   ];
 
   const features = [
-    { id: 'weather', title: "Hyperlocal weather forecasts", subtitle: "तालुका-स्तरीय अचूक हवामान", icon: CloudRain, badge: "Live Forecast", bgGradient: "from-blue-500/10 to-teal-500/10" },
-    { id: 'risk', title: "AI risk prediction", subtitle: "कृत्रिम बुद्धिमत्ता धोका अंदाज", icon: LineChart, badge: "Risk Index", bgGradient: "from-amber-500/10 to-orange-500/10" },
-    { id: 'advisory', title: "Crop-specific advisories", subtitle: `Sowing & Spray (${activeCrop})`, icon: Sprout, badge: "AI Advisory", bgGradient: "from-emerald-500/10 to-teal-500/10" },
-    { id: 'harvest', title: "Harvest planning", subtitle: `${dName} APMC Rates`, icon: Calendar, badge: `₹${mandiPriceData.minPrice} Mandi`, bgGradient: "from-blue-500/10 to-indigo-500/10" },
-    { id: 'alert', title: "Alert notifications", subtitle: "इशारा संदेश", icon: Bell, badge: "Active Alert", bgGradient: "from-red-500/10 to-amber-500/10" },
-    { id: 'historical', title: "Historical weather analysis", subtitle: "मागील हवामान विश्लेषण", icon: ShieldCheck, badge: "10-Yr Trends", bgGradient: "from-purple-500/10 to-indigo-500/10" }
+    { id: 'weather', title: "Microclimate Telemetry & Field Radar", subtitle: `Telemetry Feed (${vName})`, icon: CloudRain, badge: "Live Sensor Feed", bgGradient: "from-blue-500/10 to-teal-500/10" },
+    { id: 'risk', title: "AI Bio-Climatic Risk Prediction", subtitle: "Pathogen & Risk Dial", icon: LineChart, badge: "Risk Index", bgGradient: "from-amber-500/10 to-orange-500/10" },
+    { id: 'advisory', title: "Phenology-Stage Crop Advisories", subtitle: `Stage Strategy (${activeCrop})`, icon: Sprout, badge: "AI Advisory", bgGradient: "from-emerald-500/10 to-teal-500/10" },
+    { id: 'harvest', title: "Operability & Harvest Planning", subtitle: `${dName} APMC Mandi Rates`, icon: Calendar, badge: `₹${mandiPriceData.minPrice} Mandi`, bgGradient: "from-blue-500/10 to-indigo-500/10" },
+    { id: 'alert', title: "Agro-Action Triggers & Loss Prevention", subtitle: "Emergency Lead-Time Alerts", icon: Bell, badge: "Active Trigger", bgGradient: "from-red-500/10 to-amber-500/10" },
+    { id: 'historical', title: "Decadal Climate Baselines & Varietal Suitability", subtitle: "10-Yr Decadal Trends", icon: ShieldCheck, badge: "10-Yr Radar", bgGradient: "from-purple-500/10 to-indigo-500/10" }
   ];
 
   const scrollSlider = (direction, ref) => {

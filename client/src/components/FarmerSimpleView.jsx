@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { t } from '../data/translations';
-import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, MapPin, X, AlertTriangle, ShieldAlert, XCircle } from 'lucide-react';
+import { Sprout, Droplets, Bug, Sun, CloudRain, CloudLightning, Cloud, PhoneCall, ArrowRight, Sparkles, ChevronLeft, ChevronRight, Layers, Snowflake, MapPin, X, AlertTriangle, ShieldAlert, XCircle, Sliders, Truck } from 'lucide-react';
 import { fetchLiveWeather } from '../services/realtimeApiService';
-import { VILLAGES_DATABASE } from '../data/villages';
+import BioClimaticRiskCard from './BioClimaticRiskCard';
+import FieldTrafficabilityMatrix from './FieldTrafficabilityMatrix';
+import ActionTriggerDisasterProtocols from './ActionTriggerDisasterProtocols';
+import DecadalClimateBaselines from './DecadalClimateBaselines';
 
-export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, currentLang = 'mr', isDarkMode = false, selectedCrop: selectedCropProp = null }) {
-  const [selectedCrop, setSelectedCrop] = useState(selectedCropProp);
+export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, farmContext, onChangeFarmContext, currentLang = 'mr', isDarkMode = false, selectedCrop: selectedCropProp = null }) {
+  const [selectedCrop, setSelectedCrop] = useState(selectedCropProp || farmContext?.crop || 'Cotton');
   const [cropStageIndex, setCropStageIndex] = useState(0);
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
 
+  // Sync internal selectedCrop with farmContext.crop or selectedCropProp
   useEffect(() => {
     if (selectedCropProp) {
       setSelectedCrop(selectedCropProp);
+    } else if (farmContext?.crop) {
+      setSelectedCrop(farmContext.crop);
     }
-  }, [selectedCropProp]);
+  }, [selectedCropProp, farmContext?.crop]);
 
   if (!village || !riskMetrics) return null;
 
   const { overallRiskScore, subIndices } = riskMetrics;
-
   const lat = village?.coordinates?.latitude || 20.3888;
   const lng = village?.coordinates?.longitude || 78.1204;
 
@@ -43,8 +47,8 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   }, [lat, lng, village.villageName]);
 
   const conditionType = liveWeather?.conditionType || 'sunny';
-  const currentTemp = liveWeather?.tempC || 32;
-  const rainProb = liveWeather?.rainProbability || 20;
+  const currentTemp = liveWeather?.tempC || 34;
+  const rainProb = liveWeather?.rainProbability || 45;
   const isRainyCondition = conditionType === 'rainy' || rainProb > 50;
 
   const availableCropsCatalog = Array.from(new Set([
@@ -64,10 +68,11 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
   const getCropSpecificActions = (cropName) => {
     if (!cropName) return null;
     const name = cropName.toLowerCase();
+    const stage = farmContext?.phenologyStage || 'Flowering';
 
     if (name.includes('cotton') || name.includes('कापूस')) {
       return {
-        water: "Give light water during flowering & boll formation. Keep soil drained.",
+        water: `Give light water during ${stage.split(' ')[0]} stage. Keep soil drained in ${farmContext?.soilType || 'Black Clay'}.`,
         fertilizer: "Spray 1% MgSO4 + 19:19:19 to keep leaves green and stop reddening.",
         pest: "Hang 8 Pink Bollworm traps/acre. Spray 5% organic Neem seed extract.",
         insurance: "Inform bank within 72 hours if unseasonal rain damages open cotton.",
@@ -80,7 +85,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
     }
     if (name.includes('soybean') || name.includes('सोयाबीन')) {
       return {
-        water: "Irrigate during pod initiation and pod filling stage if rain delays.",
+        water: `Irrigate during ${stage.split(' ')[0]} stage if rain delays.`,
         fertilizer: "Spray 2% DAP or Potassium Nitrate at pod stage for bigger seeds.",
         pest: "Watch for Girdle Beetle. Spray Chlorantraniliprole 18.5% SC (3ml/10L).",
         insurance: "Inform bank within 72 hours if drought causes pod shedding.",
@@ -156,45 +161,9 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         ]
       };
     }
-    if (name.includes('bajra') || name.includes('बाजरी') || name.includes('बाजरा')) {
-      return {
-        water: "Requires only 1-2 protective irrigations. Highly drought tolerant.",
-        fertilizer: "Apply 40kg Nitrogen/acre split into sowing and tillering stage.",
-        pest: "Spray Metalaxyl (2g/L) against Downy Mildew & Ergot earhead disease.",
-        insurance: "Claim PMFBY insurance if severe dry spell causes grain filling failure.",
-        notToDo: [
-          "❌ DO NOT over-water or allow field waterlogging (causes rapid seedling rot).",
-          "❌ DO NOT store harvested bajra grains with >12% moisture content."
-        ]
-      };
-    }
-    if (name.includes('wheat') || name.includes('गहू')) {
-      return {
-        water: "Ensure critical irrigations at Crown Root Initiation (21 days) and Grain Filling stage.",
-        fertilizer: "Top dress Urea + Zinc Sulphate before second irrigation.",
-        pest: "Spray Propiconazole 25% EC (1ml/L) against Yellow Rust fungal disease.",
-        insurance: "Report March heatwaves causing early grain shrinking to crop insurance.",
-        notToDo: [
-          "❌ DO NOT skip the Crown Root Initiation (CRI) 21-day irrigation (causes 30% yield loss).",
-          "❌ DO NOT flood irrigate on high wind days (causes heavy crop lodging/falling)."
-        ]
-      };
-    }
-    if (name.includes('rice') || name.includes('भात') || name.includes('तांदूळ')) {
-      return {
-        water: "Maintain 2-3 cm standing water during tillering and panicle initiation.",
-        fertilizer: "Apply Neem Coated Urea in 3 split doses for high grain yield.",
-        pest: "Install Pheromone Traps for Stem Borer; spray Cartap Hydrochloride.",
-        insurance: "Report monsoon dry spell or flash floods damaging paddy nurseries.",
-        notToDo: [
-          "❌ DO NOT allow fields to dry out during panicle initiation stage.",
-          "❌ DO NOT apply excess Urea during high humidity spells (attracts leaf blast)."
-        ]
-      };
-    }
 
     return {
-      water: `Provide protective drip irrigation during flowering & fruiting of ${cropName}.`,
+      water: `Provide protective drip irrigation during ${stage.split(' ')[0]} stage of ${cropName}.`,
       fertilizer: `Spray 1% Potassium Nitrate (KNO3) + 19:19:19 during dry spells to boost crop yield.`,
       pest: `Install 10 Yellow Sticky Traps per acre and spray 5% organic Neem seed extract.`,
       insurance: `Inform bank or call toll-free 1800-180-1551 within 72 hours if weather damages ${cropName}.`,
@@ -215,133 +184,41 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
     } else {
       setSelectedCrop(crop);
       if (onSelectCrop) onSelectCrop(crop);
+      if (onChangeFarmContext) onChangeFarmContext({ ...farmContext, crop });
     }
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       
-      {/* 1. WEATHER WIDGET WITH FULL DYNAMIC BACKGROUND ANIMATIONS */}
-      {isWeatherLoading ? (
-        <div className="rounded-3xl bg-slate-200 border border-slate-300 p-5 shadow-md animate-pulse space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 rounded-2xl bg-slate-300 shrink-0" />
-              <div className="space-y-2">
-                <div className="w-28 h-4 bg-slate-300 rounded-md" />
-                <div className="w-40 h-6 bg-slate-300 rounded-md" />
-              </div>
-            </div>
-            <div className="w-20 h-9 bg-slate-300 rounded-2xl" />
-          </div>
-          <div className="w-full h-10 bg-slate-300 rounded-xl" />
-        </div>
-      ) : (
-        <div className={`rounded-3xl border shadow-xl overflow-hidden relative transition-all duration-500 text-white ${
-          isRainyCondition
-            ? 'bg-gradient-to-r from-blue-700 via-teal-700 to-indigo-800 border-blue-400'
-            : conditionType === 'sunny'
-            ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 border-amber-400'
-            : conditionType === 'stormy'
-            ? 'bg-gradient-to-r from-purple-800 via-slate-800 to-red-900 border-red-500'
-            : 'bg-gradient-to-r from-slate-700 via-teal-800 to-slate-800 border-slate-400'
-        }`}>
+      {/* 1. HERO WIDGET: CROP HEALTH & BIO-CLIMATIC RISK INDEX CARD */}
+      <BioClimaticRiskCard
+        village={village}
+        riskMetrics={riskMetrics}
+        liveWeather={liveWeather}
+        farmContext={farmContext}
+        isDarkMode={isDarkMode}
+      />
 
-          {/* DYNAMIC BACKGROUND WEATHER ANIMATIONS */}
-          {conditionType === 'sunny' && !isRainyCondition && (
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-              <div className="w-96 h-96 rounded-full bg-amber-300/40 blur-3xl absolute -top-20 -right-20 animate-pulse" />
-              <div className="w-64 h-64 rounded-full bg-orange-400/30 blur-2xl absolute -bottom-10 -left-10 animate-spin" style={{ animationDuration: '30s' }} />
-            </div>
-          )}
+      {/* 2. OPERATIONAL DECISION & FIELD TRAFFICABILITY MATRIX */}
+      <FieldTrafficabilityMatrix
+        village={village}
+        riskMetrics={riskMetrics}
+        liveWeather={liveWeather}
+        farmContext={farmContext}
+        isDarkMode={isDarkMode}
+      />
 
-          {isRainyCondition && (
-            <div className="absolute inset-0 pointer-events-none opacity-30 bg-[radial-gradient(#38bdf8_1.5px,transparent_1.5px)] [background-size:14px_14px] animate-pulse" />
-          )}
+      {/* 3. AGRO-ACTION TRIGGERS & LOSS PREVENTION PROTOCOLS (MITIGATION CHECKLIST) */}
+      <ActionTriggerDisasterProtocols
+        village={village}
+        riskMetrics={riskMetrics}
+        liveWeather={liveWeather}
+        farmContext={farmContext}
+        isDarkMode={isDarkMode}
+      />
 
-          {conditionType === 'stormy' && (
-            <div className="absolute inset-0 pointer-events-none opacity-25 bg-yellow-400/20 animate-ping" />
-          )}
-
-          <div className="p-4 sm:p-6 space-y-4 relative z-10">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center space-x-3.5">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 shadow-md">
-                  {isRainyCondition ? (
-                    <CloudRain className="w-7 h-7 text-cyan-200 animate-bounce" />
-                  ) : conditionType === 'sunny' ? (
-                    <Sun className="w-7 h-7 text-amber-200 animate-spin" style={{ animationDuration: '25s' }} />
-                  ) : conditionType === 'stormy' ? (
-                    <CloudLightning className="w-7 h-7 text-yellow-300 animate-pulse" />
-                  ) : (
-                    <Cloud className="w-7 h-7 text-teal-200 animate-pulse" />
-                  )}
-                </div>
-
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/30">
-                      📍 {village.villageName} ({village.blockName})
-                    </span>
-                    <span className="text-[10px] font-bold text-white/80 hidden sm:inline-block">
-                      {liveWeather?.source || 'Realtime Open-Meteo Feed'}
-                    </span>
-                  </div>
-
-                  <h2 className="text-xl sm:text-3xl font-black mt-1 leading-tight flex items-baseline space-x-2">
-                    <span>{currentTemp}°C</span>
-                    <span className="text-xs sm:text-sm font-bold opacity-90 truncate font-sans">
-                      • {liveWeather?.conditionDesc || 'Clear Sunshine'}
-                    </span>
-                  </h2>
-                </div>
-              </div>
-
-              <div className="bg-white/15 backdrop-blur-md border border-white/25 px-3.5 py-2 rounded-2xl flex items-center space-x-2 self-start sm:self-auto shadow-xs">
-                <CloudRain className="w-4 h-4 text-cyan-200 shrink-0 animate-bounce" />
-                <div>
-                  <div className="text-[9px] uppercase font-black opacity-80 leading-none">Rain Expectation (पाऊस अंदाज)</div>
-                  <div className="text-xs sm:text-sm font-black mt-0.5">{rainProb}% Chance</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-bold text-slate-900 pt-0.5">
-              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
-                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0 animate-spin" style={{ animationDuration: '15s' }} />
-                <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Drought Risk</div>
-                  <div className="text-xs sm:text-sm font-black">{subIndices.droughtIndex > 60 ? 'HIGH RISK' : 'LOW RISK'}</div>
-                </div>
-              </div>
-              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
-                <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 shrink-0 animate-pulse" />
-                <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Water Level</div>
-                  <div className="text-xs sm:text-sm font-black truncate">{village.groundwaterStatus}</div>
-                </div>
-              </div>
-              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
-                <Bug className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 shrink-0" />
-                <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Pest Risk</div>
-                  <div className="text-xs sm:text-sm font-black">{subIndices.pestIndex > 60 ? 'HIGH RISK' : 'SAFE'}</div>
-                </div>
-              </div>
-              <div className="bg-white/95 p-2.5 sm:p-3 rounded-2xl border border-white/40 flex items-center space-x-2 shadow-2xs">
-                <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
-                <div className="min-w-0">
-                  <div className="text-[9px] text-slate-500 uppercase font-black truncate">Annual Rain</div>
-                  <div className="text-xs sm:text-sm font-black">{village.annualRainfallNormal} mm/yr</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      )}
-
-      {/* 2. CROP SELECTION */}
+      {/* 4. PHENOLOGY-STAGE CROP SELECTION & ADVISORY WITH WHAT NOT TO DO RULES */}
       <div className={`p-4 sm:p-6 rounded-3xl shadow-sm space-y-3.5 border transition-colors duration-500 ${
         isDarkMode
           ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
@@ -353,10 +230,10 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           <div>
             <h3 className={`text-sm sm:text-lg font-black flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               <Sprout className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 shrink-0" />
-              <span>Select Your Crop (आपले पीक निवडा)</span>
+              <span>Phenology-Stage Crop Strategy (आपले पीक व टप्पा निवडा)</span>
             </h3>
             <p className={`text-[11px] font-medium mt-0.5 leading-snug break-words ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Click a crop to view detailed action plan and <strong>What NOT to Do</strong> guidelines.
+              Click any crop to inspect stage-specific action plan & <strong>What NOT to Do</strong> rules for <strong>{farmContext?.phenologyStage?.split(' ')[0]}</strong> stage.
             </p>
           </div>
 
@@ -405,12 +282,12 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
         </div>
 
         <div key={cropStageIndex} className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 animate-slideUp">
-          {currentCropStageItems.map(crop => {
-            const isSelected = selectedCrop === crop;
+          {currentCropStageItems.map(cropItem => {
+            const isSelected = selectedCrop === cropItem;
             return (
               <button
-                key={crop}
-                onClick={() => handleCropButtonClick(crop)}
+                key={cropItem}
+                onClick={() => handleCropButtonClick(cropItem)}
                 className={`p-3 rounded-2xl text-left border transition-all duration-300 min-h-[68px] flex flex-col justify-between cursor-pointer ${
                   isSelected
                     ? 'bg-emerald-600 text-white font-black border-emerald-700 shadow-lg scale-[1.02]'
@@ -425,15 +302,15 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
                   </span>
                   {isSelected && <X className="w-3.5 h-3.5 text-white/90 shrink-0" />}
                 </div>
-                <div className="text-xs sm:text-sm font-black truncate leading-tight mt-1">{crop}</div>
+                <div className="text-xs sm:text-sm font-black truncate leading-tight mt-1">{cropItem}</div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 3. DYNAMIC 4-STEP ACTION PLAN + WHAT NOT TO DO SECTION */}
-      {selectedCrop && currentActions ? (
+      {/* DYNAMIC ACTION PLAN & WHAT NOT TO DO CARDS */}
+      {selectedCrop && currentActions && (
         <div className={`p-4 sm:p-6 rounded-3xl shadow-sm space-y-5 border transition-all animate-slideUp ${
           isDarkMode
             ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
@@ -446,7 +323,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
               isDarkMode ? 'text-white' : 'text-slate-900'
             }`}>
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
-              <span>Key Actions (महत्त्वाचे उपाय) — </span>
+              <span>Phenology Strategy ({farmContext?.phenologyStage?.split(' ')[0]}) — </span>
               <span className="text-emerald-400 underline decoration-emerald-500/50 break-words">{selectedCrop}</span>:
             </h3>
             
@@ -549,13 +426,15 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, c
           )}
 
         </div>
-      ) : (
-        <div className={`p-3.5 rounded-3xl text-center text-xs font-bold leading-normal border border-dashed ${
-          isDarkMode ? 'bg-slate-900/80 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-300 text-slate-500'
-        }`}>
-          💡 Select any crop above to reveal its customized 4-step action plan & What NOT to Do rules.
-        </div>
       )}
+
+      {/* 5. DECADAL CLIMATE BASELINES & VARIETAL SUITABILITY TAB */}
+      <DecadalClimateBaselines
+        village={village}
+        riskMetrics={riskMetrics}
+        farmContext={farmContext}
+        isDarkMode={isDarkMode}
+      />
 
     </div>
   );

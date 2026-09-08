@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { IndianRupee, TrendingUp, TrendingDown, ArrowUpRight, MapPin, Calendar, Bell, Search, Filter, ShieldCheck, Sparkles, AlertCircle, RefreshCw, X, Check, Phone, Building2 } from 'lucide-react';
 import { fetchMandiRates } from '../services/apiService';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function MandiRatesSection({ village, selectedCrop = 'Cotton', onClose = null, isDarkMode = false }) {
+  const { language, t } = useLanguage();
   const [state, setState] = useState(village?.stateName || 'Maharashtra');
   const [district, setDistrict] = useState(village?.districtName || 'Yavatmal');
   const [commodity, setCommodity] = useState(selectedCrop || 'Cotton');

@@ -1,8 +1,17 @@
 import React from 'react';
 import { Sprout, Check } from 'lucide-react';
-import { t } from '../data/translations';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function WelcomeLanguageModal({ onSelectLanguage, isDarkMode = false }) {
+  const { setLanguage, t } = useLanguage();
+
+  const handleChoose = (lang) => {
+    setLanguage(lang);
+    if (onSelectLanguage) {
+      onSelectLanguage(lang);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
       <div className={`w-full max-w-md p-6 sm:p-8 rounded-3xl border-4 border-emerald-500 shadow-2xl text-center space-y-5 relative ${
@@ -16,20 +25,34 @@ export default function WelcomeLanguageModal({ onSelectLanguage, isDarkMode = fa
 
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-emerald-500 leading-tight">
-            नमस्कार किसान भाई! / शेतकरी मित्रांनो!
+            {t('welcomeTitle')}
           </h2>
           <p className="text-xs font-black text-slate-400 mt-1">
-            कृषिदृष्टि AI - अपनी भाषा चुनें (Select Your Language):
+            {t('welcomeSub')}
           </p>
         </div>
 
-        {/* 2 GIANT LANGUAGE BUTTONS: HINDI vs MARATHI */}
+        {/* 3 GIANT LANGUAGE BUTTONS: ENGLISH, HINDI, MARATHI */}
         <div className="space-y-3 pt-2">
           
-          {/* Button 1: Hindi */}
+          {/* Button 1: English */}
           <button
-            onClick={() => onSelectLanguage('hi')}
-            className="w-full min-h-[60px] p-4 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-lg sm:text-xl flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border-2 border-amber-500"
+            onClick={() => handleChoose('en')}
+            className="w-full min-h-[54px] p-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black text-base sm:text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border-2 border-blue-400"
+          >
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🇬🇧</span>
+              <span className="font-sans">English</span>
+            </div>
+            <span className="text-xs bg-white text-blue-900 px-3 py-1 rounded-full font-black">
+              Select ✓
+            </span>
+          </button>
+
+          {/* Button 2: Hindi */}
+          <button
+            onClick={() => handleChoose('hi')}
+            className="w-full min-h-[54px] p-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-base sm:text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border-2 border-amber-500"
           >
             <div className="flex items-center space-x-3">
               <span className="text-2xl">🇮🇳</span>
@@ -40,10 +63,10 @@ export default function WelcomeLanguageModal({ onSelectLanguage, isDarkMode = fa
             </span>
           </button>
 
-          {/* Button 2: Marathi */}
+          {/* Button 3: Marathi */}
           <button
-            onClick={() => onSelectLanguage('mr')}
-            className="w-full min-h-[60px] p-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg sm:text-xl flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border-2 border-emerald-400"
+            onClick={() => handleChoose('mr')}
+            className="w-full min-h-[54px] p-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-base sm:text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border-2 border-emerald-400"
           >
             <div className="flex items-center space-x-3">
               <span className="text-2xl">🚩</span>
@@ -57,7 +80,7 @@ export default function WelcomeLanguageModal({ onSelectLanguage, isDarkMode = fa
         </div>
 
         <p className="text-[11px] font-bold text-slate-400 pt-2 border-t border-slate-700/50">
-          💡 बाद में भी भाषा बदल सकते हैं (You can change language anytime).
+          💡 You can change language anytime from top navbar.
         </p>
 
       </div>

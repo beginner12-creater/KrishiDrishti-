@@ -1,17 +1,11 @@
-import hiLocale from '../locales/hi.json';
-import mrLocale from '../locales/mr.json';
-import enLocale from '../locales/en.json';
+import { TRANSLATIONS } from '../context/LanguageContext';
 
-export const TRANSLATIONS = {
-  hi: hiLocale,
-  mr: mrLocale,
-  en: enLocale
-};
+export { TRANSLATIONS };
 
 export function t(key, lang = 'hi') {
   const currentDict = TRANSLATIONS[lang] || TRANSLATIONS['hi'];
   if (currentDict && currentDict[key]) return currentDict[key];
-  if (TRANSLATIONS['mr'] && TRANSLATIONS['mr'][key]) return TRANSLATIONS['mr'][key];
   if (TRANSLATIONS['en'] && TRANSLATIONS['en'][key]) return TRANSLATIONS['en'][key];
+  if (TRANSLATIONS['hi'] && TRANSLATIONS['hi'][key]) return TRANSLATIONS['hi'][key];
   return key;
 }

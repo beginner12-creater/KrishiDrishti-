@@ -1,8 +1,9 @@
 import React from 'react';
-import { Sprout, FileText, Sun, Moon, Languages } from 'lucide-react';
-import { t } from '../data/translations';
+import { Sprout, FileText, Sun, Moon } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function Navbar({ currentLang, setCurrentLang, onOpenReportModal, activeVillage, isDarkMode, onToggleTheme, currentHour = 12 }) {
+export default function Navbar({ onOpenReportModal, activeVillage, isDarkMode, onToggleTheme, currentHour = 12 }) {
+  const { language, setLanguage, t } = useLanguage();
 
   // Determine Hourly Climate Label
   const getHourlyTimeBadge = () => {
@@ -20,11 +21,6 @@ export default function Navbar({ currentLang, setCurrentLang, onOpenReportModal,
 
   const timeBadge = getHourlyTimeBadge();
 
-  const handleSwitchLang = (lang) => {
-    setCurrentLang(lang);
-    localStorage.setItem('krishidrishti_lang', lang);
-  };
-
   return (
     <header className={`sticky top-0 z-40 backdrop-blur-md border-b px-3 sm:px-6 py-2.5 transition-all duration-500 w-full max-w-full overflow-hidden shadow-sm ${
       isDarkMode
@@ -41,43 +37,54 @@ export default function Navbar({ currentLang, setCurrentLang, onOpenReportModal,
           <div className="min-w-0 truncate">
             <div className="flex items-center space-x-1.5">
               <h1 className={`text-base sm:text-xl font-black leading-none truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                {t('appTitle', currentLang)} <span className="text-emerald-600 text-xs font-black">AI</span>
+                {t('appTitle')} <span className="text-emerald-600 text-xs font-black">AI</span>
               </h1>
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-black border hidden sm:inline-block whitespace-nowrap ${timeBadge.color}`}>
                 {timeBadge.label}
               </span>
             </div>
             <p className={`text-[10px] font-extrabold truncate ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-              {t('appSubtitle', currentLang)}
+              {t('appSubtitle')}
             </p>
           </div>
         </div>
 
-        {/* Center/Right: PROMINENT 2-BUTTON LANGUAGE SWITCHER (हिंदी / मराठी) + Export Button */}
+        {/* Center/Right: PROMINENT 3-BUTTON LANGUAGE SWITCHER (EN / हिंदी / मराठी) + Export Button */}
         <div className="flex items-center space-x-2 shrink-0 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-slate-200/80 pt-1.5 sm:pt-0">
           
-          {/* VISIBLE 2-BUTTON LANGUAGE SWITCHER (हिंदी / मराठी) */}
+          {/* VISIBLE 3-BUTTON LANGUAGE SWITCHER (EN / हिंदी / मराठी) */}
           <div className="flex items-center space-x-1 bg-slate-950/20 p-1 rounded-2xl border border-slate-700/50">
             <button
-              onClick={() => handleSwitchLang('hi')}
-              className={`min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center space-x-1 ${
-                currentLang === 'hi'
+              onClick={() => setLanguage('en')}
+              className={`min-h-[36px] px-2.5 py-1 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center space-x-1 ${
+                language === 'en'
+                  ? 'bg-blue-600 text-white shadow-md scale-105'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <span>🇬🇧 EN</span>
+            </button>
+
+            <button
+              onClick={() => setLanguage('hi')}
+              className={`min-h-[36px] px-2.5 py-1 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center space-x-1 ${
+                language === 'hi'
                   ? 'bg-amber-400 text-slate-950 shadow-md scale-105'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
-              <span>{t('hindiBtn', currentLang)}</span>
+              <span>{t('hindiBtn')}</span>
             </button>
 
             <button
-              onClick={() => handleSwitchLang('mr')}
-              className={`min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center space-x-1 ${
-                currentLang === 'mr'
+              onClick={() => setLanguage('mr')}
+              className={`min-h-[36px] px-2.5 py-1 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center space-x-1 ${
+                language === 'mr'
                   ? 'bg-emerald-600 text-white shadow-md scale-105'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
-              <span>{t('marathiBtn', currentLang)}</span>
+              <span>{t('marathiBtn')}</span>
             </button>
           </div>
 
@@ -108,7 +115,7 @@ export default function Navbar({ currentLang, setCurrentLang, onOpenReportModal,
                 title="Print or Download PDF Report"
               >
                 <FileText className="w-3.5 h-3.5 text-white shrink-0" />
-                <span>अहवाल</span>
+                <span>{t('exportReport')}</span>
               </button>
             )}
           </div>

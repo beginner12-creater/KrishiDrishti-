@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { IndianRupee, TrendingUp, Droplets, ShieldCheck, Star, ArrowUpRight, ChevronLeft, ChevronRight, Layers, Sparkles, X, Sprout, Bug, Sun, CheckCircle, FileText, XCircle } from 'lucide-react';
 
+import { useLanguage } from '../context/LanguageContext';
+
 export default function CropProfitRecommendation({ village, riskMetrics, onSelectCrop, isDarkMode = false }) {
+  const { language, t } = useLanguage();
   const [currentStage, setCurrentStage] = useState(0); // Stage 0 (Crops 1-4) or Stage 1 (Crops 5-8)
   const [activeAdvisoryCropModal, setActiveAdvisoryCropModal] = useState(null); // Selected Crop for Modal Popup
 

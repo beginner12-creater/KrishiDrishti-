@@ -5,9 +5,10 @@ import BioClimaticRiskCard from './BioClimaticRiskCard';
 import FieldTrafficabilityMatrix from './FieldTrafficabilityMatrix';
 import ActionTriggerDisasterProtocols from './ActionTriggerDisasterProtocols';
 import DecadalClimateBaselines from './DecadalClimateBaselines';
-import MandiRatesSection from './MandiRatesSection';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, farmContext, onChangeFarmContext, currentLang = 'mr', isDarkMode = false, selectedCrop: selectedCropProp = null }) {
+export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, farmContext, onChangeFarmContext, isDarkMode = false, selectedCrop: selectedCropProp = null }) {
+  const { language, t } = useLanguage();
   const [selectedCrop, setSelectedCrop] = useState(selectedCropProp || farmContext?.crop || 'Cotton');
   const [cropStageIndex, setCropStageIndex] = useState(0);
   const [liveWeather, setLiveWeather] = useState(null);

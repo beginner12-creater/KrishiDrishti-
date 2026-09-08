@@ -3,9 +3,10 @@ import { Volume2, VolumeX, ShieldAlert, CloudRain, Sun, Sprout, IndianRupee, Che
 import { speakText, stopSpeech, isSpeaking } from '../services/voiceSpeechService';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 import MandiRatesSection from './MandiRatesSection';
-import { t } from '../data/translations';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext, onChangeFarmContext, currentLang = 'hi', isDarkMode = false }) {
+export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext, onChangeFarmContext, isDarkMode = false }) {
+  const { language, t } = useLanguage();
   const [activeScreen, setActiveScreen] = useState('home'); // 'home' | 'weather' | 'advisory' | 'mandi'
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [liveWeather, setLiveWeather] = useState(null);
@@ -40,19 +41,19 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
   const baseRisk = riskMetrics?.overallRiskScore || 68;
   let statusColor = "bg-emerald-600 border-emerald-500 text-white";
   let statusFace = "😊";
-  let statusText = t('safe', currentLang);
-  let statusAudioMsg = t('safeAudio', currentLang);
+  let statusText = t('safe');
+  let statusAudioMsg = t('safeAudio');
 
   if (baseRisk >= 75 || rainProb > 70) {
     statusColor = "bg-red-700 border-red-500 text-white animate-pulseGlow";
     statusFace = "🚨";
-    statusText = t('danger', currentLang);
-    statusAudioMsg = t('dangerAudio', currentLang);
+    statusText = t('danger');
+    statusAudioMsg = t('dangerAudio');
   } else if (baseRisk >= 50 || rainProb > 40) {
     statusColor = "bg-amber-600 border-amber-400 text-white";
     statusFace = "⚠️";
-    statusText = t('caution', currentLang);
-    statusAudioMsg = t('cautionAudio', currentLang);
+    statusText = t('caution');
+    statusAudioMsg = t('cautionAudio');
   }
 
   const handleToggleVoice = (textToSpeak) => {
@@ -60,7 +61,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
       stopSpeech();
       setIsPlayingAudio(false);
     } else {
-      const success = speakText(textToSpeak, currentLang);
+      const success = speakText(textToSpeak, language);
       setIsPlayingAudio(success);
     }
   };
@@ -69,7 +70,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
     if (onChangeFarmContext) {
       onChangeFarmContext({ ...farmContext, crop: cName });
     }
-    speakText(`${cName}`, currentLang);
+    speakText(`${cName}`, language);
   };
 
   return (
@@ -111,7 +112,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                 ) : (
                   <Volume2 className="w-7 h-7 text-slate-950 animate-bounce" />
                 )}
-                <span>{isPlayingAudio ? t('stopVoice', currentLang) : t('listenVoice', currentLang)}</span>
+                <span>{isPlayingAudio ? t('stopVoice') : t('listenVoice')}</span>
               </button>
             </div>
 
@@ -122,7 +123,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
           }`}>
             <span className="text-xs font-black uppercase text-emerald-500 tracking-wider block">
-              🌱 {t('selectCrop', currentLang)}
+              🌱 {t('selectCrop')}
             </span>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -163,7 +164,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             <button
               onClick={() => {
                 setActiveScreen('weather');
-                speakText(`${t('temp', currentLang)} ${temp} C, ${t('rainChance', currentLang)} ${rainProb}%`, currentLang);
+                speakText(`${t('temp')} ${temp} C, ${t('rainChance')} ${rainProb}%`, language);
               }}
               className="w-full min-h-[64px] p-4 rounded-3xl bg-gradient-to-r from-blue-700 to-teal-700 hover:from-blue-600 hover:to-teal-600 text-white font-black text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border border-blue-400"
             >
@@ -172,8 +173,8 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                   🌦️
                 </div>
                 <div className="text-left">
-                  <div className="text-base sm:text-xl font-black">{t('weatherTitle', currentLang)}</div>
-                  <div className="text-xs font-bold opacity-80">{temp}°C • {rainProb}% {t('rainChance', currentLang)}</div>
+                  <div className="text-base sm:text-xl font-black">{t('weatherTitle')}</div>
+                  <div className="text-xs font-bold opacity-80">{temp}°C • {rainProb}% {t('rainChance')}</div>
                 </div>
               </div>
               <ChevronRight className="w-6 h-6 text-white/90" />
@@ -183,7 +184,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             <button
               onClick={() => {
                 setActiveScreen('advisory');
-                speakText(`${crop} ${t('adviceTitle', currentLang)}`, currentLang);
+                speakText(`${crop} ${t('adviceTitle')}`, language);
               }}
               className="w-full min-h-[64px] p-4 rounded-3xl bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border border-emerald-400"
             >
@@ -192,7 +193,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                   🌾
                 </div>
                 <div className="text-left">
-                  <div className="text-base sm:text-xl font-black">{t('adviceTitle', currentLang)}</div>
+                  <div className="text-base sm:text-xl font-black">{t('adviceTitle')}</div>
                   <div className="text-xs font-bold opacity-80">{crop}</div>
                 </div>
               </div>
@@ -203,7 +204,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             <button
               onClick={() => {
                 setActiveScreen('mandi');
-                speakText(`${crop} ${t('mandiTitle', currentLang)}`, currentLang);
+                speakText(`${crop} ${t('mandiTitle')}`, language);
               }}
               className="w-full min-h-[64px] p-4 rounded-3xl bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-500 hover:to-orange-600 text-white font-black text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border border-amber-400"
             >
@@ -212,8 +213,8 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                   💰
                 </div>
                 <div className="text-left">
-                  <div className="text-base sm:text-xl font-black">{t('mandiTitle', currentLang)}</div>
-                  <div className="text-xs font-bold text-amber-200">₹ 8,450 / {t('perQuintal', currentLang)}</div>
+                  <div className="text-base sm:text-xl font-black">{t('mandiTitle')}</div>
+                  <div className="text-xs font-bold text-amber-200">₹ 8,450 / {t('perQuintal')}</div>
                 </div>
               </div>
               <ChevronRight className="w-6 h-6 text-white/90" />
@@ -232,26 +233,26 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             onClick={() => setActiveScreen('home')}
             className="min-h-[44px] px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center space-x-2 cursor-pointer"
           >
-            <span>{t('backHome', currentLang)}</span>
+            <span>{t('backHome')}</span>
           </button>
 
           <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-800 via-teal-800 to-indigo-900 border-4 border-blue-400 text-white text-center space-y-5 shadow-2xl">
             <span className="text-7xl filter drop-shadow-md">🌦️</span>
             <div>
-              <span className="text-xs font-black uppercase text-cyan-300 tracking-wider">{t('weatherTitle', currentLang)} ({vName})</span>
+              <span className="text-xs font-black uppercase text-cyan-300 tracking-wider">{t('weatherTitle')} ({vName})</span>
               <div className="text-5xl sm:text-6xl font-black text-white mt-1 font-mono">{temp}°C</div>
             </div>
 
             <div className="p-4 rounded-2xl bg-black/40 border border-white/20 space-y-1">
-              <div className="text-xs font-black text-cyan-200">☔ {t('rainChance', currentLang)}: {rainProb}%</div>
+              <div className="text-xs font-black text-cyan-200">☔ {t('rainChance')}: {rainProb}%</div>
             </div>
 
             <button
-              onClick={() => speakText(`${t('temp', currentLang)} ${temp} C, ${t('rainChance', currentLang)} ${rainProb}%`, currentLang)}
+              onClick={() => speakText(`${t('temp')} ${temp} C, ${t('rainChance')} ${rainProb}%`, language)}
               className="w-full min-h-[52px] py-3 px-4 rounded-2xl bg-amber-400 text-slate-950 font-black text-base flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
             >
               <Volume2 className="w-6 h-6 text-slate-950" />
-              <span>{t('listenWeatherAudio', currentLang)}</span>
+              <span>{t('listenWeatherAudio')}</span>
             </button>
           </div>
         </div>
@@ -266,14 +267,14 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             onClick={() => setActiveScreen('home')}
             className="min-h-[44px] px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center space-x-2 cursor-pointer"
           >
-            <span>{t('backHome', currentLang)}</span>
+            <span>{t('backHome')}</span>
           </button>
 
           <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-800 via-teal-900 to-slate-900 border-4 border-emerald-400 text-white space-y-4 shadow-2xl">
             <div className="flex items-center space-x-3">
               <span className="text-5xl">🌾</span>
               <div>
-                <span className="text-xs font-black text-emerald-300 uppercase">{t('adviceTitle', currentLang)}</span>
+                <span className="text-xs font-black text-emerald-300 uppercase">{t('adviceTitle')}</span>
                 <h3 className="text-xl sm:text-2xl font-black text-white">{crop}</h3>
               </div>
             </div>
@@ -294,11 +295,11 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             </div>
 
             <button
-              onClick={() => speakText(`${crop} ${t('adviceTitle', currentLang)}`, currentLang)}
+              onClick={() => speakText(`${crop} ${t('adviceTitle')}`, language)}
               className="w-full min-h-[52px] py-3 px-4 rounded-2xl bg-amber-400 text-slate-950 font-black text-base flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
             >
               <Volume2 className="w-6 h-6 text-slate-950" />
-              <span>{t('listenAdviceAudio', currentLang)}</span>
+              <span>{t('listenAdviceAudio')}</span>
             </button>
           </div>
         </div>
@@ -313,13 +314,12 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             onClick={() => setActiveScreen('home')}
             className="min-h-[44px] px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center space-x-2 cursor-pointer"
           >
-            <span>{t('backHome', currentLang)}</span>
+            <span>{t('backHome')}</span>
           </button>
 
           <MandiRatesSection
             village={village}
             selectedCrop={crop}
-            currentLang={currentLang}
             isDarkMode={isDarkMode}
           />
         </div>

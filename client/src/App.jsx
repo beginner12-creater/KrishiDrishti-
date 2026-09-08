@@ -11,19 +11,17 @@ import PrintReportModal from './components/PrintReportModal';
 import WelcomeLanguageModal from './components/WelcomeLanguageModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
-import { t } from './data/translations';
+import { useLanguage } from './context/LanguageContext';
 import { Sprout, RefreshCw, TrendingUp, Volume2, ShieldAlert } from 'lucide-react';
 
 export default function App() {
+  const { language, setLanguage, t } = useLanguage();
+
   const [allVillages, setAllVillages] = useState([]);
   const [hierarchy, setHierarchy] = useState({});
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
   
-  // Persistent Language State (Default Hindi/Marathi)
-  const [currentLang, setCurrentLang] = useState(() => {
-    return localStorage.getItem('krishidrishti_lang') || 'hi';
-  });
   const [showWelcomeLangModal, setShowWelcomeLangModal] = useState(() => {
     return !localStorage.getItem('krishidrishti_lang');
   });
@@ -66,137 +64,102 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // Initial load of village database
+  // Load initial hierarchy & default village (Yavatmal District)
   useEffect(() => {
-    fetchInitialData();
+    let isMounted = true;
+
+    async function initializeData() {
+      try {
+        setLoading(true);
+        const [hData, vList] = await Promise.all([
+          fetchHierarchy(),
+          fetchVillages()
+        ]);
+
+        if (!isMounted) return;
+
+        setHierarchy(hData || {});
+        setAllVillages(vList || []);
+
+        if (vList && vList.length > 0) {
+          const defaultV = vList.find(v => v.villageName?.includes('यवतमाळ') || v.villageName?.includes('Yavatmal')) || vList[0];
+          const fullDetails = await fetchVillageDetails(defaultV.id);
+          if (isMounted) {
+            setSelectedVillage(fullDetails || defaultV);
+            setRiskMetrics(fullDetails?.riskMetrics || null);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to initialize platform data:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    initializeData();
+    return () => { isMounted = false; };
   }, []);
 
-  const fetchInitialData = async () => {
-    setLoading(true);
+  const handleSelectVillage = async (vObj) => {
+    if (!vObj) return;
     try {
-      const hier = await fetchHierarchy();
-      if (hier) setHierarchy(hier);
-
-      const villList = await fetchVillages();
-      if (villList && villList.length > 0) {
-        setAllVillages(villList);
-        loadVillageDetails(villList[0].id);
-      }
+      setLoading(true);
+      const fullDetails = await fetchVillageDetails(vObj.id);
+      setSelectedVillage(fullDetails || vObj);
+      setRiskMetrics(fullDetails?.riskMetrics || null);
     } catch (err) {
-      console.error('Failed to initialize app data:', err);
+      console.error('Error fetching village details:', err);
+      setSelectedVillage(vObj);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load detailed analysis for selected village
-  const loadVillageDetails = async (villageId) => {
-    try {
-      const data = await fetchVillageDetails(villageId);
-      if (data && data.village && data.riskMetrics) {
-        setSelectedVillage(data.village);
-        setRiskMetrics(data.riskMetrics);
-        const pCrop = data.village.primaryCrops ? data.village.primaryCrops[0] : 'Cotton';
-        setSelectedCropForAdvisory(pCrop);
-        setFarmContext(prev => ({ ...prev, crop: pCrop }));
-      }
-    } catch (err) {
-      console.error('Failed to load village risk metrics:', err);
-    }
-  };
-
-  const handleSelectVillage = (villageObj) => {
-    loadVillageDetails(villageObj.id);
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
-  };
-
-  const handleSelectLanguage = (lang) => {
-    setCurrentLang(lang);
-    localStorage.setItem('krishidrishti_lang', lang);
-    setShowWelcomeLangModal(false);
-  };
-
-  // Compute Dynamic Hourly Background Gradient & Hover Animations
-  const getHourlyBackgroundGradient = () => {
-    if (isDarkMode) {
-      if (currentHour >= 5 && currentHour < 8) {
-        return 'bg-gradient-to-br from-amber-950 via-slate-950 to-rose-950 text-slate-100';
-      }
-      if (currentHour >= 8 && currentHour < 17) {
-        return 'bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 text-slate-100';
-      }
-      if (currentHour >= 17 && currentHour < 20) {
-        return 'bg-gradient-to-br from-purple-950 via-slate-950 to-amber-950 text-slate-100';
-      }
-      return 'bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100';
-    } else {
-      if (currentHour >= 5 && currentHour < 8) {
-        return 'bg-gradient-to-br from-amber-100 via-rose-50 to-emerald-50 text-slate-900';
-      }
-      if (currentHour >= 8 && currentHour < 17) {
-        return 'bg-gradient-to-br from-emerald-50 via-teal-50 to-sky-50 text-slate-900';
-      }
-      if (currentHour >= 17 && currentHour < 20) {
-        return 'bg-gradient-to-br from-orange-100 via-purple-50 to-amber-50 text-slate-900';
-      }
-      return 'bg-gradient-to-br from-slate-200 via-indigo-50 to-slate-100 text-slate-900';
-    }
-  };
-
   return (
-    <div className={`min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white transition-colors duration-700 relative overflow-x-hidden ${getHourlyBackgroundGradient()}`}>
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-500 ${
+      isDarkMode
+        ? 'bg-slate-950 text-slate-100'
+        : 'bg-slate-50 text-slate-900'
+    }`}>
       
-      {/* FIRST-TIME WELCOME LANGUAGE SELECTION MODAL */}
+      {/* 1. TOP STICKY NAVBAR WITH PROMINENT 3-BUTTON LANGUAGE SWITCHER */}
+      <Navbar
+        onOpenReportModal={() => setIsReportModalOpen(true)}
+        activeVillage={selectedVillage}
+        isDarkMode={isDarkMode}
+        onToggleTheme={() => setIsDarkMode(prev => !prev)}
+        currentHour={currentHour}
+      />
+
+      {/* WELCOME LANGUAGE SELECTION MODAL (FIRST TIME USERS) */}
       {showWelcomeLangModal && (
         <WelcomeLanguageModal
-          onSelectLanguage={handleSelectLanguage}
+          onSelectLanguage={(lang) => {
+            setLanguage(lang);
+            setShowWelcomeLangModal(false);
+          }}
           isDarkMode={isDarkMode}
         />
       )}
 
-      {/* Dynamic Background Micro Particles / Hover Shimmer */}
-      <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
-        <div className="w-[600px] h-[600px] rounded-full bg-emerald-500/20 blur-3xl absolute -top-40 -left-40 animate-pulse" />
-        <div className="w-[500px] h-[500px] rounded-full bg-teal-500/20 blur-3xl absolute top-1/2 -right-40 animate-float" />
-      </div>
-
-      {/* 1. Minimal Top Header */}
-      <Navbar
-        currentLang={currentLang}
-        setCurrentLang={setCurrentLang}
-        onOpenReportModal={() => setIsReportModalOpen(true)}
-        activeVillage={selectedVillage}
-        isDarkMode={isDarkMode}
-        onToggleTheme={toggleTheme}
-        currentHour={currentHour}
-      />
-
-      {/* 2. Main Minimalist 1-Page Layout */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6 relative z-10">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-6 space-y-6">
         
-        {/* Village Selection Menu */}
+        {/* 2. VILLAGE TELEMETRY & MANDATORY FARM CONTEXT INTAKE */}
         <VillageSelector
-          villages={allVillages}
+          allVillages={allVillages}
           hierarchy={hierarchy}
           selectedVillage={selectedVillage}
           onSelectVillage={handleSelectVillage}
-          currentLang={currentLang}
           isDarkMode={isDarkMode}
         />
 
-        {/* Mandatory Farm Profile Intake Filter Bar */}
         {selectedVillage && (
           <FarmContextIntake
             farmContext={farmContext}
-            onChangeFarmContext={(newCtx) => {
-              setFarmContext(newCtx);
-              setSelectedCropForAdvisory(newCtx.crop);
-            }}
+            onChangeFarmContext={setFarmContext}
+            selectedCrop={selectedCropForAdvisory}
+            onSelectCrop={setSelectedCropForAdvisory}
             isDarkMode={isDarkMode}
-            primaryCrops={selectedVillage.primaryCrops}
           />
         )}
 
@@ -216,7 +179,7 @@ export default function App() {
               isDarkMode={isDarkMode}
             />
 
-            {/* B. MAIN 3 NAVIGATION TABS (SIMPLE VOICE MODE vs AI DECISION ENGINE vs PROFIT ESTIMATOR) */}
+            {/* B. MAIN 3 NAVIGATION TABS */}
             <div className={`p-1.5 rounded-2xl border flex items-center gap-1.5 shadow-md transition-colors duration-300 ${
               isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200'
             }`}>
@@ -229,7 +192,7 @@ export default function App() {
                 }`}
               >
                 <Volume2 className="w-4 h-4 text-slate-950 shrink-0 animate-bounce" />
-                <span className="truncate">{t('voiceMode', currentLang)}</span>
+                <span className="truncate">{t('voiceMode')}</span>
               </button>
 
               <button
@@ -241,7 +204,7 @@ export default function App() {
                 }`}
               >
                 <ShieldAlert className="w-4 h-4 text-emerald-300 shrink-0" />
-                <span className="truncate">{t('decisionMode', currentLang)}</span>
+                <span className="truncate">{t('decisionMode')}</span>
               </button>
 
               <button
@@ -253,7 +216,7 @@ export default function App() {
                 }`}
               >
                 <TrendingUp className="w-4 h-4 text-amber-300 shrink-0" />
-                <span className="truncate">{t('mandiMode', currentLang)}</span>
+                <span className="truncate">{t('mandiMode')}</span>
               </button>
             </div>
 
@@ -264,7 +227,6 @@ export default function App() {
                 riskMetrics={riskMetrics}
                 farmContext={farmContext}
                 onChangeFarmContext={setFarmContext}
-                currentLang={currentLang}
                 isDarkMode={isDarkMode}
               />
             ) : activeTab === 'advisory' ? (
@@ -278,7 +240,6 @@ export default function App() {
                 }}
                 farmContext={farmContext}
                 onChangeFarmContext={setFarmContext}
-                currentLang={currentLang}
                 isDarkMode={isDarkMode}
               />
             ) : (
@@ -290,7 +251,6 @@ export default function App() {
                   setFarmContext(prev => ({ ...prev, crop }));
                   setActiveTab('advisory');
                 }}
-                currentLang={currentLang}
                 isDarkMode={isDarkMode}
               />
             )}
@@ -308,7 +268,6 @@ export default function App() {
       <FloatingAIAssistant
         village={selectedVillage}
         riskMetrics={riskMetrics}
-        currentLang={currentLang}
         isDarkMode={isDarkMode}
       />
 

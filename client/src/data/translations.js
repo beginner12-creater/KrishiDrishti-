@@ -1,118 +1,17 @@
-// Comprehensive Multi-lingual Translation Dictionary for KrishiDrishti AI
-// English Main Word + Side Marathi Translation in Parentheses
+import hiLocale from '../locales/hi.json';
+import mrLocale from '../locales/mr.json';
+import enLocale from '../locales/en.json';
 
 export const TRANSLATIONS = {
-  en: {
-    appTitle: "KrishiDrishti (कृषिदृष्टी)",
-    farmerView: "🌾 Farmer View (शेतकरी माहिती)",
-    fullView: "📊 Full Analytics (पूर्ण माहिती)",
-    selectCropTitle: "Select Your Crop (आपले पीक निवडा):",
-    keyActionsTitle: "Key Actions (महत्त्वाचे उपाय):",
-    adviceFor: "Advisory For (सल्ला)",
-    drought: "Drought Risk",
-    water: "Water Supply",
-    pestRisk: "Pest Risk",
-    rainfall: "Annual Rainfall",
-    safe: "SAFE (सुरक्षित)",
-    high: "HIGH (जास्त)",
-    low: "LOW (कमी)",
-    moderate: "MODERATE (मध्यम)",
-    watering: "Watering Management",
-    soilSpray: "Soil & Fertilizer Spray",
-    insectSpray: "Insect & Pest Spray",
-    cropInsurance: "Crop Insurance Claim",
-    helplineTitle: "Kisan Call Centre Helpline (किसान कॉल सेंटर हेल्पलाइन)",
-    helplineSub: "Free Government Helpline for Farmers (मोफत शासकीय हेल्पलाइन)",
-    callNow: "Call 1800-180-1551 (कॉल करा)",
-    backToFarmerHome: "← Back to Home (मागे जा)",
-    profitCropsTitle: "Profit-Maximizing Crop Recommendations (नफा वाढवणारी पिके)",
-    profitSub: "Suggested high-profit, climate-suited crops (उत्तम उत्पन्नासाठी सुचवलेली पिके)",
-    estNetProfit: "Estimated Net Profit / Acre (अंदाजे निव्वळ नफा):",
-    getAdvisoryGuide: "Get Full Advisory Guide (पूर्ण सल्ला पहा)",
-    waterSavings: "Water Savings (पाणी बचत):",
-    resilience: "Climate Resilience (हवामान सहनशीलता):",
-    searchPlaceholder: "🔍 Search Village, Taluka or District Name (उदा. Sangamner, Baramati, Niphad)...",
-    selectedVillage: "Selected Village (निवडलेले गाव):",
-    quickSelect: "Quick Select (त्वरित निवडा):",
-    chatAiOnline: "Online (ऑनलाइन)",
-    chatPlaceholder: "Ask Krishi Mitr AI any question (उदा. 'Hello', 'Sowing tips', 'Math/Science')...",
-    send: "Send (पाठवा)"
-  },
-  mr: {
-    appTitle: "KrishiDrishti (कृषिदृष्टी)",
-    farmerView: "🌾 Farmer View (शेतकरी माहिती)",
-    fullView: "📊 Full Analytics (पूर्ण माहिती)",
-    selectCropTitle: "Select Your Crop (आपले पीक निवडा):",
-    keyActionsTitle: "Key Actions (महत्त्वाचे उपाय):",
-    adviceFor: "Advisory For (सल्ला)",
-    drought: "Drought Risk (दुष्काळ धोका)",
-    water: "Water Supply (पाणी पातळी)",
-    pestRisk: "Pest Risk (कीड धोका)",
-    rainfall: "Annual Rainfall (वार्षिक पाऊस)",
-    safe: "SAFE (सुरक्षित)",
-    high: "HIGH (जास्त)",
-    low: "LOW (कमी)",
-    moderate: "MODERATE (मध्यम)",
-    watering: "Watering Management (पाणी नियोजन)",
-    soilSpray: "Soil & Fertilizer Spray (खत फवारणी)",
-    insectSpray: "Insect & Pest Spray (कीड नियंत्रण)",
-    cropInsurance: "Crop Insurance Claim (पिक विमा)",
-    helplineTitle: "Kisan Call Centre Helpline (किसान कॉल सेंटर हेल्पलाइन)",
-    helplineSub: "Free Government Helpline for Farmers (मोफत शासकीय हेल्पलाइन)",
-    callNow: "Call 1800-180-1551 (कॉल करा)",
-    backToFarmerHome: "← Back to Home (मागे जा)",
-    profitCropsTitle: "Profit-Maximizing Crop Recommendations (नफा वाढवणारी पिके)",
-    profitSub: "Suggested high-profit, climate-suited crops (उत्तम उत्पन्नासाठी सुचवलेली पिके)",
-    estNetProfit: "Estimated Net Profit / Acre (अंदाजे निव्वळ नफा):",
-    getAdvisoryGuide: "Get Full Advisory Guide (पूर्ण सल्ला पहा)",
-    waterSavings: "Water Savings (पाणी बचत):",
-    resilience: "Climate Resilience (हवामान सहनशीलता):",
-    searchPlaceholder: "🔍 Search Village, Taluka or District Name (उदा. Sangamner, Baramati, Niphad)...",
-    selectedVillage: "Selected Village (निवडलेले गाव):",
-    quickSelect: "Quick Select (त्वरित निवडा):",
-    chatAiOnline: "Online (ऑनलाइन)",
-    chatPlaceholder: "Ask Krishi Mitr AI any question (उदा. 'Hello', 'Sowing tips', 'Math/Science')...",
-    send: "Send (पाठवा)"
-  },
-  hi: {
-    appTitle: "KrishiDrishti (कृषिदृष्टि)",
-    farmerView: "🌾 Farmer View (किसान जानकारी)",
-    fullView: "📊 Full Analytics (पूरी जानकारी)",
-    selectCropTitle: "Select Your Crop (अपनी फसल चुनें):",
-    keyActionsTitle: "Key Actions (मुख्य उपाय):",
-    adviceFor: "Advisory For (सलाह)",
-    drought: "Drought Risk (सूखा जोखिम)",
-    water: "Water Supply (जल स्तर)",
-    pestRisk: "Pest Risk (कीट जोखिम)",
-    rainfall: "Annual Rainfall (वार्षिक बारिश)",
-    safe: "SAFE (सुरक्षित)",
-    high: "HIGH (उच्च)",
-    low: "LOW (कम)",
-    moderate: "MODERATE (मध्यम)",
-    watering: "Watering Management (सिंचाई प्रबंधन)",
-    soilSpray: "Soil & Fertilizer Spray (उर्वरक छिड़काव)",
-    insectSpray: "Insect & Pest Spray (कीट नियंत्रण)",
-    cropInsurance: "Crop Insurance Claim (फसल बीमा)",
-    helplineTitle: "Kisan Call Centre Helpline (किसान कॉल सेंटर हेल्पलाइन)",
-    helplineSub: "Free Government Helpline for Farmers (मुफ्त सरकारी हेल्पलाइन)",
-    callNow: "Call 1800-180-1551 (कॉल करें)",
-    backToFarmerHome: "← Back to Home (वापस जाएं)",
-    profitCropsTitle: "Profit-Maximizing Crop Recommendations (मुनाफा बढ़ाने वाली फसलें)",
-    profitSub: "Suggested high-profit, climate-suited crops (अधिकतम आय के लिए सुझाई गई फसलें)",
-    estNetProfit: "Estimated Net Profit / Acre (अनुमानित शुद्ध लाभ):",
-    getAdvisoryGuide: "Get Full Advisory Guide (पूरा सलाह गाइड देखें)",
-    waterSavings: "Water Savings (पानी की बचत):",
-    resilience: "Climate Resilience (सहनशीलता):",
-    searchPlaceholder: "🔍 Search Village, Taluka or District Name (जैसे Sangamner, Baramati, Niphad)...",
-    selectedVillage: "Selected Village (चयनित गाँव):",
-    quickSelect: "Quick Select (त्वरित चयन):",
-    chatAiOnline: "Online (ऑनलाइन)",
-    chatPlaceholder: "Ask Krishi Mitr AI any question (जैसे 'Hello', 'Sowing tips', 'Math/Science')...",
-    send: "Send (भेजें)"
-  }
+  hi: hiLocale,
+  mr: mrLocale,
+  en: enLocale
 };
 
-export function t(key, lang = 'mr') {
-  const dict = TRANSLATIONS[lang] || TRANSLATIONS['mr'];
-  return dict[key] || TRANSLATIONS['mr'][key] || key;
+export function t(key, lang = 'hi') {
+  const currentDict = TRANSLATIONS[lang] || TRANSLATIONS['hi'];
+  if (currentDict && currentDict[key]) return currentDict[key];
+  if (TRANSLATIONS['mr'] && TRANSLATIONS['mr'][key]) return TRANSLATIONS['mr'][key];
+  if (TRANSLATIONS['en'] && TRANSLATIONS['en'][key]) return TRANSLATIONS['en'][key];
+  return key;
 }

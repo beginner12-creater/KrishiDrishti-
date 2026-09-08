@@ -8,8 +8,10 @@ import CropProfitRecommendation from './components/CropProfitRecommendation';
 import FarmerVoiceHomeView from './components/FarmerVoiceHomeView';
 import FloatingAIAssistant from './components/FloatingAIAssistant';
 import PrintReportModal from './components/PrintReportModal';
+import WelcomeLanguageModal from './components/WelcomeLanguageModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
+import { t } from './data/translations';
 import { Sprout, RefreshCw, TrendingUp, Volume2, ShieldAlert } from 'lucide-react';
 
 export default function App() {
@@ -17,7 +19,15 @@ export default function App() {
   const [hierarchy, setHierarchy] = useState({});
   const [selectedVillage, setSelectedVillage] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
-  const [currentLang, setCurrentLang] = useState('mr'); // Default to Marathi
+  
+  // Persistent Language State (Default Hindi/Marathi)
+  const [currentLang, setCurrentLang] = useState(() => {
+    return localStorage.getItem('krishidrishti_lang') || 'hi';
+  });
+  const [showWelcomeLangModal, setShowWelcomeLangModal] = useState(() => {
+    return !localStorage.getItem('krishidrishti_lang');
+  });
+
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState('Cotton');
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -103,6 +113,12 @@ export default function App() {
     setIsDarkMode(prev => !prev);
   };
 
+  const handleSelectLanguage = (lang) => {
+    setCurrentLang(lang);
+    localStorage.setItem('krishidrishti_lang', lang);
+    setShowWelcomeLangModal(false);
+  };
+
   // Compute Dynamic Hourly Background Gradient & Hover Animations
   const getHourlyBackgroundGradient = () => {
     if (isDarkMode) {
@@ -133,6 +149,14 @@ export default function App() {
   return (
     <div className={`min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white transition-colors duration-700 relative overflow-x-hidden ${getHourlyBackgroundGradient()}`}>
       
+      {/* FIRST-TIME WELCOME LANGUAGE SELECTION MODAL */}
+      {showWelcomeLangModal && (
+        <WelcomeLanguageModal
+          onSelectLanguage={handleSelectLanguage}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
       {/* Dynamic Background Micro Particles / Hover Shimmer */}
       <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
         <div className="w-[600px] h-[600px] rounded-full bg-emerald-500/20 blur-3xl absolute -top-40 -left-40 animate-pulse" />
@@ -205,7 +229,7 @@ export default function App() {
                 }`}
               >
                 <Volume2 className="w-4 h-4 text-slate-950 shrink-0 animate-bounce" />
-                <span className="truncate">किसान आवाज़ मोड (Voice Mode)</span>
+                <span className="truncate">{t('voiceMode', currentLang)}</span>
               </button>
 
               <button
@@ -217,7 +241,7 @@ export default function App() {
                 }`}
               >
                 <ShieldAlert className="w-4 h-4 text-emerald-300 shrink-0" />
-                <span className="truncate">AI Risk Radar (निर्णय मोड)</span>
+                <span className="truncate">{t('decisionMode', currentLang)}</span>
               </button>
 
               <button
@@ -229,7 +253,7 @@ export default function App() {
                 }`}
               >
                 <TrendingUp className="w-4 h-4 text-amber-300 shrink-0" />
-                <span className="truncate">Mandi & Profit (उत्पन्न गणित)</span>
+                <span className="truncate">{t('mandiMode', currentLang)}</span>
               </button>
             </div>
 

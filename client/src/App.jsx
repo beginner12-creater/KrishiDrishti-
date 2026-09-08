@@ -264,6 +264,7 @@ export default function App() {
                 riskMetrics={riskMetrics}
                 farmContext={farmContext}
                 onChangeFarmContext={setFarmContext}
+                currentLang={currentLang}
                 isDarkMode={isDarkMode}
               />
             ) : activeTab === 'advisory' ? (

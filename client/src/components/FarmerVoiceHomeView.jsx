@@ -3,8 +3,9 @@ import { Volume2, VolumeX, ShieldAlert, CloudRain, Sun, Sprout, IndianRupee, Che
 import { speakText, stopSpeech, isSpeaking } from '../services/voiceSpeechService';
 import { fetchLiveWeather } from '../services/realtimeApiService';
 import MandiRatesSection from './MandiRatesSection';
+import { t } from '../data/translations';
 
-export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext, onChangeFarmContext, isDarkMode = false }) {
+export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext, onChangeFarmContext, currentLang = 'hi', isDarkMode = false }) {
   const [activeScreen, setActiveScreen] = useState('home'); // 'home' | 'weather' | 'advisory' | 'mandi'
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [liveWeather, setLiveWeather] = useState(null);
@@ -39,19 +40,19 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
   const baseRisk = riskMetrics?.overallRiskScore || 68;
   let statusColor = "bg-emerald-600 border-emerald-500 text-white";
   let statusFace = "😊";
-  let statusTextHi = "आज मौसम सुरक्षित है (चिंता नहीं)";
-  let statusAudioMsg = `राम राम किसान भाई! ${vName} गाँव में आज मौसम बिल्कुल सुरक्षित है। फसल का सामान्य काम करें।`;
+  let statusText = t('safe', currentLang);
+  let statusAudioMsg = t('safeAudio', currentLang);
 
   if (baseRisk >= 75 || rainProb > 70) {
     statusColor = "bg-red-700 border-red-500 text-white animate-pulseGlow";
     statusFace = "🚨";
-    statusTextHi = "आज भारी खतरा है! (फसल बचाएं)";
-    statusAudioMsg = `राम राम किसान भाई! ${vName} गाँव में आज भारी बारिश और कीट का 84 प्रतिशत खतरा है। कटी फसल को तुरंत प्लास्टिक से ढकें!`;
+    statusText = t('danger', currentLang);
+    statusAudioMsg = t('dangerAudio', currentLang);
   } else if (baseRisk >= 50 || rainProb > 40) {
     statusColor = "bg-amber-600 border-amber-400 text-white";
     statusFace = "⚠️";
-    statusTextHi = "आज सावधान रहें! (हल्की बारिश)";
-    statusAudioMsg = `किसान भाई! ${vName} गाँव में आज हल्की बारिश की संभावना है। खेत में दवाई का छिड़काव रोक दें।`;
+    statusText = t('caution', currentLang);
+    statusAudioMsg = t('cautionAudio', currentLang);
   }
 
   const handleToggleVoice = (textToSpeak) => {
@@ -59,7 +60,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
       stopSpeech();
       setIsPlayingAudio(false);
     } else {
-      const success = speakText(textToSpeak, 'hi');
+      const success = speakText(textToSpeak, currentLang);
       setIsPlayingAudio(success);
     }
   };
@@ -68,7 +69,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
     if (onChangeFarmContext) {
       onChangeFarmContext({ ...farmContext, crop: cName });
     }
-    speakText(`${cName} फसल चुनी गई है`, 'hi');
+    speakText(`${cName}`, currentLang);
   };
 
   return (
@@ -90,7 +91,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
 
             {/* Spoken Headline (Under 6 Words) */}
             <h2 className="text-2xl sm:text-4xl font-black leading-tight tracking-wide font-sans">
-              {statusTextHi}
+              {statusText}
             </h2>
 
             {/* Location & Crop Pill */}
@@ -105,8 +106,12 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                 onClick={() => handleToggleVoice(statusAudioMsg)}
                 className="w-full min-h-[56px] py-3.5 px-6 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-base sm:text-lg flex items-center justify-center space-x-3 shadow-xl active:scale-95 transition-all cursor-pointer"
               >
-                <Volume2 className={`w-7 h-7 text-slate-950 ${isPlayingAudio ? 'animate-bounce' : ''}`} />
-                <span>🔊 आवाज़ में सुनें (Tap to Listen)</span>
+                {isPlayingAudio ? (
+                  <VolumeX className="w-7 h-7 text-slate-950" />
+                ) : (
+                  <Volume2 className="w-7 h-7 text-slate-950 animate-bounce" />
+                )}
+                <span>{isPlayingAudio ? t('stopVoice', currentLang) : t('listenVoice', currentLang)}</span>
               </button>
             </div>
 
@@ -117,7 +122,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
           }`}>
             <span className="text-xs font-black uppercase text-emerald-500 tracking-wider block">
-              🌱 अपनी फसल चुनें (Select Your Crop):
+              🌱 {t('selectCrop', currentLang)}
             </span>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -151,14 +156,14 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
           {/* 3. 3 GIANT 1-TAP NAVIGATION BUTTONS (ONE IDEA PER SCREEN) */}
           <div className="space-y-3 pt-1">
             <span className="text-xs font-black uppercase text-slate-400 tracking-wider block">
-              👇 1-Tap Core Features (एक क्लिक में देखें):
+              👇 1-Tap Core Features:
             </span>
 
             {/* Feature 1: Weather (मौसम हाल) */}
             <button
               onClick={() => {
                 setActiveScreen('weather');
-                speakText(`आज का तापमान ${temp} डिग्री सेल्सियस है। बारिश की संभावना ${rainProb} प्रतिशत है।`, 'hi');
+                speakText(`${t('temp', currentLang)} ${temp} C, ${t('rainChance', currentLang)} ${rainProb}%`, currentLang);
               }}
               className="w-full min-h-[64px] p-4 rounded-3xl bg-gradient-to-r from-blue-700 to-teal-700 hover:from-blue-600 hover:to-teal-600 text-white font-black text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border border-blue-400"
             >
@@ -167,8 +172,8 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                   🌦️
                 </div>
                 <div className="text-left">
-                  <div className="text-base sm:text-xl font-black">1. मौसम हाल (Weather)</div>
-                  <div className="text-xs font-bold opacity-80">{temp}°C • {rainProb}% बारिश का चांस</div>
+                  <div className="text-base sm:text-xl font-black">{t('weatherTitle', currentLang)}</div>
+                  <div className="text-xs font-bold opacity-80">{temp}°C • {rainProb}% {t('rainChance', currentLang)}</div>
                 </div>
               </div>
               <ChevronRight className="w-6 h-6 text-white/90" />
@@ -178,7 +183,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             <button
               onClick={() => {
                 setActiveScreen('advisory');
-                speakText(`आज ${crop} फसल में स्प्रे रोक दें और पानी का निकास साफ़ रखें।`, 'hi');
+                speakText(`${crop} ${t('adviceTitle', currentLang)}`, currentLang);
               }}
               className="w-full min-h-[64px] p-4 rounded-3xl bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border border-emerald-400"
             >
@@ -187,8 +192,8 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                   🌾
                 </div>
                 <div className="text-left">
-                  <div className="text-base sm:text-xl font-black">2. आज की फसल सलाह (Advice)</div>
-                  <div className="text-xs font-bold opacity-80">{crop} फसल बचाव उपाय</div>
+                  <div className="text-base sm:text-xl font-black">{t('adviceTitle', currentLang)}</div>
+                  <div className="text-xs font-bold opacity-80">{crop}</div>
                 </div>
               </div>
               <ChevronRight className="w-6 h-6 text-white/90" />
@@ -198,7 +203,7 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             <button
               onClick={() => {
                 setActiveScreen('mandi');
-                speakText(`आज यवतमाल मंडी में ${crop} का भाव ₹8,450 प्रति कुंतल है।`, 'hi');
+                speakText(`${crop} ${t('mandiTitle', currentLang)}`, currentLang);
               }}
               className="w-full min-h-[64px] p-4 rounded-3xl bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-500 hover:to-orange-600 text-white font-black text-lg flex items-center justify-between shadow-xl active:scale-95 transition-all cursor-pointer border border-amber-400"
             >
@@ -207,8 +212,8 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
                   💰
                 </div>
                 <div className="text-left">
-                  <div className="text-base sm:text-xl font-black">3. आज का मंडी भाव (Mandi Rate)</div>
-                  <div className="text-xs font-bold text-amber-200">₹ 8,450 / कुंतal (Yavatmal APMC)</div>
+                  <div className="text-base sm:text-xl font-black">{t('mandiTitle', currentLang)}</div>
+                  <div className="text-xs font-bold text-amber-200">₹ 8,450 / {t('perQuintal', currentLang)}</div>
                 </div>
               </div>
               <ChevronRight className="w-6 h-6 text-white/90" />
@@ -227,29 +232,26 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             onClick={() => setActiveScreen('home')}
             className="min-h-[44px] px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center space-x-2 cursor-pointer"
           >
-            <span>⬅️ मुख्य स्क्रीन (Back Home)</span>
+            <span>{t('backHome', currentLang)}</span>
           </button>
 
           <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-800 via-teal-800 to-indigo-900 border-4 border-blue-400 text-white text-center space-y-5 shadow-2xl">
             <span className="text-7xl filter drop-shadow-md">🌦️</span>
             <div>
-              <span className="text-xs font-black uppercase text-cyan-300 tracking-wider">आज का मौसम ({vName})</span>
+              <span className="text-xs font-black uppercase text-cyan-300 tracking-wider">{t('weatherTitle', currentLang)} ({vName})</span>
               <div className="text-5xl sm:text-6xl font-black text-white mt-1 font-mono">{temp}°C</div>
             </div>
 
             <div className="p-4 rounded-2xl bg-black/40 border border-white/20 space-y-1">
-              <div className="text-xs font-black text-cyan-200">☔ बारिश की संभावना: {rainProb}%</div>
-              <p className="text-sm font-bold text-white leading-relaxed">
-                "आज दोपहर बाद बारिश हो सकती है। खेत में पानी जमा न होने दें।"
-              </p>
+              <div className="text-xs font-black text-cyan-200">☔ {t('rainChance', currentLang)}: {rainProb}%</div>
             </div>
 
             <button
-              onClick={() => speakText(`आज का तापमान ${temp} डिग्री सेल्सियस है। दोपहर बाद बारिश की संभावना ${rainProb} प्रतिशत है। खेत में पानी का निकास साफ़ रखें।`, 'hi')}
-              className="w-full min-h-[52px] py-3 px-4 rounded-2xl bg-amber-400 text-slate-950 font-black text-base flex items-center justify-center space-x-2 shadow-lg"
+              onClick={() => speakText(`${t('temp', currentLang)} ${temp} C, ${t('rainChance', currentLang)} ${rainProb}%`, currentLang)}
+              className="w-full min-h-[52px] py-3 px-4 rounded-2xl bg-amber-400 text-slate-950 font-black text-base flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
             >
               <Volume2 className="w-6 h-6 text-slate-950" />
-              <span>🔊 आवाज़ में मौसम सुनें</span>
+              <span>{t('listenWeatherAudio', currentLang)}</span>
             </button>
           </div>
         </div>
@@ -264,39 +266,39 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             onClick={() => setActiveScreen('home')}
             className="min-h-[44px] px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center space-x-2 cursor-pointer"
           >
-            <span>⬅️ मुख्य स्क्रीन (Back Home)</span>
+            <span>{t('backHome', currentLang)}</span>
           </button>
 
           <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-800 via-teal-900 to-slate-900 border-4 border-emerald-400 text-white space-y-4 shadow-2xl">
             <div className="flex items-center space-x-3">
               <span className="text-5xl">🌾</span>
               <div>
-                <span className="text-xs font-black text-emerald-300 uppercase">आज की मुख्य सलाह</span>
-                <h3 className="text-xl sm:text-2xl font-black text-white">{crop} फसल बचाव</h3>
+                <span className="text-xs font-black text-emerald-300 uppercase">{t('adviceTitle', currentLang)}</span>
+                <h3 className="text-xl sm:text-2xl font-black text-white">{crop}</h3>
               </div>
             </div>
 
             <div className="space-y-2.5 text-xs font-bold">
               <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-emerald-500/40 text-emerald-200 leading-relaxed flex items-start space-x-2.5">
                 <span className="text-lg">💧</span>
-                <span>1. ड्रिप सिंचाई 45 मिनट शाम को करें।</span>
+                <span>1. ड्रिप सिंचाई शाम को करें।</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-amber-500/40 text-amber-200 leading-relaxed flex items-start space-x-2.5">
                 <span className="text-lg">🐛</span>
-                <span>2. गुलाबी बोंड अळी के लिए 8 फेरोमोन ट्रैप लगाएं।</span>
+                <span>2. फेरोमोन ट्रैप लगाएं।</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-rose-950/80 border border-rose-500/50 text-rose-200 leading-relaxed flex items-start space-x-2.5">
                 <span className="text-lg">❌</span>
-                <span>3. फूल खिलते समय ज़्यादा पानी न दें (फूल गिरते हैं)।</span>
+                <span>3. खेत में पानी न जमा होने दें।</span>
               </div>
             </div>
 
             <button
-              onClick={() => speakText(`आज ${crop} फसल के लिए 3 मुख्य सलाह: पहला, ड्रिप सिंचाई शाम को करें। दूसरा, गुलाबी बोंड अळी के लिए 8 फेरोमोन ट्रैप लगाएं। तीसरा, फूल खिलते समय खेत में ज़्यादा पानी न भरें।`, 'hi')}
-              className="w-full min-h-[52px] py-3 px-4 rounded-2xl bg-amber-400 text-slate-950 font-black text-base flex items-center justify-center space-x-2 shadow-lg"
+              onClick={() => speakText(`${crop} ${t('adviceTitle', currentLang)}`, currentLang)}
+              className="w-full min-h-[52px] py-3 px-4 rounded-2xl bg-amber-400 text-slate-950 font-black text-base flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
             >
               <Volume2 className="w-6 h-6 text-slate-950" />
-              <span>🔊 आवाज़ में सलाह सुनें</span>
+              <span>{t('listenAdviceAudio', currentLang)}</span>
             </button>
           </div>
         </div>
@@ -311,12 +313,13 @@ export default function FarmerVoiceHomeView({ village, riskMetrics, farmContext,
             onClick={() => setActiveScreen('home')}
             className="min-h-[44px] px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-black text-xs flex items-center space-x-2 cursor-pointer"
           >
-            <span>⬅️ मुख्य स्क्रीन (Back Home)</span>
+            <span>{t('backHome', currentLang)}</span>
           </button>
 
           <MandiRatesSection
             village={village}
             selectedCrop={crop}
+            currentLang={currentLang}
             isDarkMode={isDarkMode}
           />
         </div>

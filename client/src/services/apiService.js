@@ -1,6 +1,7 @@
 import { VILLAGES_DATABASE } from '../data/villages.js';
 import { calculateVillageClimateRisk } from './riskEngine.js';
 import { generateAIAdvisory, answerKrishiMitrQuery } from './aiAdvisoryService.js';
+import { getMandiRatesClientFallback } from './mandiClientService.js';
 
 export async function fetchHierarchy() {
   try {
@@ -113,6 +114,25 @@ export async function sendChatMessage(message, villageId) {
   return answerKrishiMitrQuery(message || '', village, riskMetrics);
 }
 
+/**
+ * Fetch Mandi Rates with server route + client fallback
+ */
+export async function fetchMandiRates(state = 'Maharashtra', district = '', commodity = '') {
+  try {
+    const query = new URLSearchParams({ state, district, commodity }).toString();
+    const res = await fetch(`/api/mandi-rates?${query}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.records) return data;
+    }
+  } catch (e) {
+    console.log('[KrishiDrishti AI] Client fallback active for Agmarknet Mandi Rates');
+  }
+
+  // Client-side fallback service call
+  return getMandiRatesClientFallback({ state, district, commodity });
+}
+
 export async function compareVillages(villageIds) {
   try {
     const res = await fetch('/api/compare', {
@@ -128,7 +148,6 @@ export async function compareVillages(villageIds) {
     console.log('[KrishiDrishti AI] Client fallback active for comparison');
   }
 
-  // Client-side comparison fallback
   return villageIds.map(id => {
     const v = VILLAGES_DATABASE.find(item => item.id === id);
     if (!v) return null;

@@ -3,6 +3,7 @@ import cors from 'cors';
 import { VILLAGES_DATABASE } from '../server/data/villages.js';
 import { calculateVillageClimateRisk } from '../server/services/riskEngine.js';
 import { generateAIAdvisory, answerKrishiMitrQuery } from '../server/services/aiAdvisoryService.js';
+import { getMandiRates, checkPriceAlertThreshold } from '../server/services/mandiService.js';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.get('/api/health', (req, res) => {
     activeFeeds: [
       'ISRO Bhuvan Geo-Portal LULC 2026',
       'IMD Agromet Micro-Climate Weather Feed',
+      'Agmarknet Daily Mandi Rates API (data.gov.in)',
       'CGWB Groundwater Aquifer Data',
       'Open-Meteo Satellite Precipitation API'
     ],
@@ -132,7 +134,27 @@ app.post('/api/krishi-mitr/chat', async (req, res) => {
   }
 });
 
-// 7. Real-Time Live SMS Gateway Dispatch Endpoint (Fast2SMS / Twilio / Operator Broadcast Integration)
+// 7. Daily Agmarknet Mandi Rates API Route (/api/mandi-rates)
+app.get('/api/mandi-rates', async (req, res) => {
+  try {
+    const { state, district, commodity, limit } = req.query;
+    const data = await getMandiRates({
+      state: state || 'Maharashtra',
+      district: district || '',
+      commodity: commodity || '',
+      limit: limit ? parseInt(limit) : 50
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch mandi rates',
+      message: err.message
+    });
+  }
+});
+
+// 8. Real-Time Live SMS Gateway Dispatch Endpoint
 app.post('/api/send-sms', async (req, res) => {
   try {
     const { phoneNumber, message, villageName } = req.body;

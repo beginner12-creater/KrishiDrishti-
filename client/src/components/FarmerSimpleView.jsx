@@ -5,6 +5,7 @@ import BioClimaticRiskCard from './BioClimaticRiskCard';
 import FieldTrafficabilityMatrix from './FieldTrafficabilityMatrix';
 import ActionTriggerDisasterProtocols from './ActionTriggerDisasterProtocols';
 import DecadalClimateBaselines from './DecadalClimateBaselines';
+import MandiRatesSection from './MandiRatesSection';
 
 export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, farmContext, onChangeFarmContext, currentLang = 'mr', isDarkMode = false, selectedCrop: selectedCropProp = null }) {
   const [selectedCrop, setSelectedCrop] = useState(selectedCropProp || farmContext?.crop || 'Cotton');
@@ -49,7 +50,6 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, f
   const conditionType = liveWeather?.conditionType || 'sunny';
   const currentTemp = liveWeather?.tempC || 34;
   const rainProb = liveWeather?.rainProbability || 45;
-  const isRainyCondition = conditionType === 'rainy' || rainProb > 50;
 
   const availableCropsCatalog = Array.from(new Set([
     ...(village.primaryCrops || ['Cotton', 'Soybean', 'Sugarcane', 'Onion']),
@@ -200,7 +200,14 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, f
         isDarkMode={isDarkMode}
       />
 
-      {/* 2. OPERATIONAL DECISION & FIELD TRAFFICABILITY MATRIX */}
+      {/* 2. DAILY MANDI RATES & APMC MARKET RADAR */}
+      <MandiRatesSection
+        village={village}
+        selectedCrop={selectedCrop}
+        isDarkMode={isDarkMode}
+      />
+
+      {/* 3. OPERATIONAL DECISION & FIELD TRAFFICABILITY MATRIX */}
       <FieldTrafficabilityMatrix
         village={village}
         riskMetrics={riskMetrics}
@@ -209,7 +216,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, f
         isDarkMode={isDarkMode}
       />
 
-      {/* 3. AGRO-ACTION TRIGGERS & LOSS PREVENTION PROTOCOLS (MITIGATION CHECKLIST) */}
+      {/* 4. AGRO-ACTION TRIGGERS & LOSS PREVENTION PROTOCOLS (MITIGATION CHECKLIST) */}
       <ActionTriggerDisasterProtocols
         village={village}
         riskMetrics={riskMetrics}
@@ -218,7 +225,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, f
         isDarkMode={isDarkMode}
       />
 
-      {/* 4. PHENOLOGY-STAGE CROP SELECTION & ADVISORY WITH WHAT NOT TO DO RULES */}
+      {/* 5. PHENOLOGY-STAGE CROP SELECTION & ADVISORY WITH WHAT NOT TO DO RULES */}
       <div className={`p-4 sm:p-6 rounded-3xl shadow-sm space-y-3.5 border transition-colors duration-500 ${
         isDarkMode
           ? 'bg-slate-900/90 border-slate-800 text-white shadow-xl'
@@ -428,7 +435,7 @@ export default function FarmerSimpleView({ village, riskMetrics, onSelectCrop, f
         </div>
       )}
 
-      {/* 5. DECADAL CLIMATE BASELINES & VARIETAL SUITABILITY TAB */}
+      {/* 6. DECADAL CLIMATE BASELINES & VARIETAL SUITABILITY TAB */}
       <DecadalClimateBaselines
         village={village}
         riskMetrics={riskMetrics}

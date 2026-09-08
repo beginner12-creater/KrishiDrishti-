@@ -1,11 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Search, ChevronDown, Check, Sparkles, Building2 } from 'lucide-react';
-import { t } from '../data/translations';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function VillageSelector({ villages, hierarchy, selectedVillage, onSelectVillage, currentLang = 'mr', isDarkMode = false }) {
+export default function VillageSelector({ villages = [], allVillages = [], hierarchy = {}, selectedVillage = null, onSelectVillage, isDarkMode = false }) {
+  const { language, t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const villageList = Array.isArray(villages) && villages.length > 0
+    ? villages
+    : (Array.isArray(allVillages) ? allVillages : []);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -18,22 +23,24 @@ export default function VillageSelector({ villages, hierarchy, selectedVillage, 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredVillages = villages.filter(v => 
-    v.villageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.districtName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.blockName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.stateName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVillages = villageList.filter(v => 
+    v && v.villageName && (
+      v.villageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (v.districtName && v.districtName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (v.blockName && v.blockName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (v.stateName && v.stateName.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
   );
 
   const handleSelect = (v) => {
-    onSelectVillage(v);
+    if (onSelectVillage) onSelectVillage(v);
     setSearchTerm('');
     setIsOpen(false);
   };
 
   const handleNativeSelectChange = (e) => {
     const vId = e.target.value;
-    const vObj = villages.find(v => v.id === vId);
+    const vObj = villageList.find(v => v.id === vId);
     if (vObj) handleSelect(vObj);
   };
 
@@ -54,7 +61,7 @@ export default function VillageSelector({ villages, hierarchy, selectedVillage, 
           </div>
           <div className="min-w-0 truncate">
             <span className="text-[10px] sm:text-xs font-black text-emerald-500 uppercase tracking-wide block">
-              📍 {t('selectedVillage', currentLang)} (निवडलेले गाव)
+              📍 {t('selectedVillage')}
             </span>
             <div className="flex items-baseline space-x-1.5 min-w-0">
               <h2 className={`text-base sm:text-xl font-black truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -85,9 +92,9 @@ export default function VillageSelector({ villages, hierarchy, selectedVillage, 
               }`}
             >
               <option value="" disabled className={isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
-                -- 📍 Select Village Menu (गाव निवडा) --
+                -- 📍 Select Village Menu --
               </option>
-              {villages.map((v) => (
+              {villageList.map((v) => (
                 <option key={v.id} value={v.id} className={isDarkMode ? 'bg-slate-900 text-white font-extrabold' : 'bg-white text-slate-900 font-extrabold'}>
                   {v.villageName} ({v.blockName}, {v.districtName})
                 </option>
@@ -101,7 +108,7 @@ export default function VillageSelector({ villages, hierarchy, selectedVillage, 
               <Search className="w-4 h-4 absolute left-3 text-slate-400 pointer-events-none" />
               <input
                 type="text"
-                placeholder={t('searchPlaceholder', currentLang)}
+                placeholder="Search village..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -168,7 +175,7 @@ export default function VillageSelector({ villages, hierarchy, selectedVillage, 
         <span className={`text-[11px] font-black shrink-0 flex items-center gap-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
           <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Quick Select Menu:
         </span>
-        {villages.slice(0, 8).map((v) => (
+        {villageList.slice(0, 8).map((v) => (
           <button
             key={v.id}
             onClick={() => handleSelect(v)}

@@ -146,6 +146,7 @@ export default function App() {
         
         {/* 2. VILLAGE TELEMETRY & MANDATORY FARM CONTEXT INTAKE */}
         <VillageSelector
+          villages={allVillages}
           allVillages={allVillages}
           hierarchy={hierarchy}
           selectedVillage={selectedVillage}

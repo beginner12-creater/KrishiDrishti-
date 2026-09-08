@@ -1,15 +1,51 @@
 @import "tailwindcss";
 
+/* KRISHIDRISHTI AI - AGRICULTURAL DESIGN TOKENS */
+:root {
+  /* Grounded Agricultural Color Tokens */
+  --farm-green-primary: #15803d;
+  --farm-green-hover: #166534;
+  --farm-green-light: #f0fdf4;
+  --soil-dark-primary: #0f172a;
+  --soil-dark-card: #1e293b;
+  --earth-amber-accent: #f59e0b;
+  
+  /* WCAG AA Risk & Alert Severity Token Scale */
+  --risk-low-bg: rgba(22, 163, 74, 0.15);
+  --risk-low-border: #16a34a;
+  --risk-low-text: #15803d;
+  
+  --risk-moderate-bg: rgba(217, 119, 6, 0.15);
+  --risk-moderate-border: #d97706;
+  --risk-moderate-text: #b45309;
+
+  --risk-high-bg: rgba(234, 88, 12, 0.15);
+  --risk-high-border: #ea580c;
+  --risk-high-text: #c2410c;
+
+  --risk-critical-bg: rgba(220, 38, 38, 0.18);
+  --risk-critical-border: #dc2626;
+  --risk-critical-text: #991b1b;
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     touch-action: manipulation;
   }
   body {
-    @apply text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white min-h-screen overflow-x-hidden;
+    @apply text-slate-900 font-sans antialiased selection:bg-emerald-600 selection:text-white min-h-screen overflow-x-hidden;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 30%, #f8fafc 70%, #f1f5f9 100%);
     background-attachment: fixed;
+    font-size: 16px; /* Generous 16px base size for rural readability */
+    line-height: 1.5;
+  }
+
+  /* Tap Target Guarantee (Minimum 44px x 44px for Rural Mobile Phones) */
+  button, input, select, a, [role="button"] {
+    min-height: 44px;
+    touch-action: manipulation;
   }
 }
 
@@ -36,8 +72,8 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); }
-  50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.45); border-color: rgba(52, 211, 153, 0.8); }
+  0%, 100% { box-shadow: 0 0 15px rgba(21, 128, 61, 0.2); border-color: rgba(21, 128, 61, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(21, 128, 61, 0.45); border-color: rgba(34, 197, 94, 0.8); }
 }
 
 @keyframes shimmerSlide {
@@ -93,7 +129,7 @@
 
 /* Premium Glassmorphism & Card Styles */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(226, 232, 240, 0.8);
@@ -101,17 +137,17 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-  transform: translateY(-4px) scale(1.005);
-  box-shadow: 0 16px 36px -4px rgba(16, 185, 129, 0.15);
-  border-color: rgba(52, 211, 153, 0.6);
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 16px 36px -4px rgba(21, 128, 61, 0.15);
+  border-color: rgba(34, 197, 94, 0.6);
 }
 
 /* Custom Scrollbars */
@@ -130,7 +166,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #10b981;
+  background: #15803d;
 }
 
 /* Leaflet Map styling */
@@ -148,7 +184,7 @@
   border-radius: 0.75rem;
 }
 
-/* PRINT PDF EXPORT STYLES (FIXES 4 PAGE DUPLICATION ISSUE) */
+/* PRINT PDF EXPORT STYLES */
 @media print {
   @page {
     size: A4 portrait;
@@ -163,13 +199,7 @@
     font-size: 11pt !important;
   }
 
-  /* Hide background elements completely */
-  nav,
-  main,
-  header,
-  footer,
-  .print-hide,
-  .print\:hidden {
+  nav, main, header, footer, .print-hide, .print\:hidden {
     display: none !important;
     height: 0 !important;
     margin: 0 !important;
@@ -177,7 +207,6 @@
     overflow: hidden !important;
   }
 
-  /* Show modal print container cleanly as a single page */
   .fixed {
     position: relative !important;
     inset: auto !important;

@@ -5,11 +5,12 @@ import FarmContextIntake from './components/FarmContextIntake';
 import PlatformImpactFeatures from './components/PlatformImpactFeatures';
 import FarmerSimpleView from './components/FarmerSimpleView';
 import CropProfitRecommendation from './components/CropProfitRecommendation';
+import FarmerVoiceHomeView from './components/FarmerVoiceHomeView';
 import FloatingAIAssistant from './components/FloatingAIAssistant';
 import PrintReportModal from './components/PrintReportModal';
 
 import { fetchHierarchy, fetchVillages, fetchVillageDetails } from './services/apiService';
-import { Sprout, RefreshCw, TrendingUp, CloudRain, Sun, Moon } from 'lucide-react';
+import { Sprout, RefreshCw, TrendingUp, Volume2, ShieldAlert } from 'lucide-react';
 
 export default function App() {
   const [allVillages, setAllVillages] = useState([]);
@@ -20,7 +21,7 @@ export default function App() {
   const [selectedCropForAdvisory, setSelectedCropForAdvisory] = useState('Cotton');
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('advisory'); // 'advisory' | 'profit'
+  const [activeTab, setActiveTab] = useState('voice'); // 'voice' | 'advisory' | 'profit'
 
   // Global Mandatory Farm Context Intake State
   const [farmContext, setFarmContext] = useState({
@@ -191,37 +192,57 @@ export default function App() {
               isDarkMode={isDarkMode}
             />
 
-            {/* B. MAIN DUAL VIEW NAVIGATION TABS (AI DECISION ENGINE vs PROFIT ESTIMATOR) */}
-            <div className={`p-1.5 rounded-2xl border flex items-center gap-2 shadow-xs transition-colors duration-300 ${
-              isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
+            {/* B. MAIN 3 NAVIGATION TABS (SIMPLE VOICE MODE vs AI DECISION ENGINE vs PROFIT ESTIMATOR) */}
+            <div className={`p-1.5 rounded-2xl border flex items-center gap-1.5 shadow-md transition-colors duration-300 ${
+              isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200'
             }`}>
               <button
+                onClick={() => setActiveTab('voice')}
+                className={`flex-1 min-h-[48px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                  activeTab === 'voice'
+                    ? 'bg-amber-500 text-slate-950 shadow-lg scale-105'
+                    : isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                <Volume2 className="w-4 h-4 text-slate-950 shrink-0 animate-bounce" />
+                <span className="truncate">किसान आवाज़ मोड (Voice Mode)</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('advisory')}
-                className={`flex-1 py-2.5 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+                className={`flex-1 min-h-[48px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
                   activeTab === 'advisory'
                     ? 'bg-emerald-600 text-white shadow-md'
                     : isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <Sprout className="w-4 h-4 text-emerald-300 shrink-0" />
-                <span className="truncate">AI Decision Engine (निर्णय प्रणाली)</span>
+                <ShieldAlert className="w-4 h-4 text-emerald-300 shrink-0" />
+                <span className="truncate">AI Risk Radar (निर्णय मोड)</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('profit')}
-                className={`flex-1 py-2.5 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+                className={`flex-1 min-h-[48px] py-2.5 px-3 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
                   activeTab === 'profit'
                     ? 'bg-emerald-600 text-white shadow-md'
                     : isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <TrendingUp className="w-4 h-4 text-amber-300 shrink-0" />
-                <span className="truncate">Crop Profit Estimator (उत्पन्न गणित)</span>
+                <span className="truncate">Mandi & Profit (उत्पन्न गणित)</span>
               </button>
             </div>
 
             {/* C. ACTIVE VIEW TAB RENDERING */}
-            {activeTab === 'advisory' ? (
+            {activeTab === 'voice' ? (
+              <FarmerVoiceHomeView
+                village={selectedVillage}
+                riskMetrics={riskMetrics}
+                farmContext={farmContext}
+                onChangeFarmContext={setFarmContext}
+                isDarkMode={isDarkMode}
+              />
+            ) : activeTab === 'advisory' ? (
               <FarmerSimpleView
                 village={selectedVillage}
                 riskMetrics={riskMetrics}

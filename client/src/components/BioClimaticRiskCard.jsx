@@ -1,7 +1,9 @@
 import React from 'react';
 import { ShieldAlert, Bug, Thermometer, Droplets, AlertTriangle, TrendingDown, IndianRupee, Sparkles, CheckCircle, Flame, RefreshCw } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function BioClimaticRiskCard({ village, riskMetrics, liveWeather, farmContext, isDarkMode = false }) {
+  const { language, t } = useLanguage();
   if (!village || !riskMetrics) {
     return (
       <div className={`p-6 rounded-3xl border animate-pulse space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>

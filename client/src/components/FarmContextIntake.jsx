@@ -1,7 +1,10 @@
 import React from 'react';
-import { Sprout, Calendar, Mountain, Maximize, Sliders, RefreshCw, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Sprout, Calendar, Mountain, Maximize, Sliders } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function FarmContextIntake({ farmContext, onChangeFarmContext, isDarkMode = false, primaryCrops = [] }) {
+  const { t } = useLanguage();
+
   const cropOptions = Array.from(new Set([
     ...(primaryCrops.length > 0 ? primaryCrops : ['Cotton', 'Soybean']),
     'Cotton', 'Soybean', 'Dragon Fruit', 'Pomegranate', 'Turmeric', 'Onion', 'Grapes', 'Bajra', 'Wheat', 'Rice', 'Sugarcane'
@@ -39,19 +42,19 @@ export default function FarmContextIntake({ farmContext, onChangeFarmContext, is
           </div>
           <div>
             <h2 className="text-xs sm:text-base font-black flex items-center gap-2">
-              <span>Mandatory Farm Profile Intake</span>
+              <span>{t('farmProfileTitle')}</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-black uppercase">
-                Active Telemetry Input
+                {t('activeTelemetry')}
               </span>
             </h2>
             <p className={`text-[11px] font-medium ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Dynamic bio-climatic risk, pathogen predictions & financial exposure recompute based on these parameters.
+              {t('farmProfileSubtitle')}
             </p>
           </div>
         </div>
 
         <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/30 font-bold self-start sm:self-auto">
-          ⚡ Recomputing Real-Time Telemetry
+          {t('recomputing')}
         </span>
       </div>
 
@@ -62,7 +65,7 @@ export default function FarmContextIntake({ farmContext, onChangeFarmContext, is
         <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
           <label className="text-[10px] uppercase font-black tracking-wider text-emerald-400 flex items-center gap-1 mb-1.5">
             <Sprout className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Target Crop (पीक निवडा):</span>
+            <span>{t('targetCrop')}</span>
           </label>
           <select
             value={farmContext.crop}
@@ -83,7 +86,7 @@ export default function FarmContextIntake({ farmContext, onChangeFarmContext, is
         <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
           <label className="text-[10px] uppercase font-black tracking-wider text-emerald-400 flex items-center gap-1 mb-1.5">
             <Calendar className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Phenology Stage (पीक वाढीचा टप्पा):</span>
+            <span>{t('phenologyStage')}</span>
           </label>
           <select
             value={farmContext.phenologyStage}
@@ -104,7 +107,7 @@ export default function FarmContextIntake({ farmContext, onChangeFarmContext, is
         <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
           <label className="text-[10px] uppercase font-black tracking-wider text-emerald-400 flex items-center gap-1 mb-1.5">
             <Mountain className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Soil Texture (जमिनीचा प्रकार):</span>
+            <span>{t('soilType')}</span>
           </label>
           <select
             value={farmContext.soilType}
@@ -125,7 +128,7 @@ export default function FarmContextIntake({ farmContext, onChangeFarmContext, is
         <div className={`p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
           <label className="text-[10px] uppercase font-black tracking-wider text-emerald-400 flex items-center gap-1 mb-1.5">
             <Maximize className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Plot Size (क्षेत्रफळ):</span>
+            <span>{t('acreage')}</span>
           </label>
           <select
             value={farmContext.acreage}
@@ -136,7 +139,7 @@ export default function FarmContextIntake({ farmContext, onChangeFarmContext, is
           >
             {acreageOptions.map(a => (
               <option key={a} value={a} className={isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-900 font-bold'}>
-                {a} {a === 1.0 ? 'Acre (एकड)' : 'Acres (एकड)'}
+                {a} Acres
               </option>
             ))}
           </select>

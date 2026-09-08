@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { CloudRain, ShieldCheck, Sprout, Calendar, Bell, LineChart, Star, Sparkles, X, ArrowRight, ChevronLeft, ChevronRight, Thermometer, Droplets, Wind, AlertTriangle, ShieldAlert, Satellite, MapPin, Cpu, CheckCircle, IndianRupee, TrendingUp, TrendingDown, Store, Radio, Send, Smartphone } from 'lucide-react';
 import CellTowerSMSBroadcastModal from './CellTowerSMSBroadcastModal';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function PlatformImpactFeatures({ village, riskMetrics, selectedCrop, isDarkMode = false }) {
+  const { language, t } = useLanguage();
   const [activeModal, setActiveModal] = useState(null); // 'weather' | 'risk' | 'advisory' | 'harvest' | 'alert' | 'historical'
   const [selectedOutcomeTab, setSelectedOutcomeTab] = useState('outcome-alert'); // 'outcome-alert' | 'outcome-loss' | 'outcome-resilience' | 'outcome-planning' | 'outcome-preparedness'
   const [isTowerModalOpen, setIsTowerModalOpen] = useState(false);
@@ -36,11 +38,11 @@ export default function PlatformImpactFeatures({ village, riskMetrics, selectedC
 
   // Dedicated Unique IDs for Expected Outcomes to show Crop-Specific Benefit Reports!
   const outcomes = [
-    { id: 'outcome-alert', text: "Early weather alerts", textMr: "वेळेवर हवामान इशारा", badge: `+35% ${activeCrop} Saved`, icon: Bell, bgGradient: "from-amber-500/10 to-orange-500/10" },
-    { id: 'outcome-loss', text: "Reduced crop losses", textMr: "पिकांचे नुकसान टाळा", badge: `Zero ${activeCrop} Loss`, icon: ShieldCheck, bgGradient: "from-emerald-500/10 to-teal-500/10" },
-    { id: 'outcome-resilience', text: "Climate-resilient farming", textMr: "हवामान-सक्षम शेती", badge: `AI Soil Protection`, icon: Sprout, bgGradient: "from-teal-500/10 to-cyan-500/10" },
-    { id: 'outcome-planning', text: "Improved crop planning", textMr: "उत्तम पीक नियोजन", badge: `₹ ${mandiPriceData.maxPrice} Mandi Rate`, icon: Calendar, bgGradient: "from-blue-500/10 to-indigo-500/10" },
-    { id: 'outcome-preparedness', text: "Better preparedness", textMr: "आपत्ती पूर्वतयारी", badge: `10-Yr PMFBY Safety Net`, icon: LineChart, bgGradient: "from-purple-500/10 to-indigo-500/10" }
+    { id: 'outcome-alert', text: t('earlyWeatherAlerts'), badge: `+35% ${activeCrop} Saved`, icon: Bell, bgGradient: "from-amber-500/10 to-orange-500/10" },
+    { id: 'outcome-loss', text: t('reducedCropLosses'), badge: `Zero ${activeCrop} Loss`, icon: ShieldCheck, bgGradient: "from-emerald-500/10 to-teal-500/10" },
+    { id: 'outcome-resilience', text: t('climateResilient'), badge: `AI Soil Protection`, icon: Sprout, bgGradient: "from-teal-500/10 to-cyan-500/10" },
+    { id: 'outcome-planning', text: t('improvedPlanning'), badge: `₹ ${mandiPriceData.maxPrice} Mandi Rate`, icon: Calendar, bgGradient: "from-blue-500/10 to-indigo-500/10" },
+    { id: 'outcome-preparedness', text: t('disasterPreparedness'), badge: `10-Yr PMFBY Safety Net`, icon: LineChart, bgGradient: "from-purple-500/10 to-indigo-500/10" }
   ];
 
   const features = [

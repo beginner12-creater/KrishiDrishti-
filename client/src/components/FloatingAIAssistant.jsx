@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Bot, MessageSquare, X, Send, Sparkles, User, RefreshCw } from 'lucide-react';
 import { sendChatMessage } from '../services/apiService';
+import { useLanguage } from '../context/LanguageContext';
 
-export default function FloatingAIAssistant({ village, riskMetrics, currentLang = 'mr' }) {
+export default function FloatingAIAssistant({ village, riskMetrics }) {
+  const { language, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
